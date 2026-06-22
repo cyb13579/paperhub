@@ -217,7 +217,7 @@ async function doLogout(){await supa.auth.signOut();U=null;updateNav();toast('�
 
 async function renderHome(){
   view='home';subj='';document.getElementById('hero').style.display='';
-  document.getElementById('main').innerHTML='<div class="sr"><div class="sb"><span style="color:var(--t3);margin-right:6px">🔍</span><input type="text" id="searchInp" placeholder="搜索试卷标题、标签..." onkeydown="if(event.key===\'Enter\')doSearch()"></div><select class="fs" id="searchSubj" onchange="doSearch()"><option value="">全部学科</option>'+['数学','语文','英语','物理','化学','生物','历史','地理','政治','计算机','其他'].map(s=>'<option value="'+s+'">'+s+'</option>').join('')+'</select><select class="fs" id="searchYear" onchange="doSearch()"><option value="">全部年份</option>'+Array.from({length:26},(_,i)=>'<option value="'+(new Date().getFullYear()-i)+'">'+(new Date().getFullYear()-i)+'</option>').join('')+'</select><select class="fs" id="searchSort" onchange="doSearch()"><option value="created_at.desc">🕐 最新</option><option value="downloads.desc">⬇ 下载最多</option><option value="avg_rating.desc">⭐ 评分最高</option></select><button class="btn btn-p btn-s" onclick="doSearch()">搜索</button>'+(U?'<button class="btn btn-o btn-s" onclick="showMine()">📂 我的上传</button>':'')+'</div><div class="sp" id="pills"><span class="pill active" onclick="pickSubj(\'\',this)">全部</span>'+['数学','语文','英语','物理','化学','生物','计算机'].map(s=>'<span class="pill" onclick="pickSubj(\''+s+'\',this)">'+s+'</span>').join('')+'</div><div class="st"><span>📄 资料列表</span><span class="c" id="rc"></span></div><div class="grid" id="grid"></div>';
+  document.getElementById('main').innerHTML='<div class="sr"><div class="sb"><span style="color:var(--t3);margin-right:6px">🔍</span><input type="text" id="searchInp" placeholder="搜索试卷标题、标签..." onkeydown="if(event.key===\'Enter\')doSearch()"></div><select class="fs" id="searchSubj" onchange="doSearch()"><option value="">全部学科</option>'+['数学','语文','英语','物理','化学','生物','历史','地理','政治','计算机','其他'].map(s=>'<option value="'+s+'">'+s+'</option>').join('')+'</select><select class="fs" id="searchYear" onchange="doSearch()"><option value="">全部年份</option>'+Array.from({length:26},(_,i)=>'<option value="'+(new Date().getFullYear()-i)+'">'+(new Date().getFullYear()-i)+'</option>').join('')+'</select><select class="fs" id="searchSort" onchange="doSearch()"><option value="created_at.desc">🕐 最新</option><option value="downloads.desc">⬇ 下载最多</option><option value="avg_rating.desc">⭐ 评分最高</option></select>'+(U?'<button class="btn btn-o btn-s" onclick="showMine()">📂 我的上传</button>':'')+'</div><div class="sp" id="pills"><span class="pill active" onclick="pickSubj(\'\',this)">全部</span>'+['数学','语文','英语','物理','化学','生物','计算机'].map(s=>'<span class="pill" onclick="pickSubj(\''+s+'\',this)">'+s+'</span>').join('')+'</div><div class="st"><span>📄 资料列表</span><span class="c" id="rc"></span></div><div class="grid" id="grid"></div>';
   await loadStats();await loadPapers();
 }
 async function loadStats(){
@@ -234,7 +234,7 @@ async function loadStats(){
 async function loadPapers(){
   const grid=document.getElementById('grid');if(!grid)return;
   const search=(document.getElementById('searchInp')?.value||'').trim().toLowerCase();
-  const s=document.getElementById('searchSubj')?.value||subj||'';
+  const s=subj||'';
   const y=document.getElementById('searchYear')?.value||'';
   const sort=(document.getElementById('searchSort')?.value||'created_at.desc').split('.');
   grid.innerHTML=Array(6).fill(0).map(()=>'<div class="card"><div class="cb"><div style="height:16px;background:#f1f5f9;border-radius:4px;margin-bottom:8px"></div><div style="height:16px;width:60%;background:#f1f5f9;border-radius:4px"></div></div></div>').join('');
@@ -255,8 +255,8 @@ function showAll(){
   const all=window._allPapers||[];const grid=document.getElementById('grid');if(!grid||!all.length)return;
   grid.innerHTML=all.map(p=>'<div class="card" onclick="showDetail(\''+p.id+'\')"><div class="ct '+(SUBS[p.subject]||'ot')+'">'+(EMOJI[p.subject]||'📄')+'</div><div class="cb"><div class="cti">'+esc(p.title||'')+'</div><div class="ctg"><span class="tag">'+esc(p.subject||'')+'</span><span class="tag yr">'+p.year+'</span>'+(p.file_type?'<span class="tag fl">'+p.file_type.toUpperCase()+' '+(p.file_size?(p.file_size/1048576).toFixed(1)+'MB':'')+'</span>':'')+'</div><div class="cf"><span>⬇ '+(p.downloads||0)+'</span><span>⭐ '+(p.rating_count?p.avg_rating.toFixed(1):'-')+'</span><span>'+timeAgo(p.created_at)+'</span></div></div></div>').join('');document.getElementById('rc').textContent='共 '+all.length+' 份';
 }
-function pickSubj(s,el){subj=s;document.querySelectorAll('.pill').forEach(p=>p.classList.remove('active'));if(el)el.classList.add('active');document.getElementById('searchSubj').value=s;loadPapers()}
-function doSearch(){subj='';loadPapers()}
+function pickSubj(s,el){subj=s;document.querySelectorAll('.pill').forEach(p=>p.classList.remove('active'));if(el)el.classList.add('active');loadPapers()}
+let _st=null;function debounceSearch(){clearTimeout(_st);_st=setTimeout(()=>{subj='';loadPapers()},400)};function doSearch(){subj='';loadPapers()}
 
 async function showMine(){
   if(!U){toast('请先登录');return}view='mine';document.getElementById('hero').style.display='none';
@@ -346,5 +346,7 @@ document.addEventListener('DOMContentLoaded',()=>{
 
 initAuth();renderHome();console.log('PaperHub OK');
 </script>
+<button id="backTop" onclick="scrollTo({top:0,behavior:'smooth'})" style="position:fixed;bottom:24px;right:24px;width:44px;height:44px;border-radius:50%;background:var(--p);color:#fff;border:none;font-size:1.2rem;cursor:pointer;display:none;z-index:100;box-shadow:0 4px 12px rgba(0,0,0,.2)">⬆</button>
+<script>window.addEventListener('scroll',()=>{document.getElementById('backTop').style.display=scrollY>500?'block':'none'})</script>
 </body>
 </html>
