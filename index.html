@@ -262,6 +262,7 @@ a{color:var(--primary);text-decoration:none}
       <span class="user-email" id="userInfo"></span>
       <button class="btn btn-white btn-sm" onclick="showUploadModal()" id="uploadNavBtn">+ 上传</button>
       <button class="btn btn-white btn-sm" onclick="showAuthModal()" id="loginBtn">登录</button>
+      <button class="btn btn-white btn-sm" onclick="showSettingsModal()" title="设置">⚙️</button>
       <button class="btn btn-white btn-sm" onclick="logout()" id="logoutBtn" style="display:none">退出</button>
     </div>
   </div>
@@ -290,6 +291,17 @@ a{color:var(--primary);text-decoration:none}
   <div class="modal-actions">
     <button class="btn btn-ghost" id="authToggle" onclick="toggleAuthMode()">去注册</button>
     <button class="btn btn-primary" onclick="doAuth()">登录</button>
+  </div>
+</div></div>
+
+<!-- Settings Modal -->
+<div class="modal-overlay" id="settingsModal"><div class="modal">
+  <h2>⚙️ 设置</h2>
+  <div class="form-group"><label>GitHub Token（直传加速用）</label><input type="password" id="ghTokenInput" placeholder="ghp_... 或 github_pat_..."></div>
+  <p style="font-size:0.75rem;color:var(--text3);margin-bottom:12px">Token 仅存浏览器本地，不上传服务器。留空则使用 Netlify 函数上传。</p>
+  <div class="modal-actions">
+    <button class="btn btn-ghost" onclick="closeSettingsModal()">取消</button>
+    <button class="btn btn-primary" onclick="saveSettings()">保存</button>
   </div>
 </div></div>
 
@@ -325,8 +337,9 @@ a{color:var(--primary);text-decoration:none}
 // ======================================================================
 const SUPABASE_URL = 'https://ugkyvcevycpmcbrqucla.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_L-cWMAfLnZ1jw-S3yscfdQ_B5lmiElK';
-const GITHUB_TOKEN = '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';
 const GITHUB_REPO = 'cyb13579/paperhub';
+function getGHToken() { return localStorage.getItem('gh_token') || ''; }
+function setGHToken(t) { localStorage.setItem('gh_token', t); }
 
 // ── Supabase Client ──
 function createSupabaseClient(url, key) {
@@ -740,6 +753,17 @@ function showUploadModal() {
 
 function closeUploadModal() { document.getElementById('uploadModal').classList.remove('active'); }
 
+function showSettingsModal() {
+  document.getElementById('ghTokenInput').value = getGHToken();
+  document.getElementById('settingsModal').classList.add('active');
+}
+function closeSettingsModal() { document.getElementById('settingsModal').classList.remove('active'); }
+function saveSettings() {
+  setGHToken(document.getElementById('ghTokenInput').value.trim());
+  document.getElementById('settingsModal').classList.remove('active');
+  toast(getGHToken()?'Token 已保存，上传直连 GitHub！':'Token 已清除，将使用 Netlify 函数上传');
+}
+
 // Drag and drop
 document.addEventListener('DOMContentLoaded',()=>{
   const zone = document.getElementById('dropZone');
@@ -777,33 +801,43 @@ async function doUpload() {
   document.getElementById('uploadBtn').disabled = true;
 
   try {
-    // 直接上传到 GitHub（绕过 Netlify，速度更快）
-    const reader = new FileReader();
-    const base64Promise = new Promise((resolve,reject) => {
-      reader.onload = () => resolve(reader.result.split(',')[1]);
-      reader.onerror = reject;
-    });
-    reader.readAsDataURL(file);
-    const base64 = await base64Promise;
+    let downloadUrl;
+    const token = getGHToken();
 
-    const ghRes = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/files/${safePath}`, {
-      method: 'PUT',
-      headers: {
-        'Authorization': `Bearer ${GITHUB_TOKEN}`,
-        'Accept': 'application/vnd.github+json',
-        'Content-Type': 'application/json',
-        'X-GitHub-Api-Version': '2022-11-28',
-      },
-      body: JSON.stringify({ message: `Upload ${safePath}`, content: base64, branch: 'master' })
-    });
+    if (token) {
+      // 直传 GitHub（快）
+      const reader = new FileReader();
+      const base64 = await new Promise((resolve,reject) => {
+        reader.onload = () => resolve(reader.result.split(',')[1]);
+        reader.onerror = reject;
+      });
+      reader.readAsDataURL(file);
 
-    if (!ghRes.ok) {
-      const err = await ghRes.json().catch(()=>({}));
-      throw new Error(err.message || '上传失败');
+      const ghRes = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/files/${safePath}`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Accept': 'application/vnd.github+json',
+          'Content-Type': 'application/json',
+          'X-GitHub-Api-Version': '2022-11-28',
+        },
+        body: JSON.stringify({ message: `Upload ${safePath}`, content: base64, branch: 'master' })
+      });
+
+      if (!ghRes.ok) {
+        const err = await ghRes.json().catch(()=>({}));
+        throw new Error(err.message || '上传失败');
+      }
+      const ghData = await ghRes.json();
+      downloadUrl = ghData.content?.download_url || `https://raw.githubusercontent.com/${GITHUB_REPO}/master/files/${safePath}`;
+    } else {
+      // 兜底：Netlify 函数上传
+      const form = new FormData(); form.append('file',file); form.append('path',safePath);
+      const upRes = await fetch('/api/upload',{method:'POST',body:form});
+      const upData = await upRes.json();
+      if (!upRes.ok) throw new Error(upData.error||'上传失败');
+      downloadUrl = upData.url;
     }
-
-    const ghData = await ghRes.json();
-    const downloadUrl = ghData.content?.download_url || `https://raw.githubusercontent.com/${GITHUB_REPO}/master/files/${safePath}`;
 
     const {error:dbErr} = await supabase.from('papers').insert({
       title,subject,year:parseInt(year),tags,description:'',
@@ -840,6 +874,7 @@ function timeAgo(d) {
 // ===== Modal close on overlay click =====
 document.getElementById('authModal').addEventListener('click',function(e){ if(e.target===this) this.classList.remove('active'); });
 document.getElementById('uploadModal').addEventListener('click',function(e){ if(e.target===this) this.classList.remove('active'); });
+document.getElementById('settingsModal').addEventListener('click',function(e){ if(e.target===this) this.classList.remove('active'); });
 
 // ===== Init =====
 (async function init() {
