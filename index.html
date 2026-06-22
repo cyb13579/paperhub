@@ -656,7 +656,8 @@ async function showDetail(id) {
       ${paper.tags?`<div style="margin:8px 0;font-size:0.85rem;color:var(--text2)">🏷️ ${esc(paper.tags)}</div>`:''}
       ${paper.description?`<div class="detail-desc">${esc(paper.description)}</div>`:''}
       <div class="detail-actions">
-        <button class="btn btn-primary download-btn" data-id="${paper.id}" data-path="${esc(paper.file_path||'')}">⬇ 下载文件</button>
+        <button class="btn btn-primary" onclick="downloadFile('${paper.id}','${paper.file_path||''}')">⬇ 下载</button>
+        ${paper.file_type==='pdf'?`<button class="btn btn-outline" onclick="previewFile('${paper.file_path||''}')">👁 在线预览</button>`:''}
         ${currentUser?`<button class="btn btn-outline btn-sm" onclick="showReviewInput('${paper.id}')">⭐ 评分</button>`:''}
         ${currentUser&&currentUser.id===paper.user_id?`<button class="btn btn-danger btn-sm" onclick="deletePaper('${paper.id}')">🗑 删除</button>`:''}
       </div>
@@ -695,11 +696,25 @@ async function updatePaperRating(paperId) {
   await supabase.from('papers').update({avg_rating:Math.round(avg*10)/10,rating_count:reviews.length}).eq('id',paperId);
 }
 
-async function downloadPaper(paperId, filePath) {
+function downloadFile(paperId, filePath) {
   if (!filePath) { toast('文件路径无效'); return; }
-  await supabase.rpc('increment_downloads',{paper_id:paperId});
-  window.open(filePath,'_blank'); toast('开始下载！');
-  setTimeout(()=>{ if(currentView==='detail') showDetail(paperId); },500);
+  supabase.rpc('increment_downloads',{paper_id:paperId}).catch(()=>{});
+  // Use a hidden link to trigger download
+  const a = document.createElement('a');
+  a.href = filePath;
+  a.download = '';
+  a.target = '_blank';
+  a.rel = 'noopener';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  toast('开始下载！');
+  setTimeout(()=>{ if(currentView==='detail') showDetail(paperId); },800);
+}
+
+function previewFile(filePath) {
+  if (!filePath) { toast('文件路径无效'); return; }
+  window.open(filePath,'_blank');
 }
 
 async function deletePaper(paperId) {
@@ -795,11 +810,7 @@ function timeAgo(d) {
   return Math.floor(days/365)+'年前';
 }
 
-// ===== Event Delegation =====
-document.getElementById('mainContent').addEventListener('click',function(e){
-  const btn = e.target.closest('.download-btn');
-  if (btn) { const id=btn.getAttribute('data-id'), path=btn.getAttribute('data-path'); if(id&&path) downloadPaper(id,path); }
-});
+// ===== Modal close on overlay click =====
 document.getElementById('authModal').addEventListener('click',function(e){ if(e.target===this) this.classList.remove('active'); });
 document.getElementById('uploadModal').addEventListener('click',function(e){ if(e.target===this) this.classList.remove('active'); });
 
