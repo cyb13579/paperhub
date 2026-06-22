@@ -9,46 +9,38 @@
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans SC',sans-serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh}
 a{color:var(--p);text-decoration:none}
-
-.header{background:linear-gradient(135deg,#312e81,#4f46e5,#6366f1);color:#fff}
+.header{background:linear-gradient(135deg,#1e293b,#334155,#475569);color:#fff}
 .hi{max-width:1200px;margin:0 auto;padding:12px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
-.logo{font-size:1.4rem;font-weight:800;color:#fff}.logo span{color:#c7d2fe}
+.logo{font-size:1.4rem;font-weight:800;color:#fff}.logo span{color:#94a3b8}
 .nr{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.ue{font-size:0.82rem;color:#c7d2fe;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-
 .btn{padding:7px 16px;border-radius:20px;font-size:0.85rem;font-weight:500;cursor:pointer;border:none;transition:all .15s;display:inline-flex;align-items:center;gap:4px;white-space:nowrap}
-.btn-w{background:rgba(255,255,255,.2);color:#fff}.btn-w:hover{background:rgba(255,255,255,.35)}
+.btn-w{background:rgba(255,255,255,.15);color:#fff}.btn-w:hover{background:rgba(255,255,255,.25)}
 .btn-p{background:var(--p);color:#fff}.btn-p:hover{background:var(--p2)}
 .btn-o{background:transparent;border:1px solid var(--border);color:var(--text)}.btn-o:hover{background:var(--bg)}
 .btn-g{background:transparent;color:var(--text2)}.btn-g:hover{color:var(--text)}
 .btn-s{padding:4px 11px;font-size:0.76rem;border-radius:14px}
 .btn-d{background:var(--red);color:#fff}
-
 .container{max-width:1200px;margin:0 auto;padding:0 20px}
-.hero{background:linear-gradient(135deg,#312e81,#4f46e5,#6366f1);padding:0 0 32px}
+.hero{background:linear-gradient(135deg,#1e293b,#334155,#475569);padding:0 0 32px}
 .hri{max-width:1200px;margin:0 auto;padding:0 20px}
 .ht{font-size:1.8rem;font-weight:800;color:#fff;padding:16px 0 4px}
-.hs{color:#c7d2fe;font-size:0.9rem;margin-bottom:20px}
+.hs{color:#94a3b8;font-size:0.9rem;margin-bottom:20px}
 .sc{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
-.scd{background:rgba(255,255,255,.12);border-radius:var(--r);padding:16px 18px;color:#fff;border:1px solid rgba(255,255,255,.1)}
-.sv{font-size:1.4rem;font-weight:700}.sl{font-size:0.75rem;color:#c7d2fe}
-
+.scd{background:rgba(255,255,255,.1);border-radius:var(--r);padding:16px 18px;color:#fff;border:1px solid rgba(255,255,255,.08)}
+.sv{font-size:1.4rem;font-weight:700}.sl{font-size:0.75rem;color:#94a3b8}
 .content{padding:20px 0 60px}
 .sr{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
 .sb{flex:1;min-width:200px;display:flex;align-items:center;background:var(--card);border:1px solid var(--border);border-radius:24px;padding:0 14px;transition:all .15s}
 .sb:focus-within{border-color:var(--p);box-shadow:0 0 0 3px rgba(99,102,241,.1)}
 .sb input{flex:1;border:none;padding:11px 0;font-size:0.9rem;outline:none;background:transparent;color:var(--text)}
 .sb input::placeholder{color:var(--text3)}
-.fs{padding:10px 30px 10px 12px;border:1px solid var(--border);border-radius:24px;font-size:0.85rem;outline:none;background:var(--card);color:var(--text);cursor:pointer;appearance:none;background-image:url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2364748b' d='M6 8L1 3h10z'/%3E%3C/svg%3E\");background-repeat:no-repeat;background-position:right 10px center}
+.fs{padding:10px 30px 10px 12px;border:1px solid var(--border);border-radius:24px;font-size:0.85rem;outline:none;background:var(--card);color:var(--text);cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2364748b' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center}
 .fs:focus{border-color:var(--p);outline:none}
-
 .sp{display:flex;gap:5px;margin-bottom:16px;flex-wrap:wrap}
 .pill{padding:5px 14px;border-radius:20px;font-size:0.8rem;font-weight:500;cursor:pointer;border:1px solid var(--border);background:var(--card);color:var(--text2);transition:all .12s;white-space:nowrap}
 .pill.active,.pill:hover{background:var(--p);color:#fff;border-color:var(--p)}
-
 .st{font-size:1rem;font-weight:700;margin:16px 0 10px;display:flex;justify-content:space-between}
 .st .c{font-size:0.8rem;color:var(--text3);font-weight:400}
-
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:12px;margin-bottom:20px}
 .card{background:var(--card);border-radius:var(--r);border:1px solid var(--border);overflow:hidden;transition:all .15s;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,.06)}
 .card:hover{transform:translateY(-1px);box-shadow:0 6px 24px rgba(0,0,0,.07);border-color:#c7d2fe}
@@ -60,12 +52,7 @@ a{color:var(--p);text-decoration:none}
 .tag{padding:2px 9px;border-radius:12px;font-size:0.7rem;font-weight:500;background:#eef2ff;color:var(--p)}
 .tag.yr{background:#fef3c7;color:#92400e}.tag.fl{background:#fee2e2;color:#991b1b}
 .cf{display:flex;align-items:center;justify-content:space-between;font-size:0.76rem;color:var(--text3);padding-top:8px;border-top:1px solid var(--border)}
-
 .lm{text-align:center;padding:16px}
-.pg{display:flex;gap:6px;justify-content:center}
-.pg button{width:34px;height:34px;border-radius:50%;border:1px solid var(--border);background:var(--card);cursor:pointer;font-size:0.82rem}
-.pg button.active{background:var(--p);color:#fff;border-color:var(--p)}
-
 .empty{text-align:center;padding:60px 20px;color:var(--text2)}.empty .ic{font-size:3rem;margin-bottom:10px}
 
 .mo{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;align-items:center;justify-content:center}
@@ -96,7 +83,6 @@ a{color:var(--p);text-decoration:none}
 
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1e293b;color:#fff;padding:10px 22px;border-radius:30px;font-size:0.85rem;z-index:300;opacity:0;transition:opacity .2s;pointer-events:none}
 .toast.show{opacity:1}
-
 @media(max-width:768px){.sc{grid-template-columns:repeat(2,1fr)}.grid{grid-template-columns:1fr}.sr{flex-direction:column}.dc{padding:16px}.fr{flex-direction:column}}
 </style>
 </head>
@@ -105,305 +91,219 @@ a{color:var(--p);text-decoration:none}
 <header class="header"><div class="hi">
 <a href="#" class="logo" onclick="goHome()">📚 Paper<span>Hub</span></a>
 <div class="nr">
-<span class="ue" id="userInfo"></span>
 <button class="btn btn-w btn-s" onclick="showUploadModal()">+ 上传</button>
-<button class="btn btn-w btn-s" onclick="showSettingsModal()">⚙️</button>
-<button class="btn btn-w btn-s" onclick="showAuthModal()" id="loginBtn">登录</button>
-<button class="btn btn-w btn-s" onclick="logout()" id="logoutBtn" style="display:none">退出</button>
+<button class="btn btn-w btn-s" onclick="showTokenModal()">⚙️ 设置Token</button>
 </div>
 </div></header>
 
 <div class="hero" id="heroSection"><div class="hri">
 <div class="ht">知识共享，从这里开始</div>
-<div class="hs">上传试卷、搜索资料、交流学习</div>
+<div class="hs">纯 GitHub 驱动 — 零积分、无限存储、永久免费</div>
 <div class="sc">
 <div class="scd"><div class="sv" id="hTotal">-</div><div class="sl">资料总数</div></div>
 <div class="scd"><div class="sv" id="hDownloads">-</div><div class="sl">累计下载</div></div>
 <div class="scd"><div class="sv" id="hUsers">-</div><div class="sl">贡献用户</div></div>
-<div class="scd"><div class="sv">11</div><div class="sl">涵盖学科</div></div>
+<div class="scd"><div class="sv" id="hStorage">-</div><div class="sl">存储用量</div></div>
 </div>
 </div></div>
 
 <div class="container content" id="mainContent"></div>
 
-<div class="mo" id="settingsModal"><div class="modal">
-<h2>⚙️ 设置</h2>
-<div class="fg"><label>GitHub Token（解锁无限存储）</label><input type="password" id="ghTokenInput" placeholder="ghp_...或 github_pat_..."></div>
-<p style="font-size:0.75rem;color:var(--text3);margin-bottom:12px">Token 仅存浏览器本地。设置后上传文件自动镜像到 GitHub + jsDelivr CDN，突破 1GB 限制。</p>
-<div class="ma"><button class="btn btn-g" onclick="document.getElementById('settingsModal').classList.remove('active')">取消</button><button class="btn btn-p" onclick="saveSettings()">保存</button></div>
-</div></div>
-
-<div class="mo" id="authModal"><div class="modal">
-<h2 id="authTitle">登录</h2>
-<div class="fg"><label>邮箱</label><input type="email" id="authEmail" placeholder="your@email.com"></div>
-<div class="fg"><label>密码（至少6位）</label><input type="password" id="authPassword" placeholder="···"></div>
-<div class="ma"><button class="btn btn-g" id="authToggle" onclick="toggleAuthMode()">去注册</button><button class="btn btn-p" onclick="doAuth()">登录</button></div>
+<div class="mo" id="tokenModal"><div class="modal">
+<h2>⚙️ GitHub Token</h2>
+<div class="fg"><label>Personal Access Token</label><input type="password" id="tokenInput" placeholder="ghp_...或 github_pat_..."></div>
+<p style="font-size:0.75rem;color:var(--text3);margin-bottom:12px">上传文件需要 Token。Token 仅存浏览器本地。去 <a href="https://github.com/settings/tokens" target="_blank">github.com/settings/tokens</a> 创建 classic token，勾选 <b>repo</b> 权限。</p>
+<div class="ma"><button class="btn btn-g" onclick="document.getElementById('tokenModal').classList.remove('active')">取消</button><button class="btn btn-p" onclick="saveToken()">保存</button></div>
 </div></div>
 
 <div class="mo" id="uploadModal"><div class="modal">
 <h2>📤 上传资料</h2>
+<div class="fg"><label>你的昵称</label><input type="text" id="upUser" placeholder="你的名字，显示在资料上"></div>
 <div class="fg"><label>标题</label><input type="text" id="upTitle" placeholder="例如：2024年高考数学真题" maxlength="100"></div>
 <div class="fr"><div class="fg"><label>学科</label><select id="upSubject"><option value="数学">数学</option><option value="语文">语文</option><option value="英语">英语</option><option value="物理">物理</option><option value="化学">化学</option><option value="生物">生物</option><option value="历史">历史</option><option value="地理">地理</option><option value="政治">政治</option><option value="计算机">计算机</option><option value="其他">其他</option></select></div>
 <div class="fg"><label>年份</label><select id="upYear"><script>for(let y=new Date().getFullYear();y>=2000;y--)document.write(`<option value="${y}">${y}</option>`);</script></select></div></div>
 <div class="fg"><label>标签（逗号分隔）</label><input type="text" id="upTags" placeholder="高考,真题,全国卷"></div>
 <div class="fg"><label>文件（最大100MB）</label><div class="uz" id="dropZone" onclick="document.getElementById('upFile').click()"><div class="ic">📁</div><div class="hi">拖拽文件到此处，或<strong>点击选择</strong></div><div style="font-size:0.75rem;color:var(--text3);margin-top:4px" id="fileInfo"></div></div><input type="file" id="upFile" accept=".pdf,.jpg,.jpeg,.png,.zip,.doc,.docx,.ppt,.pptx" style="display:none"></div>
-<div class="ma"><button class="btn btn-g" onclick="closeUploadModal()">取消</button><button class="btn btn-p" onclick="doUpload()" id="uploadBtn">上传</button></div>
+<div class="ma"><button class="btn btn-g" onclick="document.getElementById('uploadModal').classList.remove('active')">取消</button><button class="btn btn-p" onclick="doUpload()" id="uploadBtn">上传</button></div>
 </div></div>
 
 <div class="toast" id="toast"></div>
 
 <script>
-const SUPABASE_URL='https://ugkyvcevycpmcbrqucla.supabase.co';
-const SUPABASE_KEY='sb_publishable_L-cWMAfLnZ1jw-S3yscfdQ_B5lmiElK';
+const REPO='cyb13579/paperhub';
+const CDN='https://cdn.jsdelivr.net/gh/'+REPO+'@master';
+const DATA_URL=CDN+'/data.json';
 
-// Supabase Client (pure fetch)
-function mkClient(url,key){
-  let session=null,listeners=[];
-  function jh(){return{'apikey':key,'Authorization':'Bearer '+key,'Content-Type':'application/json'}}
-  function ah(){const h={'apikey':key};if(session?.access_token)h.Authorization='Bearer '+session.access_token;else h.Authorization='Bearer '+key;return h}
-  function notify(){const s=session?{user:session.user}:null;listeners.forEach(f=>f('CHANGE',s))}
-
-  const auth={
-    async getSession(){try{const s=localStorage.getItem('sb');if(s)session=JSON.parse(s)}catch{}return{data:{session}}},
-    async signUp({email,password}){
-      const r=await fetch(url+'/auth/v1/signup',{method:'POST',headers:jh(),body:JSON.stringify({email,password})});
-      const d=await r.json().catch(()=>({}));if(!r.ok)return{error:{message:d.msg||r.statusText}};
-      if(d.session){session={access_token:d.session.access_token,user:d.user||d.session.user};localStorage.setItem('sb',JSON.stringify(session));notify();return{data:{session,user:session.user},error:null}}
-      return{data:d,error:null}
-    },
-    async signInWithPassword({email,password}){
-      const r=await fetch(url+'/auth/v1/token?grant_type=password',{method:'POST',headers:jh(),body:JSON.stringify({email,password})});
-      const d=await r.json().catch(()=>({}));if(!r.ok)return{error:{message:d.error_description||d.msg||'登录失败'}};
-      session={access_token:d.access_token,user:d.user};localStorage.setItem('sb',JSON.stringify(session));notify();
-      return{data:{session,user:d.user},error:null}
-    },
-    async signOut(){if(session?.access_token)await fetch(url+'/auth/v1/logout',{method:'POST',headers:{...jh(),Authorization:'Bearer '+session.access_token}}).catch(()=>{});session=null;localStorage.removeItem('sb');notify();return{error:null}},
-    onAuthStateChange(fn){listeners.push(fn)}
-  };
-
-  const storage={from(b){return{
-    async upload(fp,file){const fd=new FormData();fd.append('file',file);const h={'apikey':key,'Authorization':'Bearer '+key};if(session?.access_token)h.Authorization='Bearer '+session.access_token;const r=await fetch(url+'/storage/v1/object/'+b+'/'+fp,{method:'POST',headers:h,body:fd});if(!r.ok){const e=await r.json().catch(()=>({}));return{error:{message:e.error||e.message||'上传失败'}}}return{data:await r.json().catch(()=>null),error:null}},
-    getPublicUrl(fp){return{data:{publicUrl:url+'/storage/v1/object/public/'+b+'/'+fp}}}
-  }}};
-
-  function from(table){
-    let q={table,method:'GET',filters:[],params:{},body:null,cols:'*',single:false,count:false};
-    const chain={
-      select(cols,opts){q.cols=cols||'*';if(opts?.count)q.count=true;return this},
-      insert(body){q.method='POST';q.body=body;return this},
-      delete(){q.method='DELETE';return this},
-      update(body){q.method='PATCH';q.body=body;return this},
-      eq(f,v){q.filters.push([f,'eq',v]);return this},
-      ilike(f,v){q.filters.push([f,'ilike',v]);return this},
-      order(f,opts){q.params.order=f+'.'+(opts?.ascending===false?'desc':'asc');return this},
-      limit(n){q.params.limit=n;return this},
-      range(a,b){q.params.offset=a;q.params.limit=b-a+1;return this},
-      single(){q.single=true;return this},
-      async then(resolve){
-        try{
-          const p=new URLSearchParams();
-          for(const[k,v]of Object.entries(q.params))p.set(k,v);
-          for(const[f,op,v]of q.filters)p.set(f,op+'.'+encodeURIComponent(v));
-          if(q.cols&&q.cols!=='*')p.set('select',q.cols);
-          const h=ah();
-          if(q.method!=='GET'&&q.method!=='DELETE'){h['Content-Type']='application/json';if(q.method==='POST')h['Prefer']='return=representation'}
-          if(q.count)h['Prefer']=(h['Prefer']?h['Prefer']+',':'')+'count=exact';
-          const opts={method:q.method,headers:h};if(q.body)opts.body=JSON.stringify(q.body);
-          const ps=p.toString();const r=await fetch(ps?url+'/rest/v1/'+q.table+'?'+ps:url+'/rest/v1/'+q.table,opts);
-          if(!r.ok){resolve({data:null,error:{message:await r.text().catch(()=>r.statusText)}});return}
-          let data=r.status!==204?await r.json():[];if(!Array.isArray(data))data=[data];if(q.single)data=data[0]||null;
-          const cnt=r.headers.get('content-range')?.split('/')?.pop();
-          resolve({data,error:null,count:cnt?parseInt(cnt):(Array.isArray(data)?data.length:0)});
-        }catch(e){resolve({data:null,error:{message:e.message}})}
-      }
-    };return chain
-  }
-
-  async function rpc(fn,params){const h=ah();h['Content-Type']='application/json';const r=await fetch(url+'/rest/v1/rpc/'+fn,{method:'POST',headers:h,body:JSON.stringify(params)});return r.ok?{data:null,error:null}:{error:{message:await r.text().catch(()=>'RPC error')}}}
-  return{auth,from,storage,rpc}
-}
-
-const supabase=mkClient(SUPABASE_URL,SUPABASE_KEY);
-
-let currentUser=null,currentView='home',currentPage=0,currentSubject='';
-const PAGE_SIZE=12;
-
-async function checkAuth(){const{data:{session}}=await supabase.auth.getSession();currentUser=session?.user||null;updateAuthUI();return currentUser}
-supabase.auth.onAuthStateChange((_e,session)=>{currentUser=session?.user||null;updateAuthUI();if(currentView==='home')renderHome()});
-
-function updateAuthUI(){
-  document.getElementById('loginBtn').style.display=currentUser?'none':'';
-  document.getElementById('logoutBtn').style.display=currentUser?'':'none';
-  document.getElementById('userInfo').textContent=currentUser?.email||'';
-}
-
-function showAuthModal(){
-  document.getElementById('authTitle').textContent='登录';document.getElementById('authToggle').textContent='去注册';
-  document.getElementById('authEmail').value='';document.getElementById('authPassword').value='';
-  document.getElementById('authModal').classList.add('active');document.getElementById('authModal')._mode='login';
-}
-function toggleAuthMode(){
-  const m=document.getElementById('authModal');
-  if(m._mode==='login'){m._mode='signup';document.getElementById('authTitle').textContent='注册';document.getElementById('authToggle').textContent='去登录'}
-  else{m._mode='login';document.getElementById('authTitle').textContent='登录';document.getElementById('authToggle').textContent='去注册'}
-}
-async function doAuth(){
-  const e=document.getElementById('authEmail').value.trim(),p=document.getElementById('authPassword').value;
-  if(!e||!p){toast('请填写邮箱和密码');return}
-  const m=document.getElementById('authModal');let r;
-  if(m._mode==='signup'){r=await supabase.auth.signUp({email:e,password:p});if(r.error){toast('注册失败: '+r.error.message);return};if(r.data?.session){toast('注册成功！')}else{toast('注册成功！正在登录...');r=await supabase.auth.signInWithPassword({email:e,password:p});if(r.error){toast('请检查邮箱确认后登录');return}}}
-  else{r=await supabase.auth.signInWithPassword({email:e,password:p});if(r.error){toast('登录失败: '+r.error.message);return};toast('登录成功！')}
-  document.getElementById('authModal').classList.remove('active');renderHome();
-}
-async function logout(){await supabase.auth.signOut();toast('已退出');renderHome()}
-
-function showSettingsModal(){document.getElementById('ghTokenInput').value=localStorage.getItem('gh_token')||'';document.getElementById('settingsModal').classList.add('active')}
-function saveSettings(){localStorage.setItem('gh_token',document.getElementById('ghTokenInput').value.trim());document.getElementById('settingsModal').classList.remove('active');toast('设置已保存！'+(localStorage.getItem('gh_token')?'上传将自动镜像到GitHub':'未填Token，仅用Supabase存储'))}
-
+function getToken(){return localStorage.getItem('gh_token')||''}
 function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2500)}
 
+// Settings
+function showTokenModal(){document.getElementById('tokenInput').value=getToken();document.getElementById('tokenModal').classList.add('active')}
+function saveToken(){localStorage.setItem('gh_token',document.getElementById('tokenInput').value.trim());document.getElementById('tokenModal').classList.remove('active');toast(getToken()?'Token 已保存！可以上传了':'Token 已清除')}
+
+// State
+let papers=[],reviews=[],currentView='home',currentSubject='';
+
+// Load data
+async function loadData(){
+  try{
+    const r=await fetch(DATA_URL+'?t='+Date.now());
+    if(!r.ok)throw new Error('load failed');
+    const d=await r.json();
+    papers=d.papers||[];reviews=d.reviews||[];
+  }catch(e){
+    papers=[];reviews=[];
+    document.getElementById('hTotal').textContent='加载中...';
+  }
+}
+
+// Save data to GitHub
+async function saveData(){
+  const token=getToken();if(!token)return;
+  const content=btoa(unescape(encodeURIComponent(JSON.stringify({papers,reviews},null,2))));
+  try{
+    // Get current SHA
+    const r1=await fetch('https://api.github.com/repos/'+REPO+'/contents/data.json',{headers:{'Authorization':'Bearer '+token,'Accept':'application/vnd.github+json'}});
+    const d1=r1.ok?await r1.json():{};
+    const sha=d1.sha||null;
+    const body=JSON.stringify({message:'Update data',content,branch:'master'});
+    // PUT with SHA to avoid conflicts
+    await fetch('https://api.github.com/repos/'+REPO+'/contents/data.json',{
+      method:'PUT',
+      headers:{'Authorization':'Bearer '+token,'Accept':'application/vnd.github+json','Content-Type':'application/json'},
+      body:sha?JSON.stringify({message:'Update data',content,branch:'master',sha}):body
+    });
+    // Clear CDN cache
+    await fetch(DATA_URL+'?t='+Date.now()).catch(()=>{});
+  }catch(e){console.error('Save failed:',e)}
+}
+
+// Home
 async function renderHome(){
-  currentView='home';currentPage=0;currentSubject='';
-  document.getElementById('authModal')?.classList.remove('active');document.getElementById('uploadModal')?.classList.remove('active');
-  document.getElementById('heroSection').style.display='';updateAuthUI();
-  document.getElementById('mainContent').innerHTML='<div class="sr"><div class="sb"><span style="color:var(--text3);margin-right:6px">🔍</span><input type="text" id="searchInput" placeholder="搜索试卷标题、学科..." onkeydown="if(event.key===\'Enter\')doSearch()"></div><select class="fs" id="searchSubject" onchange="doSearch()"><option value="">全部学科</option>'+['数学','语文','英语','物理','化学','生物','历史','地理','政治','计算机','其他'].map(s=>'<option value="'+s+'">'+s+'</option>').join('')+'</select><select class="fs" id="searchYear" onchange="doSearch()"><option value="">全部年份</option>'+Array.from({length:new Date().getFullYear()-1999},(_,i)=>'<option value="'+(new Date().getFullYear()-i)+'">'+(new Date().getFullYear()-i)+'</option>').join('')+'</select><button class="btn btn-p btn-s" onclick="doSearch()">搜索</button>'+(currentUser?'<button class="btn btn-o btn-s" onclick="showMyPapers()">📂 我的上传</button>':'')+'</div><div class="sp" id="subjectPills"><span class="pill active" onclick="filterSubject(\'\',this)">全部</span>'+['数学','语文','英语','物理','化学','生物','计算机'].map(s=>'<span class="pill" onclick="filterSubject(\''+s+'\',this)">'+s+'</span>').join('')+'</div><div class="st"><span>📄 资料列表</span><span class="c" id="resultCount"></span></div><div class="grid" id="paperGrid"></div><div class="lm" id="loadMore"></div>';
-  await loadStats();await loadPapers();
+  currentView='home';currentSubject='';
+  document.getElementById('heroSection').style.display='';
+  document.getElementById('mainContent').innerHTML='<div class="sr"><div class="sb"><span style="color:var(--text3);margin-right:6px">🔍</span><input type="text" id="searchInput" placeholder="搜索试卷..." onkeydown="if(event.key===\'Enter\')doSearch()"></div><select class="fs" id="searchSubject" onchange="doSearch()"><option value="">全部学科</option>'+['数学','语文','英语','物理','化学','生物','历史','地理','政治','计算机','其他'].map(s=>'<option value="'+s+'">'+s+'</option>').join('')+'</select><select class="fs" id="searchYear" onchange="doSearch()"><option value="">全部年份</option>'+Array.from({length:26},(_,i)=>'<option value="'+(new Date().getFullYear()-i)+'">'+(new Date().getFullYear()-i)+'</option>').join('')+'</select><button class="btn btn-p btn-s" onclick="doSearch()">搜索</button></div><div class="sp" id="subjectPills"><span class="pill active" onclick="filterSubject(\'\',this)">全部</span>'+['数学','语文','英语','物理','化学','生物','计算机'].map(s=>'<span class="pill" onclick="filterSubject(\''+s+'\',this)">'+s+'</span>').join('')+'</div><div class="st"><span>📄 资料列表</span><span class="c" id="resultCount"></span></div><div class="grid" id="paperGrid"></div>';
+  await loadData();
+  renderPapers();
 }
 
-async function loadStats(){
-  try{const{count:t}=await supabase.from('papers').select('id',{count:'exact'}).limit(1);document.getElementById('hTotal').textContent=t??'0'}catch{}
-  try{const{data:all}=await supabase.from('papers').select('downloads,user_id').limit(500);if(all){document.getElementById('hDownloads').textContent=all.reduce((s,p)=>s+(p.downloads||0),0).toLocaleString();document.getElementById('hUsers').textContent=new Set(all.map(p=>p.user_id).filter(Boolean)).size+''}}catch{}
-}
+function filterSubject(s,el){currentSubject=s;document.querySelectorAll('.pill').forEach(p=>p.classList.remove('active'));if(el)el.classList.add('active');const sel=document.getElementById('searchSubject');if(sel)sel.value=s;renderPapers()}
+function doSearch(){currentSubject='';renderPapers()}
 
-async function loadPapers(reset=true){
-  if(reset)currentPage=0;
-  const grid=document.getElementById('paperGrid');if(!grid)return;
-  const search=(document.getElementById('searchInput')?.value||'').trim();
+function renderPapers(){
+  // Stats
+  document.getElementById('hTotal').textContent=papers.length;
+  document.getElementById('hDownloads').textContent=papers.reduce((s,p)=>s+(p.downloads||0),0).toLocaleString();
+  document.getElementById('hUsers').textContent=new Set(papers.map(p=>p.user).filter(Boolean)).size||'0';
+
+  // Filter
+  const search=(document.getElementById('searchInput')?.value||'').trim().toLowerCase();
   const subject=document.getElementById('searchSubject')?.value||currentSubject||'';
   const year=document.getElementById('searchYear')?.value||'';
-  if(reset)grid.innerHTML=Array(6).fill(0).map(()=>'<div class="card"><div class="cb"><div style="height:16px;background:#f1f5f9;border-radius:4px;margin-bottom:8px"></div><div style="height:16px;width:60%;background:#f1f5f9;border-radius:4px"></div></div></div>').join('');
-  try{
-    let q=supabase.from('papers').select('*',{count:'exact'}).order('created_at',{ascending:false}).range(currentPage*PAGE_SIZE,(currentPage+1)*PAGE_SIZE-1);
-    if(subject)q=q.eq('subject',subject);if(year)q=q.eq('year',parseInt(year));if(search)q=q.ilike('title','*'+search+'*');
-    const{data:papers,error}=await q;
-    if(error){grid.innerHTML='<div class="empty"><div class="ic">⚠</div><p>加载失败: '+error.message+'</p></div>';return}
-    document.getElementById('resultCount').textContent=papers?.length?'共 '+(papers.length)+(currentPage*PAGE_SIZE>0?'+':''):'';
-    if(!papers||!papers.length){grid.innerHTML='<div class="empty"><div class="ic">📭</div><p>'+(currentUser?'快来上传第一份！':'还没有资料，登录后可上传')+'</p></div>';document.getElementById('loadMore').innerHTML='';return}
-    const sm={数学:'m',语文:'c',英语:'e',物理:'p',化学:'ch',生物:'b',历史:'h',地理:'g',政治:'po',计算机:'cs'};
-    const em={数学:'📐',语文:'📖',英语:'🌍',物理:'⚡',化学:'🧪',生物:'🧬',历史:'📜',地理:'🗺️',政治:'⚖️',计算机:'💻'};
-    grid.innerHTML=papers.map(p=>'<div class="card" onclick="showDetail(\''+p.id+'\')"><div class="ct '+(sm[p.subject]||'ot')+'">'+(em[p.subject]||'📄')+'</div><div class="cb"><div class="cti">'+esc(p.title||'')+'</div><div class="ctg"><span class="tag">'+esc(p.subject||'')+'</span><span class="tag yr">'+p.year+'</span>'+(p.file_type?'<span class="tag fl">'+p.file_type.toUpperCase()+'</span>':'')+'</div><div class="cf"><span>⬇ '+(p.downloads||0)+'</span><span>⭐ '+(p.rating_count?p.avg_rating.toFixed(1):'-')+'</span><span>'+timeAgo(p.created_at)+'</span></div></div></div>').join('');
-    document.getElementById('loadMore').innerHTML=papers.length===PAGE_SIZE?'<div class="lm"><button class="btn btn-o btn-s" onclick="goPage('+(currentPage+1)+')">加载更多...</button></div>':'';
-  }catch(e){grid.innerHTML='<div class="empty"><p>加载失败</p></div>'}
+  let filtered=papers;
+  if(subject)filtered=filtered.filter(p=>p.subject===subject);
+  if(year)filtered=filtered.filter(p=>String(p.year)===year);
+  if(search)filtered=filtered.filter(p=>(p.title||'').toLowerCase().includes(search)||(p.tags||'').toLowerCase().includes(search));
+  filtered.sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));
+
+  const grid=document.getElementById('paperGrid');
+  if(!grid)return;
+  document.getElementById('resultCount').textContent='共 '+filtered.length+' 份';
+
+  if(!filtered.length){grid.innerHTML='<div class="empty"><div class="ic">📭</div><p>'+(getToken()?'快来上传第一份！':'还没有资料。点右上角设置Token即可上传')+'</p></div>';return}
+
+  const sm={数学:'m',语文:'c',英语:'e',物理:'p',化学:'ch',生物:'b',历史:'h',地理:'g',政治:'po',计算机:'cs'};
+  const em={数学:'📐',语文:'📖',英语:'🌍',物理:'⚡',化学:'🧪',生物:'🧬',历史:'📜',地理:'🗺️',政治:'⚖️',计算机:'💻'};
+  grid.innerHTML=filtered.map(p=>'<div class="card" onclick="showDetail(\''+p.id+'\')"><div class="ct '+(sm[p.subject]||'ot')+'">'+(em[p.subject]||'📄')+'</div><div class="cb"><div class="cti">'+esc(p.title||'')+'</div><div class="ctg"><span class="tag">'+esc(p.subject||'')+'</span><span class="tag yr">'+p.year+'</span>'+(p.file_type?'<span class="tag fl">'+p.file_type.toUpperCase()+'</span>':'')+'</div><div class="cf"><span>⬇ '+(p.downloads||0)+'</span><span>⭐ '+(p.ratings?(p.ratings.reduce((s,r)=>s+r.rating,0)/p.ratings.length).toFixed(1):'-')+'</span><span>'+timeAgo(p.created_at)+'</span></div></div></div>').join('');
 }
 
-function filterSubject(s,el){currentSubject=s;document.querySelectorAll('.pill').forEach(p=>p.classList.remove('active'));if(el)el.classList.add('active');const sel=document.getElementById('searchSubject');if(sel)sel.value=s;loadPapers(true)}
-function doSearch(){currentSubject='';loadPapers(true)}
-function goPage(n){currentPage=n;loadPapers(false);scrollTo({top:400,behavior:'smooth'})}
+// Detail
+function showDetail(id){
+  currentView='detail';document.getElementById('heroSection').style.display='none';
+  const p=papers.find(x=>x.id===id);
+  if(!p){toast('资料不存在');renderHome();return}
+  const revs=reviews.filter(r=>r.paper_id===id);
+  const avg=revs.length?(revs.reduce((s,r)=>s+r.rating,0)/revs.length).toFixed(1):'-';
+  document.getElementById('mainContent').innerHTML='<a href="#" onclick="goHome()" class="bl">← 返回首页</a><div class="dc"><h1 class="dt">'+esc(p.title||'')+'</h1><div class="dm"><span class="tag">'+esc(p.subject||'')+'</span><span class="tag yr">'+p.year+'</span>'+(p.file_type?'<span class="tag fl">'+p.file_type.toUpperCase()+'</span>':'')+'<span style="font-size:0.85rem;color:var(--text2)">⬇ '+(p.downloads||0)+' 下载</span><span style="font-size:0.85rem;color:var(--text2)">⭐ '+avg+' ('+revs.length+')</span></div>'+(p.tags?'<div style="margin:6px 0;font-size:0.84rem;color:var(--text2)">🏷️ '+esc(p.tags)+'</div>':'')+(p.user?'<div style="font-size:0.82rem;color:var(--text3)">上传者: '+esc(p.user)+'</div>':'')+'<div class="da"><button class="btn btn-p" onclick="downloadFile(\''+p.id+'\',\''+(p.file_url||'')+'\')">⬇ 下载</button>'+(p.file_type==='pdf'?'<button class="btn btn-o btn-s" onclick="previewFile(\''+(p.file_url||'')+'\')">👁 预览</button>':'')+'<button class="btn btn-o btn-s" onclick="showReviewInput(\''+p.id+'\')">⭐ 评分</button></div></div><div class="st">💬 评价 ('+revs.length+')</div><div id="reviewList">'+(revs.length===0?'<p style="color:var(--text2);font-size:0.9rem">暂无评价</p>':'')+revs.map(r=>'<div class="rc"><div class="rh"><span>'+esc(r.user||'匿名')+'</span><span class="stars">'+'★'.repeat(r.rating)+'☆'.repeat(5-r.rating)+'</span><span>'+timeAgo(r.created_at)+'</span></div>'+(r.comment?'<p style="font-size:0.88rem">'+esc(r.comment)+'</p>':'')+'</div>').join('')+'</div><div id="reviewInputArea"></div>';
+}
 
-async function showMyPapers(){
-  if(!currentUser){toast('请先登录');return}
-  currentView='mine';document.getElementById('heroSection').style.display='none';
-  document.getElementById('mainContent').innerHTML='<a href="#" onclick="goHome()" class="bl">← 返回首页</a><div class="st">📂 我上传的资料</div><div class="grid" id="paperGrid"></div>';
-  const grid=document.getElementById('paperGrid');
-  try{
-    const{data:papers}=await supabase.from('papers').select('*').eq('user_id',currentUser.id).order('created_at',{ascending:false});
-    if(!papers||!papers.length){grid.innerHTML='<div class="empty"><div class="ic">📭</div><p>还没有上传资料</p></div>';return}
-    grid.innerHTML=papers.map(p=>'<div class="card" onclick="showDetail(\''+p.id+'\')"><div class="cb"><div class="cti">'+esc(p.title||'')+'</div><div class="ctg"><span class="tag">'+esc(p.subject||'')+'</span><span class="tag yr">'+p.year+'</span></div><div class="cf"><span>⬇ '+(p.downloads||0)+'</span><span>⭐ '+(p.rating_count?p.avg_rating.toFixed(1):'-')+'</span><span>'+timeAgo(p.created_at)+'</span></div></div></div>').join('');
-  }catch(e){grid.innerHTML='<div class="empty"><p>加载失败</p></div>'}
+function showReviewInput(pid){
+  document.getElementById('reviewInputArea').innerHTML='<div class="rc"><div style="font-weight:600;margin-bottom:6px">留下评价</div><div class="fg"><label>昵称</label><input type="text" id="reviewUser" placeholder="你的名字"></div><div style="margin-bottom:6px">'+[1,2,3,4,5].map(n=>'<button class="btn btn-g" onclick="setRating('+n+')" id="star'+n+'" style="font-size:1.3rem;padding:2px 5px">☆</button>').join('')+'</div><div class="fg"><textarea id="reviewComment" placeholder="写点评论（可选）" rows="2"></textarea></div><button class="btn btn-p btn-s" onclick="submitReview(\''+pid+'\')">提交评价</button></div>';
+  window._rating=0;
+}
+function setRating(n){window._rating=n;for(let i=1;i<=5;i++)document.getElementById('star'+i).textContent=i<=n?'★':'☆'}
+
+async function submitReview(pid){
+  const user=document.getElementById('reviewUser').value.trim()||'匿名';
+  if(!window._rating){toast('请选择评分');return}
+  const comment=document.getElementById('reviewComment')?.value?.trim()||'';
+  reviews.push({id:Date.now().toString(36),paper_id:pid,user,rating:window._rating,comment,created_at:new Date().toISOString()});
+  // Update paper average
+  const p=papers.find(x=>x.id===pid);
+  if(p){if(!p.ratings)p.ratings=[];p.ratings.push({rating:window._rating})}
+  await saveData();
+  toast('评价已提交');showDetail(pid)
+}
+
+function previewFile(url){if(!url)return;window.open(url,'_blank')}
+function downloadFile(pid,url){
+  if(!url){toast('文件路径无效');return}
+  const p=papers.find(x=>x.id===pid);
+  if(p){p.downloads=(p.downloads||0)+1;saveData()}
+  window.open(url,'_blank');toast('开始下载')
 }
 
 function goHome(){document.getElementById('heroSection').style.display='';renderHome()}
 
-async function showDetail(id){
-  currentView='detail';document.getElementById('heroSection').style.display='none';
-  try{
-    const{data:p}=await supabase.from('papers').select('*').eq('id',id).single();
-    if(!p){toast('资料不存在');renderHome();return}
-    const{data:reviews}=await supabase.from('reviews').select('*').eq('paper_id',id).order('created_at',{ascending:false});
-    const isOwner=currentUser&&currentUser.id===p.user_id;
-    document.getElementById('mainContent').innerHTML='<a href="#" onclick="goHome()" class="bl">← 返回首页</a><div class="dc"><h1 class="dt">'+esc(p.title||'')+'</h1><div class="dm"><span class="tag">'+esc(p.subject||'')+'</span><span class="tag yr">'+p.year+'</span>'+(p.file_type?'<span class="tag fl">'+p.file_type.toUpperCase()+'</span>':'')+'<span style="font-size:0.85rem;color:var(--text2)">⬇ '+(p.downloads||0)+' 下载</span><span style="font-size:0.85rem;color:var(--text2)">⭐ '+(p.rating_count?p.avg_rating.toFixed(1)+' ('+p.rating_count+')':'暂无评分')+'</span></div>'+(p.tags?'<div style="margin:6px 0;font-size:0.84rem;color:var(--text2)">🏷️ '+esc(p.tags)+'</div>':'')+'<div class="da">'+(currentUser?'<button class="btn btn-p" onclick="downloadFile(\''+p.id+'\',\''+(p.file_path||'')+'\')">⬇ 下载</button><button class="btn btn-outline btn-s" onclick="showReviewInput(\''+p.id+'\')">⭐ 评分</button>':'<p style="color:var(--orange);font-size:0.9rem">🔒 请登录后下载</p>')+(isOwner?'<button class="btn btn-d btn-s" onclick="deletePaper(\''+p.id+'\')">🗑 删除</button>':'')+'</div></div><div class="st">💬 评价 ('+(reviews?reviews.length:0)+')</div><div id="reviewList">'+(!reviews||!reviews.length?'<p style="color:var(--text2);font-size:0.9rem">暂无评价</p>':'')+(reviews?reviews.map(r=>'<div class="rc"><div class="rh"><span>'+esc(r.user_email||'匿名')+'</span><span class="stars">'+'★'.repeat(r.rating||0)+'☆'.repeat(5-(r.rating||0))+'</span><span>'+timeAgo(r.created_at)+'</span></div>'+(r.comment?'<p style="font-size:0.88rem">'+esc(r.comment)+'</p>':'')+'</div>').join(''):'')+'</div><div id="reviewInputArea"></div>';
-  }catch(e){toast('加载失败');renderHome()}
+// Upload
+function showUploadModal(){
+  if(!getToken()){toast('请先设置 GitHub Token');showTokenModal();return}
+  document.getElementById('uploadModal').classList.add('active');
+  document.getElementById('upTitle').value='';document.getElementById('upTags').value='';
+  document.getElementById('upFile').value='';document.getElementById('fileInfo').textContent='';
 }
-
-function showReviewInput(pid){
-  document.getElementById('reviewInputArea').innerHTML='<div class="rc"><div style="font-weight:600;margin-bottom:6px">留下评价</div><div style="margin-bottom:6px">'+[1,2,3,4,5].map(n=>'<button class="btn btn-g" onclick="setRating('+n+')" id="star'+n+'" style="font-size:1.3rem;padding:2px 5px">☆</button>').join('')+'</div><div class="fg"><textarea id="reviewComment" placeholder="写点评论（可选）" rows="2"></textarea></div><button class="btn btn-p btn-s" onclick="submitReview(\''+pid+'\')">提交评价</button></div>';
-  window._rating=0;
-}
-function setRating(n){window._rating=n;for(let i=1;i<=5;i++)document.getElementById('star'+i).textContent=i<=n?'★':'☆'}
-async function submitReview(pid){
-  if(!currentUser){toast('请先登录');return}if(!window._rating){toast('请选择评分');return}
-  const c=document.getElementById('reviewComment')?.value?.trim()||'';
-  const{error}=await supabase.from('reviews').insert({paper_id:pid,user_id:currentUser.id,user_email:currentUser.email,rating:window._rating,comment:c});
-  if(error){toast('提交失败: '+error.message);return}
-  const{data:reviews}=await supabase.from('reviews').select('rating').eq('paper_id',pid);
-  if(reviews&&reviews.length){const avg=reviews.reduce((s,r)=>s+r.rating,0)/reviews.length;await supabase.from('papers').update({avg_rating:Math.round(avg*10)/10,rating_count:reviews.length}).eq('id',pid)}
-  toast('评价已提交');showDetail(pid)
-}
-
-async function downloadFile(pid,url){
-  if(!currentUser){toast('请先登录后再下载');return}
-  if(!url){toast('文件路径无效');return}
-  supabase.rpc('increment_downloads',{paper_id:pid}).catch(()=>{});
-  window.open(url,'_blank');toast('开始下载')
-}
-
-async function deletePaper(pid){
-  if(!confirm('确定删除？'))return;
-  await supabase.from('reviews').delete().eq('paper_id',pid);
-  await supabase.from('papers').delete().eq('id',pid);
-  toast('已删除');renderHome()
-}
-
-function showUploadModal(){if(!currentUser){toast('请先登录');return}document.getElementById('uploadModal').classList.add('active');document.getElementById('upTitle').value='';document.getElementById('upTags').value='';document.getElementById('upFile').value='';document.getElementById('fileInfo').textContent=''}
-function closeUploadModal(){document.getElementById('uploadModal').classList.remove('active')}
 
 async function doUpload(){
-  if(!currentUser){toast('请先登录');return}
-  const title=document.getElementById('upTitle').value.trim(),subject=document.getElementById('upSubject').value;
-  const year=document.getElementById('upYear').value,tags=document.getElementById('upTags').value.trim();
+  const token=getToken();if(!token){toast('请先设置Token');return}
+  const user=document.getElementById('upUser').value.trim()||'匿名';
+  const title=document.getElementById('upTitle').value.trim();
+  const subject=document.getElementById('upSubject').value;
+  const year=document.getElementById('upYear').value;
+  const tags=document.getElementById('upTags').value.trim();
   const file=document.getElementById('upFile').files[0];
-  if(!title){toast('请输入标题');return}if(!file){toast('请选择文件');return}if(file.size>100*1024*1024){toast('文件不能超过100MB');return}
-  const ext=file.name.split('.').pop().toLowerCase();
-  const fileName=Date.now()+'.'+ext;
-  const safePath=currentUser.id+'/'+fileName;
+  if(!title){toast('请输入标题');return}if(!file){toast('请选择文件');return}
+  if(file.size>100*1024*1024){toast('文件不能超过100MB');return}
   const btn=document.getElementById('uploadBtn');btn.textContent='上传中...';btn.disabled=true;
   try{
-    // 1. 上传到 Supabase（快）
-    const{error:upErr}=await supabase.storage.from('papers').upload(safePath,file);
-    if(upErr)throw new Error(upErr.message||'上传失败');
-    const{data:urlData}=supabase.storage.from('papers').getPublicUrl(safePath);
-    const supabaseUrl=urlData?.publicUrl||'';
+    const ext=file.name.split('.').pop().toLowerCase();
+    const fileName=Date.now()+'.'+ext;
 
-    // 2. 后台镜像到 GitHub（无限存储）+ jsDelivr CDN
-    let cdnUrl=supabaseUrl;
-    const token=localStorage.getItem('gh_token')||'';
-    if(token){
-      try{
-        const reader=new FileReader();
-        const base64=await new Promise((resolve,reject)=>{reader.onload=()=>resolve(reader.result.split(',')[1]);reader.onerror=reject});
-        reader.readAsDataURL(file);
-        const ghPath='files/'+fileName;
-        const ghRes=await fetch('https://api.github.com/repos/cyb13579/paperhub/contents/'+ghPath,{
-          method:'PUT',
-          headers:{'Authorization':'Bearer '+token,'Accept':'application/vnd.github+json','Content-Type':'application/json'},
-          body:JSON.stringify({message:'Upload '+fileName,content:base64,branch:'master'})
-        });
-        if(ghRes.ok)cdnUrl='https://cdn.jsdelivr.net/gh/cyb13579/paperhub@master/'+ghPath;
-      }catch{} // mirror fails silently, use Supabase URL
-    }
+    // Upload file to GitHub
+    const reader=new FileReader();
+    const base64=await new Promise((resolve,reject)=>{reader.onload=()=>resolve(reader.result.split(',')[1]);reader.onerror=reject});
+    reader.readAsDataURL(file);
+    const ghPath='files/'+fileName;
+    const ghRes=await fetch('https://api.github.com/repos/'+REPO+'/contents/'+ghPath,{
+      method:'PUT',headers:{'Authorization':'Bearer '+token,'Accept':'application/vnd.github+json','Content-Type':'application/json'},
+      body:JSON.stringify({message:'Upload '+fileName,content:base64,branch:'master'})
+    });
+    if(!ghRes.ok)throw new Error((await ghRes.json().catch(()=>({})).message)||'上传失败');
 
-    // 3. 存数据库（jsDelivr 优先，Supabase 兜底）
-    const{error:dbErr}=await supabase.from('papers').insert({title,subject,year:parseInt(year),tags,description:'',file_path:cdnUrl,file_type:ext,file_size:file.size,user_id:currentUser.id,user_email:currentUser.email});
-    if(dbErr)throw new Error(dbErr.message);
-    toast(token?'上传成功！CDN加速中...🎉':'上传成功！💡点⚙️设Token可解锁无限存储');
-    closeUploadModal();renderHome();
+    // Add paper entry
+    const id=Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+    papers.push({id,title,subject,year:parseInt(year),tags,user,file_url:CDN+'/'+ghPath,file_type:ext,file_size:file.size,downloads:0,ratings:[],created_at:new Date().toISOString()});
+    await saveData();
+
+    toast('上传成功！🎉');document.getElementById('uploadModal').classList.remove('active');renderHome();
   }catch(e){toast('上传失败: '+(e.message||''))}
   btn.textContent='上传';btn.disabled=false;
 }
 
+// Helpers
 function esc(s){if(!s)return'';const d=document.createElement('div');d.textContent=String(s);return d.innerHTML}
 function timeAgo(d){if(!d)return'';const m=Math.floor((Date.now()-new Date(d).getTime())/60000);if(m<1)return'刚刚';if(m<60)return m+'分钟前';const h=Math.floor(m/60);if(h<24)return h+'小时前';const days=Math.floor(h/24);if(days<30)return days+'天前';if(days<365)return Math.floor(days/30)+'个月前';return Math.floor(days/365)+'年前'}
 
+// Drag & drop
 document.addEventListener('DOMContentLoaded',()=>{
   const dz=document.getElementById('dropZone');if(!dz)return;
   dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('drag')});
@@ -412,9 +312,23 @@ document.addEventListener('DOMContentLoaded',()=>{
   document.getElementById('upFile').addEventListener('change',function(){const f=this.files[0];if(f)document.getElementById('fileInfo').textContent='已选择: '+f.name+' ('+(f.size/1024/1024).toFixed(1)+'MB)'});
 });
 
-['authModal','uploadModal','settingsModal'].forEach(id=>{document.getElementById(id).addEventListener('click',function(e){if(e.target===this)this.classList.remove('active')})});
+['tokenModal','uploadModal'].forEach(id=>{document.getElementById(id).addEventListener('click',function(e){if(e.target===this)this.classList.remove('active')})});
 
-(async function init(){await checkAuth();renderHome();console.log('PaperHub Supabase ready')})();
+// Init
+async function init(){
+  // Check if data.json exists, if not create one
+  try{
+    const r=await fetch(DATA_URL);
+    if(r.ok){await loadData();renderHome();return}
+  }catch{}
+  // Create initial data.json with token
+  if(getToken()){
+    await saveData();
+  }
+  renderHome();
+}
+init();
+console.log('PaperHub GitHub - ready');
 </script>
 </body>
 </html>
