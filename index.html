@@ -692,27 +692,16 @@ async function downloadPaper(paperId, filePath) {
   if (!filePath) { toast('文件路径无效'); return; }
   // Increment download count
   await supabase.rpc('increment_downloads', {paper_id: paperId});
-  // Get public URL
-  const {data} = supabase.storage.from('papers').getPublicUrl(filePath);
-  if (data?.publicUrl) {
-    window.open(data.publicUrl, '_blank');
-    toast('开始下载！');
-    // Refresh detail to update count
-    setTimeout(() => showDetail(paperId), 500);
-  } else {
-    toast('获取下载链接失败');
-  }
+  window.open(filePath, '_blank');
+  toast('开始下载！');
+  setTimeout(() => showDetail(paperId), 500);
 }
 
 async function deletePaper(paperId) {
   if (!confirm('确定要删除这份资料吗？此操作不可撤销。')) return;
-  const {data: paper} = await supabase.from('papers').select('file_path').eq('id', paperId).single();
-  if (paper?.file_path) {
-    await supabase.storage.from('papers').remove([paper.file_path]);
-  }
   await supabase.from('reviews').delete().eq('paper_id', paperId);
   await supabase.from('papers').delete().eq('id', paperId);
-  toast('已删除');
+  toast('已删除（文件保留在 GitHub）');
   renderHome();
 }
 
@@ -747,21 +736,21 @@ async function doUpload() {
   const ext = file.name.split('.').pop().toLowerCase();
   const filePath = `${currentUser.id}/${Date.now()}.${ext}`;
 
-  // Upload file
-  const {error: uploadError} = await supabase.storage.from('papers').upload(filePath, file);
-  if (uploadError) { toast('上传失败: ' + uploadError.message); return; }
+  // Upload file to GitHub via Netlify function
+  const form = new FormData();
+  form.append('file', file);
+  form.append('path', filePath);
+  const upRes = await fetch('/api/upload', { method: 'POST', body: form });
+  const upData = await upRes.json();
+  if (!upRes.ok) { toast('上传失败: ' + (upData.error || upRes.statusText)); return; }
+  const downloadUrl = upData.url;
 
   // Insert record
   const {error: insertError} = await supabase.from('papers').insert({
     title, subject, year: parseInt(year), tags, description: desc,
-    file_path: filePath, file_type: ext, file_size: file.size,
+    file_path: downloadUrl, file_type: ext, file_size: file.size,
     user_id: currentUser.id, user_email: currentUser.email
   });
-  if (insertError) {
-    toast('保存记录失败: ' + insertError.message);
-    await supabase.storage.from('papers').remove([filePath]);
-    return;
-  }
 
   toast('上传成功！🎉');
   closeUploadModal();
