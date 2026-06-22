@@ -805,39 +805,43 @@ async function doUpload() {
     const token = getGHToken();
 
     if (token) {
-      // 直传 GitHub（快）
-      const reader = new FileReader();
-      const base64 = await new Promise((resolve,reject) => {
-        reader.onload = () => resolve(reader.result.split(',')[1]);
-        reader.onerror = reject;
+      // 直传 GitHub Releases（二进制，无 base64 开销）
+      // 1. 创建或获取 Release
+      const tag = 'storage';
+      let releaseId;
+      const relRes = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/releases/tags/${tag}`, {
+        headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/vnd.github+json' }
       });
-      reader.readAsDataURL(file);
+      if (relRes.ok) {
+        releaseId = (await relRes.json()).id;
+      } else {
+        const createRes = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/releases`, {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/vnd.github+json', 'Content-Type': 'application/json' },
+          body: JSON.stringify({ tag_name: tag, name: '文件存储', body: 'PaperHub 自动存储', draft: false, prerelease: false })
+        });
+        if (!createRes.ok) throw new Error('创建 Release 失败');
+        releaseId = (await createRes.json()).id;
+      }
 
-      const ghRes = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/files/${safePath}`, {
-        method: 'PUT',
+      // 2. 直传二进制文件到 Release（无编码）
+      const assetRes = await fetch(`https://uploads.github.com/repos/${GITHUB_REPO}/releases/${releaseId}/assets?name=${encodeURIComponent(safePath.replace('/','_'))}`, {
+        method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
           'Accept': 'application/vnd.github+json',
-          'Content-Type': 'application/json',
-          'X-GitHub-Api-Version': '2022-11-28',
+          'Content-Type': 'application/octet-stream',
         },
-        body: JSON.stringify({ message: `Upload ${safePath}`, content: base64, branch: 'master' })
+        body: file  // 直接传原始文件，无 base64！
       });
 
-      if (!ghRes.ok) {
-        const err = await ghRes.json().catch(()=>({}));
+      if (!assetRes.ok) {
+        const err = await assetRes.json().catch(()=>({}));
         throw new Error(err.message || '上传失败');
       }
-      const ghData = await ghRes.json();
-      downloadUrl = ghData.content?.download_url || `https://raw.githubusercontent.com/${GITHUB_REPO}/master/files/${safePath}`;
+      const assetData = await assetRes.json();
+      downloadUrl = assetData.browser_download_url;
     } else {
-      // 兜底：Netlify 函数上传
-      const form = new FormData(); form.append('file',file); form.append('path',safePath);
-      const upRes = await fetch('/api/upload',{method:'POST',body:form});
-      const upData = await upRes.json();
-      if (!upRes.ok) throw new Error(upData.error||'上传失败');
-      downloadUrl = upData.url;
-    }
 
     const {error:dbErr} = await supabase.from('papers').insert({
       title,subject,year:parseInt(year),tags,description:'',
