@@ -107,6 +107,7 @@ a{color:var(--p);text-decoration:none}
 <div class="nr">
 <span class="ue" id="userInfo"></span>
 <button class="btn btn-w btn-s" onclick="showUploadModal()">+ 上传</button>
+<button class="btn btn-w btn-s" onclick="showSettingsModal()">⚙️</button>
 <button class="btn btn-w btn-s" onclick="showAuthModal()" id="loginBtn">登录</button>
 <button class="btn btn-w btn-s" onclick="logout()" id="logoutBtn" style="display:none">退出</button>
 </div>
@@ -124,6 +125,13 @@ a{color:var(--p);text-decoration:none}
 </div></div>
 
 <div class="container content" id="mainContent"></div>
+
+<div class="mo" id="settingsModal"><div class="modal">
+<h2>⚙️ 设置</h2>
+<div class="fg"><label>GitHub Token（解锁无限存储）</label><input type="password" id="ghTokenInput" placeholder="ghp_...或 github_pat_..."></div>
+<p style="font-size:0.75rem;color:var(--text3);margin-bottom:12px">Token 仅存浏览器本地。设置后上传文件自动镜像到 GitHub + jsDelivr CDN，突破 1GB 限制。</p>
+<div class="ma"><button class="btn btn-g" onclick="document.getElementById('settingsModal').classList.remove('active')">取消</button><button class="btn btn-p" onclick="saveSettings()">保存</button></div>
+</div></div>
 
 <div class="mo" id="authModal"><div class="modal">
 <h2 id="authTitle">登录</h2>
@@ -249,6 +257,9 @@ async function doAuth(){
 }
 async function logout(){await supabase.auth.signOut();toast('已退出');renderHome()}
 
+function showSettingsModal(){document.getElementById('ghTokenInput').value=localStorage.getItem('gh_token')||'';document.getElementById('settingsModal').classList.add('active')}
+function saveSettings(){localStorage.setItem('gh_token',document.getElementById('ghTokenInput').value.trim());document.getElementById('settingsModal').classList.remove('active');toast('设置已保存！'+(localStorage.getItem('gh_token')?'上传将自动镜像到GitHub':'未填Token，仅用Supabase存储'))}
+
 function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2500)}
 
 async function renderHome(){
@@ -348,16 +359,39 @@ async function doUpload(){
   const file=document.getElementById('upFile').files[0];
   if(!title){toast('请输入标题');return}if(!file){toast('请选择文件');return}if(file.size>50*1024*1024){toast('文件不能超过50MB');return}
   const ext=file.name.split('.').pop().toLowerCase();
-  const safePath=currentUser.id+'/'+Date.now()+'.'+ext;
+  const fileName=Date.now()+'.'+ext;
+  const safePath=currentUser.id+'/'+fileName;
   const btn=document.getElementById('uploadBtn');btn.textContent='上传中...';btn.disabled=true;
   try{
+    // 1. 上传到 Supabase（快）
     const{error:upErr}=await supabase.storage.from('papers').upload(safePath,file);
     if(upErr)throw new Error(upErr.message||'上传失败');
     const{data:urlData}=supabase.storage.from('papers').getPublicUrl(safePath);
-    const downloadUrl=urlData?.publicUrl||'';
-    const{error:dbErr}=await supabase.from('papers').insert({title,subject,year:parseInt(year),tags,description:'',file_path:downloadUrl,file_type:ext,file_size:file.size,user_id:currentUser.id,user_email:currentUser.email});
+    const supabaseUrl=urlData?.publicUrl||'';
+
+    // 2. 后台镜像到 GitHub（无限存储）+ jsDelivr CDN
+    let cdnUrl=supabaseUrl;
+    const token=localStorage.getItem('gh_token')||'';
+    if(token){
+      try{
+        const reader=new FileReader();
+        const base64=await new Promise((resolve,reject)=>{reader.onload=()=>resolve(reader.result.split(',')[1]);reader.onerror=reject});
+        reader.readAsDataURL(file);
+        const ghPath='files/'+fileName;
+        const ghRes=await fetch('https://api.github.com/repos/cyb13579/paperhub/contents/'+ghPath,{
+          method:'PUT',
+          headers:{'Authorization':'Bearer '+token,'Accept':'application/vnd.github+json','Content-Type':'application/json'},
+          body:JSON.stringify({message:'Upload '+fileName,content:base64,branch:'master'})
+        });
+        if(ghRes.ok)cdnUrl='https://cdn.jsdelivr.net/gh/cyb13579/paperhub@master/'+ghPath;
+      }catch{} // mirror fails silently, use Supabase URL
+    }
+
+    // 3. 存数据库（jsDelivr 优先，Supabase 兜底）
+    const{error:dbErr}=await supabase.from('papers').insert({title,subject,year:parseInt(year),tags,description:'',file_path:cdnUrl,file_type:ext,file_size:file.size,user_id:currentUser.id,user_email:currentUser.email});
     if(dbErr)throw new Error(dbErr.message);
-    toast('上传成功！🎉');closeUploadModal();renderHome();
+    toast(token?'上传成功！CDN加速中...🎉':'上传成功！💡点⚙️设Token可解锁无限存储');
+    closeUploadModal();renderHome();
   }catch(e){toast('上传失败: '+(e.message||''))}
   btn.textContent='上传';btn.disabled=false;
 }
@@ -373,7 +407,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   document.getElementById('upFile').addEventListener('change',function(){const f=this.files[0];if(f)document.getElementById('fileInfo').textContent='已选择: '+f.name+' ('+(f.size/1024/1024).toFixed(1)+'MB)'});
 });
 
-['authModal','uploadModal'].forEach(id=>{document.getElementById(id).addEventListener('click',function(e){if(e.target===this)this.classList.remove('active')})});
+['authModal','uploadModal','settingsModal'].forEach(id=>{document.getElementById(id).addEventListener('click',function(e){if(e.target===this)this.classList.remove('active')})});
 
 (async function init(){await checkAuth();renderHome();console.log('PaperHub Supabase ready')})();
 </script>
