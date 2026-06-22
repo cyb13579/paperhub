@@ -716,7 +716,9 @@ function downloadFile(paperId, filePath) {
 
 function previewFile(filePath) {
   if (!filePath) { toast('文件路径无效'); return; }
-  window.open(filePath,'_blank');
+  // 用 Google Docs Viewer 在线预览 PDF
+  const viewerUrl = 'https://docs.google.com/viewer?embedded=true&url=' + encodeURIComponent(filePath);
+  window.open(viewerUrl,'_blank');
 }
 
 async function deletePaper(paperId) {
