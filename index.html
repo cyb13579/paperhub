@@ -186,7 +186,7 @@ function mkClient(url,key){
         try{
           const p=new URLSearchParams();
           for(const[k,v]of Object.entries(q.params))p.set(k,v);
-          for(const[f,op,v]of q.filters)p.set(f,op+'.'+encodeURIComponent(v));
+          for(const[f,op,v]of q.filters)p.set(f,op+'.'+v);
           if(q.cols&&q.cols!=='*')p.set('select',q.cols);
           const h=ah();
           if(q.method!=='GET'&&q.method!=='DELETE'){h['Content-Type']='application/json';if(q.method==='POST')h['Prefer']='return=representation'}
