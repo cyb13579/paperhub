@@ -209,7 +209,7 @@ function mkClient(url,key){
 const supabase=mkClient(SUPA_URL,SUPA_KEY);
 
 // ===== State =====
-let currentUser=null,currentView='home',currentSubject='';
+let currentUser=null,currentView='home',currentSubject='',paperCache=null,cacheTime=0;
 
 async function checkAuth(){
   const{data:{session}}=await supabase.auth.getSession();
@@ -272,9 +272,12 @@ async function renderHome(){
   await loadStats();await loadPapers();
 }
 
-async function loadStats(){
-  try{const{count:t}=await supabase.from('papers').select('id',{count:'exact'}).limit(1);document.getElementById('hTotal').textContent=t??'0'}catch{}
-  try{const{data:all}=await supabase.from('papers').select('downloads,user_id').limit(500);if(all){document.getElementById('hDownloads').textContent=all.reduce((s,p)=>s+(p.downloads||0),0).toLocaleString();document.getElementById('hUsers').textContent=new Set(all.map(p=>p.user_id).filter(Boolean)).size+''}}catch{}
+function loadStats(){
+  // Run stats in background after page loads
+  setTimeout(async()=>{
+    try{const{count:t}=await supabase.from('papers').select('id',{count:'exact'}).limit(1);document.getElementById('hTotal').textContent=t??'0'}catch{}
+    try{const{data:all}=await supabase.from('papers').select('downloads,user_id').limit(100);if(all){document.getElementById('hDownloads').textContent=all.reduce((s,p)=>s+(p.downloads||0),0).toLocaleString();document.getElementById('hUsers').textContent=new Set(all.map(p=>p.user_id).filter(Boolean)).size+''}}catch{}
+  },500);
 }
 
 async function loadPapers(reset=true){
@@ -282,22 +285,38 @@ async function loadPapers(reset=true){
   const search=(document.getElementById('searchInput')?.value||'').trim().toLowerCase();
   const subject=document.getElementById('searchSubject')?.value||currentSubject||'';
   const year=document.getElementById('searchYear')?.value||'';
+
+  // Cache hit: skip API call, re-render from cache
+  const cacheKey=subject+'|'+year;
+  if(reset&&!search&&paperCache&&cacheKey===paperCache.key&&Date.now()-cacheTime<30000){
+    renderPapersFromCache(paperCache.data,search);return;
+  }
+
   if(reset)grid.innerHTML=Array(6).fill(0).map(()=>'<div class="card"><div class="cb"><div style="height:16px;background:#f1f5f9;border-radius:4px;margin-bottom:8px"></div><div style="height:16px;width:60%;background:#f1f5f9;border-radius:4px"></div></div></div>').join('');
   try{
-    let q=supabase.from('papers').select('*').order('created_at',{ascending:false}).limit(50);
+    let q=supabase.from('papers').select('*').order('created_at',{ascending:false}).limit(100);
     if(subject)q=q.eq('subject',subject);if(year)q=q.eq('year',parseInt(year));
     const{data:papers,error}=await q;
-    if(error){grid.innerHTML='<div class="empty"><div class="ic">⚠</div><p>加载失败</p></div>';return}
-    let filtered=papers||[];
-    if(search)filtered=filtered.filter(p=>(p.title||'').toLowerCase().includes(search)||(p.tags||'').toLowerCase().includes(search));
-    document.getElementById('resultCount').textContent=filtered.length?'共 '+filtered.length+' 份':'';
-    if(!filtered.length){grid.innerHTML='<div class="empty"><div class="ic">📭</div><p>'+(currentUser?'快来上传第一份！':'还没有资料')+'</p></div>';return}
-    const sm={数学:'m',语文:'cn',英语:'en',物理:'ph',化学:'ch',生物:'bi',历史:'hi',地理:'ge',政治:'po',计算机:'cs'};
-    const em={数学:'📐',语文:'📖',英语:'🌍',物理:'⚡',化学:'🧪',生物:'🧬',历史:'📜',地理:'🗺️',政治:'⚖️',计算机:'💻'};
-    grid.innerHTML=filtered.map(p=>'<div class="card" onclick="showDetail(\''+p.id+'\')"><div class="ct '+(sm[p.subject]||'ot')+'">'+(em[p.subject]||'📄')+'</div><div class="cb"><div class="cti">'+esc(p.title||'')+'</div><div class="ctg"><span class="tag">'+esc(p.subject||'')+'</span><span class="tag yr">'+p.year+'</span>'+(p.file_type?'<span class="tag fl">'+p.file_type.toUpperCase()+'</span>':'')+'</div><div class="cf"><span>⬇ '+(p.downloads||0)+'</span><span>⭐ '+(p.rating_count?p.avg_rating.toFixed(1):'-')+'</span><span>'+timeAgo(p.created_at)+'</span></div></div></div>').join('');
+
+    // Update cache for non-search queries
+    if(!search){paperCache={key:cacheKey,data:papers||[]};cacheTime=Date.now()}
+
+    renderPapersFromCache(papers||[],search);
   }catch(e){grid.innerHTML='<div class="empty"><p>加载失败</p></div>'}
 }
 
+function renderPapersFromCache(papers,search){
+  const grid=document.getElementById('paperGrid');if(!grid)return;
+  let filtered=papers||[];
+  if(search)filtered=filtered.filter(p=>(p.title||'').toLowerCase().includes(search)||(p.tags||'').toLowerCase().includes(search));
+  document.getElementById('resultCount').textContent=filtered.length?'共 '+filtered.length+' 份':'';
+  if(!filtered.length){grid.innerHTML='<div class="empty"><div class="ic">📭</div><p>'+(currentUser?'快来上传第一份！':'还没有资料')+'</p></div>';return}
+  const sm={数学:'m',语文:'cn',英语:'en',物理:'ph',化学:'ch',生物:'bi',历史:'hi',地理:'ge',政治:'po',计算机:'cs'};
+  const em={数学:'📐',语文:'📖',英语:'🌍',物理:'⚡',化学:'🧪',生物:'🧬',历史:'📜',地理:'🗺️',政治:'⚖️',计算机:'💻'};
+  grid.innerHTML=filtered.map(p=>'<div class="card" onclick="showDetail(\''+p.id+'\')"><div class="ct '+(sm[p.subject]||'ot')+'">'+(em[p.subject]||'📄')+'</div><div class="cb"><div class="cti">'+esc(p.title||'')+'</div><div class="ctg"><span class="tag">'+esc(p.subject||'')+'</span><span class="tag yr">'+p.year+'</span>'+(p.file_type?'<span class="tag fl">'+p.file_type.toUpperCase()+'</span>':'')+'</div><div class="cf"><span>⬇ '+(p.downloads||0)+'</span><span>⭐ '+(p.rating_count?p.avg_rating.toFixed(1):'-')+'</span><span>'+timeAgo(p.created_at)+'</span></div></div></div>').join('');
+}
+
+// Legacy wrapper for old code paths
 function filterSubject(s,el){currentSubject=s;document.querySelectorAll('.pill').forEach(p=>p.classList.remove('active'));if(el)el.classList.add('active');const sel=document.getElementById('searchSubject');if(sel)sel.value=s;loadPapers(true)}
 function doSearch(){currentSubject='';loadPapers(true)}
 
