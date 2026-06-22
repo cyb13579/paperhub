@@ -4,426 +4,452 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PaperHub · 试卷资料共享平台</title>
-<!-- 无需外部 CDN，纯 fetch 实现 -->
 <style>
 :root {
-  --bg: #f8f9fb; --surface: #fff; --border: #e5e7eb;
-  --text: #1a1a2e; --text2: #6b7280; --text3: #9ca3af;
-  --primary: #4f46e5; --primary2: #4338ca; --green: #10b981;
+  --bg: #f5f6fa; --card: #fff; --border: #e8ecf1;
+  --text: #1e293b; --text2: #64748b; --text3: #94a3b8;
+  --primary: #6366f1; --primary2: #4f46e5; --green: #10b981;
   --red: #ef4444; --orange: #f59e0b; --blue: #3b82f6;
-  --radius: 10px; --radius-sm: 6px;
+  --radius: 14px; --radius-sm: 8px; --shadow: 0 1px 3px rgba(0,0,0,.06);
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 body{
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-  background: var(--bg); color: var(--text); line-height: 1.6;
-  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans SC', system-ui, sans-serif;
+  background: var(--bg); color: var(--text); line-height: 1.6; min-height: 100vh;
 }
 a{color:var(--primary);text-decoration:none}
-a:hover{text-decoration:underline}
 
-/* Layout */
-.container{max-width:1100px;margin:0 auto;padding:0 20px}
-header{
-  background: var(--surface); border-bottom: 1px solid var(--border);
-  padding: 16px 0; position: sticky; top:0; z-index: 100;
+/* Header */
+.header{
+  background: linear-gradient(135deg, #312e81, #4f46e5, #6366f1);
+  color: #fff; padding: 0;
 }
-.header-inner{display:flex;align-items:center;justify-content:space-between}
-.logo{font-size:1.4rem;font-weight:800;color:var(--primary);letter-spacing:-0.02em}
-.logo span{color:var(--text)}
-nav{display:flex;align-items:center;gap:12px}
+.header-inner{
+  max-width: 1200px; margin: 0 auto; padding: 16px 24px;
+  display: flex; align-items: center; justify-content: space-between; gap:16px; flex-wrap:wrap;
+}
+.logo{font-size:1.5rem;font-weight:800;color:#fff;letter-spacing:-0.02em}
+.logo span{color:#c7d2fe}
+.nav-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.user-email{font-size:0.85rem;color:#c7d2fe;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
 .btn{
-  padding: 8px 18px; border-radius: var(--radius-sm); font-size:0.9rem;
-  font-weight:500; cursor:pointer; border:none; transition:all .15s;
-  display:inline-flex;align-items:center;gap:6px;
+  padding: 8px 16px; border-radius: 20px; font-size:0.88rem;
+  font-weight:500; cursor:pointer; border:none; transition:all .2s;
+  display:inline-flex;align-items:center;gap:5px; white-space:nowrap;
 }
+.btn-white{background:rgba(255,255,255,.2);color:#fff}
+.btn-white:hover{background:rgba(255,255,255,.3)}
 .btn-primary{background:var(--primary);color:#fff}
-.btn-primary:hover{background:var(--primary2)}
+.btn-primary:hover{background:var(--primary2);transform:translateY(-1px)}
 .btn-outline{background:transparent;border:1px solid var(--border);color:var(--text)}
 .btn-outline:hover{background:var(--bg)}
-.btn-sm{padding:5px 12px;font-size:0.8rem}
+.btn-ghost{background:transparent;color:var(--text2)}
+.btn-ghost:hover{color:var(--text);background:var(--bg)}
+.btn-sm{padding:5px 12px;font-size:0.78rem;border-radius:14px}
 .btn-danger{background:var(--red);color:#fff}
 .btn-danger:hover{opacity:.85}
-.btn-ghost{background:transparent;color:var(--text2);padding:4px 8px}
-.btn-ghost:hover{color:var(--text)}
+.btn-green{background:var(--green);color:#fff}
 
-/* Search */
-.search-bar{
-  display:flex;gap:8px;margin:24px 0;
-  flex-wrap:wrap;
-}
-.search-bar input, .search-bar select{
-  padding:10px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);
-  font-size:0.9rem;outline:none;background:var(--surface);
-}
-.search-bar input:focus, .search-bar select:focus{
-  border-color:var(--primary);box-shadow:0 0 0 3px rgba(79,70,229,.1);
-}
-.search-bar input{flex:1;min-width:200px}
-.search-bar select{min-width:120px}
+/* Container */
+.container{max-width:1200px;margin:0 auto;padding:0 24px}
 
-/* Cards */
-.section-title{font-size:1.1rem;font-weight:700;margin:24px 0 12px}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;margin-bottom:40px}
+/* Hero Stats */
+.hero-section{background: linear-gradient(135deg, #312e81, #4f46e5, #6366f1); padding: 0 0 40px;}
+.hero-inner{max-width:1200px;margin:0 auto;padding:0 24px}
+.hero-title{font-size:2rem;font-weight:800;color:#fff;padding:20px 0 6px}
+.hero-sub{color:#c7d2fe;font-size:0.95rem;margin-bottom:24px}
+.stat-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.stat-card{
+  background:rgba(255,255,255,.12); backdrop-filter:blur(10px);
+  border-radius:var(--radius); padding:18px 20px; color:#fff;
+  border:1px solid rgba(255,255,255,.1);
+}
+.stat-icon{font-size:1.6rem;margin-bottom:4px}
+.stat-val{font-size:1.6rem;font-weight:700}
+.stat-lbl{font-size:0.78rem;color:#c7d2fe}
+
+/* Content area */
+.content{padding:24px 0 60px}
+
+/* Search bar */
+.search-row{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;align-items:center}
+.search-box{
+  flex:1;min-width:220px;display:flex;align-items:center;
+  background:var(--card);border:1px solid var(--border);border-radius:24px;
+  padding:0 16px; transition:all .2s;
+}
+.search-box:focus-within{border-color:var(--primary);box-shadow:0 0 0 3px rgba(99,102,241,.1)}
+.search-box input{
+  flex:1;border:none;padding:12px 0;font-size:0.93rem;outline:none;background:transparent;
+  color:var(--text);
+}
+.search-box input::placeholder{color:var(--text3)}
+.search-icon{color:var(--text3);margin-right:8px;font-size:1.1rem}
+.filter-select{
+  padding:11px 32px 11px 14px; border:1px solid var(--border); border-radius:24px;
+  font-size:0.88rem;outline:none;background:var(--card);color:var(--text);
+  cursor:pointer;appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2364748b' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 10px center;
+}
+.filter-select:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(99,102,241,.06);outline:none}
+
+/* Subject pills */
+.subject-pills{display:flex;gap:6px;margin-bottom:20px;flex-wrap:wrap}
+.pill{
+  padding:6px 16px;border-radius:20px;font-size:0.82rem;font-weight:500;
+  cursor:pointer;border:1px solid var(--border);background:var(--card);color:var(--text2);
+  transition:all .15s; white-space:nowrap;
+}
+.pill:hover,.pill.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+
+/* Section title */
+.section-title{
+  font-size:1.05rem;font-weight:700;margin:20px 0 12px;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.section-title .count{font-size:0.82rem;color:var(--text3);font-weight:400}
+
+/* Grid */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;margin-bottom:24px}
+
+/* Paper card */
 .card{
-  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
-  padding:18px 20px;transition:all .15s;cursor:pointer;
+  background:var(--card);border-radius:var(--radius);border:1px solid var(--border);
+  padding:0;overflow:hidden;transition:all .2s;cursor:pointer;box-shadow:var(--shadow);
 }
-.card:hover{border-color:var(--primary);box-shadow:0 4px 20px rgba(0,0,0,.06)}
-.card-title{font-size:1rem;font-weight:600;margin-bottom:4px;line-height:1.3}
-.card-meta{font-size:0.82rem;color:var(--text2)}
-.card-footer{display:flex;align-items:center;justify-content:space-between;margin-top:12px}
-.badge{
-  display:inline-block;padding:2px 10px;border-radius:20px;font-size:0.75rem;
-  font-weight:500;
+.card:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(0,0,0,.08);border-color:#c7d2fe}
+.card-top{
+  height:80px;display:flex;align-items:center;justify-content:center;
+  font-size:2.5rem;
 }
-.badge-subject{background:#eef2ff;color:var(--primary)}
-.badge-year{background:#fef3c7;color:#92400e}
-.badge-free{background:#d1fae5;color:#065f46}
-.badge-pdf{background:#fee2e2;color:#991b1b}
+.card-top.math{background:linear-gradient(135deg,#eef2ff,#e0e7ff)}
+.card-top.chinese{background:linear-gradient(135deg,#fef3c7,#fef9c3)}
+.card-top.english{background:linear-gradient(135deg,#fce7f3,#fbcfe8)}
+.card-top.physics{background:linear-gradient(135deg,#e0f2fe,#bae6fd)}
+.card-top.chemistry{background:linear-gradient(135deg,#f0fdf4,#dcfce7)}
+.card-top.biology{background:linear-gradient(135deg,#ecfdf5,#d1fae5)}
+.card-top.history{background:linear-gradient(135deg,#fef2f2,#fecaca)}
+.card-top.geography{background:linear-gradient(135deg,#f0fdfa,#99f6e4)}
+.card-top.politics{background:linear-gradient(135deg,#fefce8,#fef08a)}
+.card-top.cs{background:linear-gradient(135deg,#f5f3ff,#ddd6fe)}
+.card-top.other{background:linear-gradient(135deg,#f8fafc,#e2e8f0)}
+.card-body{padding:16px 18px}
+.card-title{font-size:0.95rem;font-weight:600;line-height:1.4;margin-bottom:8px;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.card-tags{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px}
+.tag{
+  display:inline-block;padding:2px 10px;border-radius:12px;font-size:0.72rem;font-weight:500;
+  background:#eef2ff;color:var(--primary);
+}
+.tag.year{background:#fef3c7;color:#92400e}
+.tag.file{background:#fee2e2;color:#991b1b}
+.card-footer{
+  display:flex;align-items:center;justify-content:space-between;
+  font-size:0.78rem;color:var(--text3);padding-top:10px;border-top:1px solid var(--border);
+}
 
-/* Stats row */
-.stats{display:flex;gap:6px;font-size:0.8rem;color:var(--text2);align-items:center}
+/* Skeleton */
+.skeleton{background:linear-gradient(90deg,#f1f5f9 25%,#e2e8f0 50%,#f1f5f9 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:var(--radius-sm)}
+@keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+.skel-card{height:200px}
+.skel-text{height:16px;margin-bottom:8px}
+.skel-text.short{width:60%}
+
+/* Upload zone */
+.upload-zone{
+  border:2px dashed var(--border);border-radius:var(--radius);padding:36px;
+  text-align:center;cursor:pointer;transition:all .2s;background:var(--card);
+  margin-bottom:16px;
+}
+.upload-zone:hover,.upload-zone.drag{border-color:var(--primary);background:#eef2ff}
+.upload-zone .icon{font-size:3rem;margin-bottom:8px}
+.upload-zone .hint{font-size:0.9rem;color:var(--text2)}
+.upload-zone .hint strong{color:var(--primary)}
+
+/* Detail page */
+.back-link{display:inline-flex;align-items:center;gap:4px;color:var(--text2);font-size:0.9rem;margin:16px 0}
+.back-link:hover{color:var(--text)}
+.detail-card{
+  background:var(--card);border-radius:var(--radius);border:1px solid var(--border);
+  padding:28px 30px;box-shadow:var(--shadow);margin-bottom:20px;
+}
+.detail-title{font-size:1.4rem;font-weight:700;margin-bottom:10px}
+.detail-meta{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.detail-desc{color:var(--text2);font-size:0.93rem;white-space:pre-wrap;margin-bottom:16px}
+.detail-actions{display:flex;gap:8px;flex-wrap:wrap}
+
+/* Review */
+.review-card{
+  background:var(--card);border-radius:var(--radius);border:1px solid var(--border);
+  padding:14px 18px;margin-bottom:8px;
+}
+.review-header{display:flex;justify-content:space-between;font-size:0.8rem;color:var(--text2);margin-bottom:4px}
+.stars{color:var(--orange)}
+
+/* Load more */
+.load-more{text-align:center;padding:20px}
+
+/* Empty */
+.empty-state{text-align:center;padding:60px 20px;color:var(--text2)}
+.empty-state .icon{font-size:3.5rem;margin-bottom:12px}
 
 /* Modal */
 .modal-overlay{
-  display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);
   z-index:200;align-items:center;justify-content:center;
 }
 .modal-overlay.active{display:flex}
 .modal{
-  background:var(--surface);border-radius:var(--radius);padding:28px 30px;
-  max-width:440px;width:90%;max-height:90vh;overflow-y:auto;
+  background:var(--card);border-radius:var(--radius);padding:28px 30px;
+  max-width:480px;width:94%;max-height:90vh;overflow-y:auto;
+  box-shadow:0 20px 60px rgba(0,0,0,.15);
 }
-.modal h2{font-size:1.2rem;margin-bottom:18px}
+.modal h2{font-size:1.15rem;font-weight:700;margin-bottom:18px}
 .form-group{margin-bottom:14px}
-.form-group label{display:block;font-size:0.85rem;font-weight:500;margin-bottom:4px;color:var(--text2)}
-.form-group input, .form-group select, .form-group textarea{
-  width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);
-  font-size:0.9rem;outline:none;background:var(--bg);
+.form-group label{display:block;font-size:0.83rem;font-weight:600;margin-bottom:4px;color:var(--text2)}
+.form-group input,.form-group select,.form-group textarea{
+  width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);
+  font-size:0.9rem;outline:none;background:var(--bg);color:var(--text);
+  transition:border .15s;
 }
-.form-group input:focus, .form-group textarea:focus, .form-group select:focus{
-  border-color:var(--primary);box-shadow:0 0 0 3px rgba(79,70,229,.08);
+.form-group input:focus,.form-group textarea:focus,.form-group select:focus{
+  border-color:var(--primary);box-shadow:0 0 0 3px rgba(99,102,241,.08);
 }
-.form-group textarea{resize:vertical;min-height:80px}
+.form-group textarea{resize:vertical;min-height:70px}
 .form-row{display:flex;gap:10px}
 .form-row .form-group{flex:1}
 .modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:20px}
-.modal-actions button{min-width:80px}
-
-/* Detail page */
-.detail-header{margin:24px 0}
-.detail-header h1{font-size:1.6rem;font-weight:700}
-.detail-meta{display:flex;gap:12px;flex-wrap:wrap;margin:8px 0;font-size:0.85rem;color:var(--text2)}
-.detail-actions{display:flex;gap:8px;margin:16px 0}
-.review-card{
-  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
-  padding:14px 18px;margin-bottom:8px;
-}
-.review-header{display:flex;justify-content:space-between;font-size:0.82rem;color:var(--text2);margin-bottom:4px}
-.stars{color:var(--orange)}
 
 /* Toast */
 .toast{
   position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
-  background:#1a1a2e;color:#fff;padding:10px 24px;border-radius:30px;
-  font-size:0.85rem;z-index:300;opacity:0;transition:opacity .25s;pointer-events:none;
+  background:#1e293b;color:#fff;padding:10px 24px;border-radius:30px;
+  font-size:0.88rem;z-index:300;opacity:0;transition:opacity .25s;pointer-events:none;
 }
 .toast.show{opacity:1}
 
-/* Empty state */
-.empty-state{text-align:center;padding:60px 20px;color:var(--text2)}
-.empty-state .icon{font-size:3rem;margin-bottom:12px}
-.empty-state p{font-size:0.95rem}
+/* Pagination */
+.pagination{display:flex;gap:8px;justify-content:center;margin:24px 0}
+.pagination button{
+  width:36px;height:36px;border-radius:50%;border:1px solid var(--border);
+  background:var(--card);cursor:pointer;font-size:0.85rem;font-weight:500;
+  transition:all .15s;
+}
+.pagination button.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+.pagination button:hover:not(.active){border-color:var(--primary)}
 
-/* Responsive */
-@media(max-width:640px){
+@media(max-width:768px){
+  .header-inner{padding:12px 16px}
+  .hero-section{padding-bottom:24px}
+  .hero-title{font-size:1.5rem}
+  .stat-cards{grid-template-columns:repeat(2,1fr)}
   .grid{grid-template-columns:1fr}
-  .logo{font-size:1.1rem}
-  .search-bar{flex-direction:column}
-  .search-bar select{width:100%}
+  .search-row{flex-direction:column}
+  .filter-select{width:100%}
+  .detail-card{padding:18px 16px}
   .form-row{flex-direction:column}
 }
 </style>
 </head>
 <body>
 
-<!-- ========== HEADER ========== -->
-<header>
-  <div class="container header-inner">
+<header class="header">
+  <div class="header-inner">
     <a href="#" class="logo" onclick="goHome()">📚 Paper<span>Hub</span></a>
-    <nav>
-      <span id="userInfo" style="font-size:0.85rem;color:var(--text2)"></span>
-      <button class="btn btn-outline btn-sm" onclick="showUploadModal()" id="uploadNavBtn">+ 上传</button>
-      <button class="btn btn-primary btn-sm" onclick="showAuthModal()" id="loginBtn">登录</button>
-      <button class="btn btn-outline btn-sm" onclick="logout()" id="logoutBtn" style="display:none">退出</button>
-    </nav>
+    <div class="nav-right">
+      <span class="user-email" id="userInfo"></span>
+      <button class="btn btn-white btn-sm" onclick="showUploadModal()" id="uploadNavBtn">+ 上传</button>
+      <button class="btn btn-white btn-sm" onclick="showAuthModal()" id="loginBtn">登录</button>
+      <button class="btn btn-white btn-sm" onclick="logout()" id="logoutBtn" style="display:none">退出</button>
+    </div>
   </div>
 </header>
 
-<!-- ========== MAIN ========== -->
-<div class="container" id="mainContent">
-  <!-- dynamically filled -->
-</div>
-
-<!-- ========== MODALS ========== -->
-<div class="modal-overlay" id="authModal">
-  <div class="modal">
-    <h2 id="authTitle">登录</h2>
-    <div class="form-group"><label>邮箱</label><input type="email" id="authEmail" placeholder="your@email.com"></div>
-    <div class="form-group"><label>密码</label><input type="password" id="authPassword" placeholder="至少6位"></div>
-    <div class="modal-actions">
-      <button class="btn btn-outline" id="authToggle" onclick="toggleAuthMode()">去注册</button>
-      <button class="btn btn-primary" onclick="doAuth()">登录</button>
+<div class="hero-section" id="heroSection">
+  <div class="hero-inner">
+    <div class="hero-title">知识共享，从这里开始</div>
+    <div class="hero-sub">上传试卷、搜索资料、交流学习——PaperHub 让每一份资料都有价值</div>
+    <div class="stat-cards">
+      <div class="stat-card"><div class="stat-icon">📄</div><div class="stat-val" id="hTotal">-</div><div class="stat-lbl">资料总数</div></div>
+      <div class="stat-card"><div class="stat-icon">⬇</div><div class="stat-val" id="hDownloads">-</div><div class="stat-lbl">累计下载</div></div>
+      <div class="stat-card"><div class="stat-icon">👥</div><div class="stat-val" id="hUsers">-</div><div class="stat-lbl">贡献用户</div></div>
+      <div class="stat-card"><div class="stat-icon">📚</div><div class="stat-val" id="hSubjects">-</div><div class="stat-lbl">涵盖学科</div></div>
     </div>
   </div>
 </div>
 
-<div class="modal-overlay" id="uploadModal">
-  <div class="modal">
-    <h2>📤 上传资料</h2>
-    <div class="form-group"><label>标题</label><input type="text" id="upTitle" placeholder="例如：2024年高考数学真题" maxlength="100"></div>
-    <div class="form-row">
-      <div class="form-group"><label>学科</label><select id="upSubject">
-        <option value="数学">数学</option><option value="语文">语文</option><option value="英语">英语</option>
-        <option value="物理">物理</option><option value="化学">化学</option><option value="生物">生物</option>
-        <option value="历史">历史</option><option value="地理">地理</option><option value="政治">政治</option>
-        <option value="计算机">计算机</option><option value="其他">其他</option>
-      </select></div>
-      <div class="form-group"><label>年份</label><select id="upYear">
-        <script>
-          for(let y=new Date().getFullYear();y>=2000;y--)document.write(`<option value="${y}">${y}</option>`);
-        </script>
-      </select></div>
-    </div>
-    <div class="form-group"><label>标签（用逗号分隔）</label><input type="text" id="upTags" placeholder="高考,真题,全国卷"></div>
-    <div class="form-group"><label>描述</label><textarea id="upDesc" placeholder="简要描述这份资料..."></textarea></div>
-    <div class="form-group"><label>文件（PDF/图片/ZIP，最大20MB）</label><input type="file" id="upFile" accept=".pdf,.jpg,.jpeg,.png,.zip,.doc,.docx,.ppt,.pptx"></div>
-    <div class="modal-actions">
-      <button class="btn btn-outline" onclick="closeUploadModal()">取消</button>
-      <button class="btn btn-primary" onclick="doUpload()">上传</button>
-    </div>
-  </div>
-</div>
+<div class="container content" id="mainContent"></div>
 
-<!-- Toast -->
+<!-- Auth Modal -->
+<div class="modal-overlay" id="authModal"><div class="modal">
+  <h2 id="authTitle">登录</h2>
+  <div class="form-group"><label>邮箱</label><input type="email" id="authEmail" placeholder="your@email.com"></div>
+  <div class="form-group"><label>密码（至少6位）</label><input type="password" id="authPassword" placeholder="···"></div>
+  <div class="modal-actions">
+    <button class="btn btn-ghost" id="authToggle" onclick="toggleAuthMode()">去注册</button>
+    <button class="btn btn-primary" onclick="doAuth()">登录</button>
+  </div>
+</div></div>
+
+<!-- Upload Modal -->
+<div class="modal-overlay" id="uploadModal"><div class="modal">
+  <h2>📤 上传资料</h2>
+  <div class="form-group"><label>标题</label><input type="text" id="upTitle" placeholder="例如：2024年高考数学真题" maxlength="100"></div>
+  <div class="form-row">
+    <div class="form-group"><label>学科</label><select id="upSubject"><option value="数学">数学</option><option value="语文">语文</option><option value="英语">英语</option><option value="物理">物理</option><option value="化学">化学</option><option value="生物">生物</option><option value="历史">历史</option><option value="地理">地理</option><option value="政治">政治</option><option value="计算机">计算机</option><option value="其他">其他</option></select></div>
+    <div class="form-group"><label>年份</label><select id="upYear"><script>for(let y=new Date().getFullYear();y>=2000;y--)document.write(`<option value="${y}">${y}</option>`);</script></select></div>
+  </div>
+  <div class="form-group"><label>标签（逗号分隔）</label><input type="text" id="upTags" placeholder="高考,真题,全国卷"></div>
+  <div class="form-group"><label>文件（最大100MB）</label>
+    <div class="upload-zone" id="dropZone" onclick="document.getElementById('upFile').click()">
+      <div class="icon">📁</div>
+      <div class="hint">拖拽文件到此处，或 <strong>点击选择</strong></div>
+      <div style="font-size:0.75rem;color:var(--text3);margin-top:4px" id="fileInfo"></div>
+    </div>
+    <input type="file" id="upFile" accept=".pdf,.jpg,.jpeg,.png,.zip,.doc,.docx,.ppt,.pptx" style="display:none">
+  </div>
+  <div class="modal-actions">
+    <button class="btn btn-ghost" onclick="closeUploadModal()">取消</button>
+    <button class="btn btn-primary" onclick="doUpload()" id="uploadBtn">上传</button>
+  </div>
+</div></div>
+
 <div class="toast" id="toast"></div>
 
 <script>
 // ======================================================================
-// 📚 PaperHub · 试卷资料共享平台
-// 纯 fetch 实现，不依赖任何外部 CDN
+// PaperHub · 试卷共享平台 v2
+// Supabase + GitHub 存储 + Netlify 部署
 // ======================================================================
 const SUPABASE_URL = 'https://ugkyvcevycpmcbrqucla.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_L-cWMAfLnZ1jw-S3yscfdQ_B5lmiElK';
 
-// ── 轻量 Supabase 客户端 (fetch-based) ──
+// ── Supabase Client ──
 function createSupabaseClient(url, key) {
-  const jsonHeaders = () => ({
-    'apikey': key,
-    'Authorization': `Bearer ${key}`,
-    'Content-Type': 'application/json'
-  });
+  const jsonHeaders = () => ({'apikey':key,'Authorization':`Bearer ${key}`,'Content-Type':'application/json'});
+  let session = null, listeners = [];
 
-  let session = null;
-  const listeners = [];
-
-  // ── Auth ──
   const auth = {
     async getSession() {
-      const stored = localStorage.getItem('sb_session');
-      if (stored) {
-        try { session = JSON.parse(stored); } catch { session = null; }
-      }
+      try { const s = localStorage.getItem('sb_session'); if (s) session = JSON.parse(s); } catch { session = null; }
       return { data: { session } };
     },
     async signUp({email, password}) {
-      const r = await fetch(`${url}/auth/v1/signup`, {
-        method: 'POST', headers: jsonHeaders(),
-        body: JSON.stringify({email, password})
-      });
+      const r = await fetch(`${url}/auth/v1/signup`, {method:'POST',headers:jsonHeaders(),body:JSON.stringify({email,password})});
       const data = await r.json().catch(()=>({}));
       if (!r.ok) return { error: { message: data.msg || r.statusText }};
-      // Supabase may require email confirmation
       if (data.session) {
         session = { access_token: data.session.access_token, user: data.user || data.session.user };
-        localStorage.setItem('sb_session', JSON.stringify(session));
-        notify();
+        localStorage.setItem('sb_session', JSON.stringify(session)); notify();
         return { data: { session, user: session.user }, error: null };
       }
-      // Email confirmation needed
       return { data, error: null };
     },
     async signInWithPassword({email, password}) {
-      const r = await fetch(`${url}/auth/v1/token?grant_type=password`, {
-        method: 'POST', headers: jsonHeaders(),
-        body: JSON.stringify({email, password})
-      });
+      const r = await fetch(`${url}/auth/v1/token?grant_type=password`, {method:'POST',headers:jsonHeaders(),body:JSON.stringify({email,password})});
       const data = await r.json().catch(()=>({}));
-      if (!r.ok) {
-        return { error: { message: data.error_description || data.msg || '登录失败' }};
-      }
+      if (!r.ok) return { error: { message: data.error_description || data.msg || '登录失败' }};
       session = { access_token: data.access_token, user: data.user };
-      localStorage.setItem('sb_session', JSON.stringify(session));
-      notify();
+      localStorage.setItem('sb_session', JSON.stringify(session)); notify();
       return { data: { session, user: data.user }, error: null };
     },
     async signOut() {
       if (session?.access_token) {
-        await fetch(`${url}/auth/v1/logout`, {
-          method: 'POST',
-          headers: { ...jsonHeaders(), Authorization: `Bearer ${session.access_token}` }
-        }).catch(()=>{});
+        await fetch(`${url}/auth/v1/logout`, {method:'POST',headers:{...jsonHeaders(),Authorization:`Bearer ${session.access_token}`}}).catch(()=>{});
       }
-      session = null;
-      localStorage.removeItem('sb_session');
-      notify();
+      session = null; localStorage.removeItem('sb_session'); notify();
       return { error: null };
     },
     onAuthStateChange(fn) { listeners.push(fn); },
   };
-  function notify() {
-    const s = session ? { user: session.user } : null;
-    listeners.forEach(fn => fn('AUTH_CHANGE', s));
-  }
+  function notify() { const s = session ? { user: session.user } : null; listeners.forEach(fn => fn('AUTH_CHANGE', s)); }
 
-  // ── Storage ──
-  const storage = {
-    from(bucket) {
-      return {
-        async upload(filePath, file) {
-          const form = new FormData();
-          form.append('file', file);
-          const h = { 'apikey': key, 'Authorization': `Bearer ${key}` };
-          const r = await fetch(`${url}/storage/v1/object/${bucket}/${filePath}`, {
-            method: 'POST', headers: h, body: form
-          });
-          if (!r.ok) {
-            const txt = await r.text().catch(()=>'');
-            return { error: { message: txt || 'Upload failed' }};
-          }
-          return { data: await r.json().catch(()=>null), error: null };
-        },
-        getPublicUrl(filePath) {
-          return { data: { publicUrl: `${url}/storage/v1/object/public/${bucket}/${filePath}` }};
-        },
-        async remove(paths) {
-          const qs = paths.map(p => `paths=${encodeURIComponent(p)}`).join('&');
-          const h = { 'apikey': key, 'Authorization': `Bearer ${key}` };
-          if (session?.access_token) h.Authorization = `Bearer ${session.access_token}`;
-          const r = await fetch(`${url}/storage/v1/object/${bucket}?${qs}`, {
-            method: 'DELETE', headers: h
-          });
-          return { data: await r.json().catch(()=>null), error: r.ok ? null : { message: await r.text().catch(()=>'') }};
-        }
-      };
-    }
-  };
-
-  // ── Query Builder ──
   function from(table) {
-    let q = { table, method: 'GET', filters: [], params:{}, body:null, cols:'*', single:false, count:false };
+    let q = { table, method:'GET', filters:[], params:{}, body:null, cols:'*', single:false, count:false };
     const chain = {
-      select(cols='*', opts) { q.cols = cols; if (opts?.count) q.count = true; return this; },
-      insert(body) { q.method = 'POST'; q.body = body; return this; },
-      delete() { q.method = 'DELETE'; return this; },
-      eq(field, val) { q.filters.push([field, 'eq', val]); return this; },
-      ilike(field, val) { q.filters.push([field, 'ilike', val]); return this; },
-      order(field, opts) {
-        q.params.order = `${field}.${opts?.ascending === false ? 'desc' : 'asc'}`;
-        return this;
-      },
-      limit(n) { q.params.limit = n; return this; },
-      single() { q.single = true; return this; },
+      select(cols='*',opts) { q.cols=cols; if(opts?.count)q.count=true; return this; },
+      insert(body) { q.method='POST'; q.body=body; return this; },
+      delete() { q.method='DELETE'; return this; },
+      eq(field,val) { q.filters.push([field,'eq',val]); return this; },
+      ilike(field,val) { q.filters.push([field,'ilike',val]); return this; },
+      order(field,opts) { q.params.order=`${field}.${opts?.ascending===false?'desc':'asc'}`; return this; },
+      limit(n) { q.params.limit=n; return this; },
+      range(from,to) { q.params.offset=from; q.params.limit=to-from+1; return this; },
+      single() { q.single=true; return this; },
       async then(resolve) {
         try {
-          let path = `${url}/rest/v1/${q.table}`;
           const params = new URLSearchParams();
-          for (const [k, v] of Object.entries(q.params)) params.set(k, v);
-          for (const [f, op, v] of q.filters) params.set(f, `${op}.${encodeURIComponent(v)}`);
-          if (q.cols && q.cols !== '*') params.set('select', q.cols);
-
-          const h = { 'apikey': key };
+          for (const [k,v] of Object.entries(q.params)) params.set(k,v);
+          for (const [f,op,v] of q.filters) params.set(f,`${op}.${encodeURIComponent(v)}`);
+          if (q.cols && q.cols!=='*') params.set('select',q.cols);
+          const h = {'apikey':key};
           if (session?.access_token) h.Authorization = `Bearer ${session.access_token}`;
           else h.Authorization = `Bearer ${key}`;
-
-          if (q.method !== 'GET' && q.method !== 'DELETE') {
-            h['Content-Type'] = 'application/json';
-            if (q.method === 'POST') h['Prefer'] = 'return=representation';
+          if (q.method!=='GET' && q.method!=='DELETE') {
+            h['Content-Type']='application/json';
+            if (q.method==='POST') h['Prefer']='return=representation';
           }
-          if (q.count) h['Prefer'] = h['Prefer'] ? h['Prefer'] + ',count=exact' : 'count=exact';
-
-          const fetchOpts = { method: q.method, headers: h };
+          if (q.count) h['Prefer'] = (h['Prefer']?h['Prefer']+',':'')+'count=exact';
+          const fetchOpts = { method:q.method, headers:h };
           if (q.body) fetchOpts.body = JSON.stringify(q.body);
-
           const paramStr = params.toString();
-          const fullUrl = paramStr ? `${path}?${paramStr}` : path;
-
-          const r = await fetch(fullUrl, fetchOpts);
-          if (!r.ok) {
-            const txt = await r.text().catch(()=>r.statusText);
-            resolve({ data: null, error: { message: txt } });
-            return;
-          }
-          let data = r.status !== 204 ? await r.json() : [];
+          const r = await fetch(paramStr?`${url}/rest/v1/${q.table}?${paramStr}`:`${url}/rest/v1/${q.table}`, fetchOpts);
+          if (!r.ok) { resolve({ data:null, error:{message:await r.text().catch(()=>r.statusText)} }); return; }
+          let data = r.status!==204 ? await r.json() : [];
           if (!Array.isArray(data)) data = [data];
           if (q.single) data = data[0] || null;
-          const cntHdr = r.headers.get('content-range');
-          const count = cntHdr ? parseInt(cntHdr.split('/').pop()) : null;
-          resolve({ data, error: null, count: count !== null ? count : (Array.isArray(data) ? data.length : 0) });
-        } catch(e) {
-          resolve({ data: null, error: { message: e.message } });
-        }
+          const cnt = r.headers.get('content-range')?.split('/')?.pop();
+          resolve({ data, error:null, count:cnt?parseInt(cnt):(Array.isArray(data)?data.length:0) });
+        } catch(e) { resolve({ data:null, error:{message:e.message} }); }
       }
     };
     return chain;
   }
 
-  // ── RPC ──
   async function rpc(fnName, params) {
-    const h = { 'apikey': key, 'Content-Type': 'application/json' };
-    if (session?.access_token) h.Authorization = `Bearer ${session.access_token}`;
-    else h.Authorization = `Bearer ${key}`;
-    const r = await fetch(`${url}/rest/v1/rpc/${fnName}`, {
-      method: 'POST', headers: h, body: JSON.stringify(params)
-    });
-    if (!r.ok) return { error: { message: await r.text().catch(()=>'RPC error') }};
-    return { data: null, error: null };
+    const h = {'apikey':key,'Content-Type':'application/json'};
+    if (session?.access_token) h.Authorization='Bearer '+session.access_token; else h.Authorization='Bearer '+key;
+    const r = await fetch(`${url}/rest/v1/rpc/${fnName}`,{method:'POST',headers:h,body:JSON.stringify(params)});
+    if (!r.ok) return { error:{message:await r.text().catch(()=>'RPC error')}};
+    return { data:null, error:null };
   }
 
-  return { auth, from, storage, rpc };
+  return { auth, from, rpc };
 }
 
 const supabase = createSupabaseClient(SUPABASE_URL, SUPABASE_KEY);
-console.log('✅ PaperHub 就绪');
 
-// ====== State ======
-let currentView = 'home';
-let currentUser = null;
-let currentDetailId = null;
+// ===== State =====
+let currentUser = null, currentView = 'home', currentPage = 0, currentSubject = '';
+const PAGE_SIZE = 12;
 
-// ====== Auth ======
+// ===== Auth =====
 async function checkAuth() {
   const {data:{session}} = await supabase.auth.getSession();
   currentUser = session?.user || null;
   updateAuthUI();
   return currentUser;
 }
-supabase.auth.onAuthStateChange((_event, session) => {
+supabase.auth.onAuthStateChange((_e, session) => {
   currentUser = session?.user || null;
   updateAuthUI();
-  if (currentView === 'home' || currentView === 'mine') renderHome();
+  if (currentView === 'home') renderHome();
 });
 
 function updateAuthUI() {
+  const loginBtn = document.getElementById('loginBtn');
+  const logoutBtn = document.getElementById('logoutBtn');
+  const userInfo = document.getElementById('userInfo');
   if (currentUser) {
-    document.getElementById('loginBtn').style.display = 'none';
-    document.getElementById('logoutBtn').style.display = '';
-    document.getElementById('userInfo').textContent = currentUser.email;
+    loginBtn.style.display = 'none';
+    logoutBtn.style.display = '';
+    userInfo.textContent = currentUser.email;
   } else {
-    document.getElementById('loginBtn').style.display = '';
-    document.getElementById('logoutBtn').style.display = 'none';
-    document.getElementById('userInfo').textContent = '';
+    loginBtn.style.display = '';
+    logoutBtn.style.display = 'none';
+    userInfo.textContent = '';
   }
 }
 
@@ -437,31 +463,24 @@ function showAuthModal() {
 }
 
 function toggleAuthMode() {
-  const modal = document.getElementById('authModal');
-  if (modal._mode === 'login') {
-    modal._mode = 'signup';
-    document.getElementById('authTitle').textContent = '注册';
-    document.getElementById('authToggle').textContent = '去登录';
-  } else {
-    modal._mode = 'login';
-    document.getElementById('authTitle').textContent = '登录';
-    document.getElementById('authToggle').textContent = '去注册';
-  }
+  const m = document.getElementById('authModal');
+  if (m._mode === 'login') { m._mode='signup'; document.getElementById('authTitle').textContent='注册'; document.getElementById('authToggle').textContent='去登录'; }
+  else { m._mode='login'; document.getElementById('authTitle').textContent='登录'; document.getElementById('authToggle').textContent='去注册'; }
 }
 
 async function doAuth() {
   const email = document.getElementById('authEmail').value.trim();
   const password = document.getElementById('authPassword').value;
-  if (!email || !password) { toast('请填写邮箱和密码'); return; }
-  const modal = document.getElementById('authModal');
-  let result;
-  if (modal._mode === 'signup') {
-    result = await supabase.auth.signUp({email, password});
-    if (result.error) { toast('注册失败: ' + result.error.message); return; }
-    toast('注册成功！请检查邮箱确认（或直接登录）');
+  if (!email||!password) { toast('请填写邮箱和密码'); return; }
+  const m = document.getElementById('authModal');
+  let r;
+  if (m._mode==='signup') {
+    r = await supabase.auth.signUp({email,password});
+    if (r.error) { toast('注册失败: '+r.error.message); return; }
+    toast(r.data?.session?'注册成功！自动登录中...':'注册成功！请查收邮箱确认，然后登录');
   } else {
-    result = await supabase.auth.signInWithPassword({email, password});
-    if (result.error) { toast('登录失败: ' + result.error.message); return; }
+    r = await supabase.auth.signInWithPassword({email,password});
+    if (r.error) { toast('登录失败: '+r.error.message); return; }
     toast('登录成功！');
   }
   document.getElementById('authModal').classList.remove('active');
@@ -470,254 +489,257 @@ async function doAuth() {
 
 async function logout() {
   await supabase.auth.signOut();
-  toast('已退出');
-  renderHome();
+  toast('已退出'); renderHome();
 }
 
-// ====== Toast ======
 function toast(msg) {
   const t = document.getElementById('toast');
   t.textContent = msg; t.classList.add('show');
-  clearTimeout(t._timer);
-  t._timer = setTimeout(() => t.classList.remove('show'), 2500);
+  clearTimeout(t._timer); t._timer = setTimeout(() => t.classList.remove('show'), 2500);
 }
 
-// ====== Views ======
+// ===== Home =====
 async function renderHome() {
-  currentView = 'home';
-  document.getElementById('uploadModal').classList.remove('active');
+  currentView = 'home'; currentPage = 0; currentSubject = '';
   document.getElementById('authModal').classList.remove('active');
+  document.getElementById('uploadModal').classList.remove('active');
 
-  const main = document.getElementById('mainContent');
-  main.innerHTML = `
-    <!-- Search -->
-    <div class="search-bar">
-      <input type="text" id="searchInput" placeholder="🔍 搜索试卷标题、学科、标签..." onkeydown="if(event.key==='Enter')searchPapers()">
-      <select id="searchSubject"><option value="">全部学科</option>
-        ${['数学','语文','英语','物理','化学','生物','历史','地理','政治','计算机','其他'].map(s=>`<option value="${s}">${s}</option>`).join('')}
-      </select>
-      <select id="searchYear"><option value="">全部年份</option>
-        ${(()=>{let o='';for(let y=new Date().getFullYear();y>=2000;y--)o+=`<option value="${y}">${y}</option>`;return o;})()}
-      </select>
-      <button class="btn btn-primary" onclick="searchPapers()">搜索</button>
-      ${currentUser ? '<button class="btn btn-outline" onclick="showMyPapers()">📂 我的上传</button>' : ''}
+  document.getElementById('mainContent').innerHTML = `
+    <div class="search-row">
+      <div class="search-box">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="searchInput" placeholder="搜索试卷标题、标签..." onkeydown="if(event.key==='Enter')doSearch()">
+      </div>
+      <select class="filter-select" id="searchSubject" onchange="doSearch()"><option value="">📚 全部学科</option>${['数学','语文','英语','物理','化学','生物','历史','地理','政治','计算机','其他'].map(s=>`<option value="${s}">${s}</option>`).join('')}</select>
+      <select class="filter-select" id="searchYear" onchange="doSearch()"><option value="">📅 全部年份</option>${(()=>{let o='';for(let y=new Date().getFullYear();y>=2000;y--)o+=`<option value="${y}">${y}</option>`;return o;})()}</select>
+      <select class="filter-select" id="searchSort" onchange="doSearch()"><option value="created_at.desc">🕐 最新</option><option value="downloads.desc">⬇ 最多下载</option><option value="avg_rating.desc">⭐ 最高评分</option></select>
+      <button class="btn btn-primary btn-sm" onclick="doSearch()">搜索</button>
+      ${currentUser?'<button class="btn btn-outline btn-sm" onclick="showMyPapers()">📂 我的上传</button>':''}
     </div>
-
-    <div class="section-title">📄 最新上传</div>
+    <div class="subject-pills" id="subjectPills">
+      <span class="pill active" onclick="filterSubject('')">全部</span>
+      ${['数学','语文','英语','物理','化学','生物','计算机'].map(s=>`<span class="pill" onclick="filterSubject('${s}')">${s}</span>`).join('')}
+    </div>
+    <div class="section-title"><span>📄 资料列表</span><span class="count" id="resultCount"></span></div>
     <div class="grid" id="paperGrid"></div>
-    <div id="pagination"></div>
+    <div class="load-more" id="loadMore"></div>
   `;
 
+  await loadStats();
   await loadPapers();
 }
 
-async function loadPapers(subject='', year='', search='', userId='') {
+async function loadStats() {
+  const {count:total} = await supabase.from('papers').select('*',{count:'exact'}).limit(1);
+  const {count:subjects} = await supabase.from('papers').select('subject',{count:'exact'}).limit(1);
+  // Get distinct subject count and total downloads
+  const {data:all} = await supabase.from('papers').select('downloads,user_id');
+  const totalDownloads = all ? all.reduce((s,p)=>s+(p.downloads||0),0) : 0;
+  const uniqueUsers = all ? new Set(all.map(p=>p.user_id)).size : 0;
+  const uniqueSubjects = all ? new Set().size : 0; // simplified
+
+  document.getElementById('hTotal').textContent = total ?? '-';
+  document.getElementById('hDownloads').textContent = totalDownloads.toLocaleString();
+  document.getElementById('hUsers').textContent = uniqueUsers || '-';
+  document.getElementById('hSubjects').textContent = 11;
+}
+
+async function loadPapers(reset=true) {
+  if (reset) { currentPage = 0; }
   const grid = document.getElementById('paperGrid');
   if (!grid) return;
-  grid.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text2)">加载中...</div>';
 
-  let query = supabase.from('papers').select('*', {count:'exact'}).order('created_at', {ascending:false}).limit(50);
+  const search = document.getElementById('searchInput')?.value?.trim() || '';
+  const subject = document.getElementById('searchSubject')?.value || currentSubject || '';
+  const year = document.getElementById('searchYear')?.value || '';
+  const sort = document.getElementById('searchSort')?.value || 'created_at.desc';
+  const [sortField, sortDir] = sort.split('.');
+
+  if (reset) grid.innerHTML = Array(6).fill(0).map(()=>'<div class="card"><div class="card-body"><div class="skeleton skel-text"></div><div class="skeleton skel-text short"></div></div></div>').join('');
+
+  let query = supabase.from('papers').select('*',{count:'exact'}).order(sortField,{ascending:sortDir==='asc'}).range(currentPage*PAGE_SIZE, (currentPage+1)*PAGE_SIZE-1);
   if (subject) query = query.eq('subject', subject);
   if (year) query = query.eq('year', parseInt(year));
   if (search) query = query.ilike('title', `*${search}*`);
-  if (userId) query = query.eq('user_id', userId);
-  // If searching and no subject filter, also search tags
-  // (simplified: title search is primary)
 
-  const {data: papers, error, count} = await query;
+  const {data:papers, error, count} = await query;
+  if (error) { grid.innerHTML=`<div class="empty-state"><div class="icon">⚠️</div><p>加载失败: ${error.message}</p></div>`; return; }
 
-  if (error) { grid.innerHTML = `<div class="empty-state"><div class="icon">⚠️</div><p>加载失败: ${error.message}</p></div>`; return; }
-  if (!papers || papers.length === 0) {
-    grid.innerHTML = `<div class="empty-state"><div class="icon">📭</div><p>还没有资料，${currentUser?'上传第一份吧！':'登录后可以上传资料'}</p></div>`;
+  document.getElementById('resultCount').textContent = count ? `共 ${count} 份` : '';
+
+  if (!papers || papers.length===0) {
+    grid.innerHTML = `<div class="empty-state"><div class="icon">📭</div><p>还没有资料，${currentUser?'快来上传第一份吧！':'登录后可以上传资料'}</p></div>`;
+    document.getElementById('loadMore').innerHTML = '';
     return;
   }
 
-  // Also search by tags if searching
-  let filtered = papers;
-  if (search && !subject && !year && !userId) {
-    const q = search.toLowerCase();
-    filtered = papers.filter(p => {
-      if (p.title.toLowerCase().includes(q)) return true;
-      if (p.subject.toLowerCase().includes(q)) return true;
-      if (p.tags && p.tags.toLowerCase().includes(q)) return true;
-      return false;
-    });
-  }
-  if (filtered.length === 0) {
-    grid.innerHTML = `<div class="empty-state"><div class="icon">🔍</div><p>没有找到匹配的资料</p></div>`;
-    return;
-  }
+  grid.innerHTML = papers.map(p => {
+    const subjects = {数学:'math',语文:'chinese',英语:'english',物理:'physics',化学:'chemistry',生物:'biology',历史:'history',地理:'geography',政治:'politics',计算机:'cs'};
+    const subjClass = subjects[p.subject] || 'other';
+    const emojis = {数学:'📐',语文:'📖',英语:'🌍',物理:'⚡',化学:'🧪',生物:'🧬',历史:'📜',地理:'🗺️',政治:'⚖️',计算机:'💻'};
+    const emoji = emojis[p.subject] || '📄';
+    return `<div class="card" onclick="showDetail('${p.id}')">
+      <div class="card-top ${subjClass}">${emoji}</div>
+      <div class="card-body">
+        <div class="card-title">${esc(p.title)}</div>
+        <div class="card-tags">
+          <span class="tag">${esc(p.subject)}</span>
+          <span class="tag year">${p.year}</span>
+          ${p.file_type?`<span class="tag file">${p.file_type.toUpperCase()}</span>`:''}
+          ${p.tags?p.tags.split(',').slice(0,2).map(t=>`<span class="tag">${esc(t.trim())}</span>`).join(''):''}
+        </div>
+        <div class="card-footer">
+          <span>⬇ ${p.downloads||0}</span>
+          <span>⭐ ${p.rating_count?p.avg_rating.toFixed(1):'-'}</span>
+          <span>${timeAgo(p.created_at)}</span>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
 
-  grid.innerHTML = filtered.map(p => `
-    <div class="card" onclick="showDetail('${p.id}')">
-      <div class="card-title">${esc(p.title)}</div>
-      <div class="card-meta">
-        <span class="badge badge-subject">${esc(p.subject)}</span>
-        <span class="badge badge-year">${p.year}</span>
-        ${p.file_type ? `<span class="badge badge-pdf">${p.file_type.toUpperCase()}</span>` : ''}
-      </div>
-      ${p.tags ? `<div style="margin-top:6px;font-size:0.78rem;color:var(--text3)">🏷️ ${esc(p.tags)}</div>` : ''}
-      <div class="card-footer">
-        <span class="stats">⬇ ${p.downloads || 0} &nbsp;⭐ ${p.rating_count ? p.avg_rating.toFixed(1) : '-'}</span>
-        <span style="font-size:0.78rem;color:var(--text3)">${timeAgo(p.created_at)}</span>
-      </div>
-    </div>
-  `).join('');
+  // Pagination
+  const totalPages = Math.ceil((count||0) / PAGE_SIZE);
+  document.getElementById('loadMore').innerHTML = totalPages > 1 ? `
+    <div class="pagination">
+      ${Array.from({length:Math.min(totalPages,8)},(_,i)=>`<button class="${i===currentPage?'active':''}" onclick="goPage(${i})">${i+1}</button>`).join('')}
+      ${totalPages>8?'<span style="color:var(--text3)">...</span>':''}
+    </div>` : '';
 }
 
-async function searchPapers() {
-  const search = document.getElementById('searchInput')?.value?.trim() || '';
-  const subject = document.getElementById('searchSubject')?.value || '';
-  const year = document.getElementById('searchYear')?.value || '';
-  await loadPapers(subject, year, search);
+function filterSubject(s) {
+  currentSubject = s;
+  document.querySelectorAll('.pill').forEach(el=>el.classList.remove('active'));
+  event?.target?.classList?.add('active');
+  const sel = document.getElementById('searchSubject');
+  if (sel) sel.value = s;
+  loadPapers(true);
 }
+
+function doSearch() { currentSubject=''; loadPapers(true); }
+function goPage(n) { currentPage = n; loadPapers(false); window.scrollTo({top:400,behavior:'smooth'}); }
 
 async function showMyPapers() {
   if (!currentUser) { toast('请先登录'); return; }
   currentView = 'mine';
-  const main = document.getElementById('mainContent');
-  main.innerHTML = `
-    <div style="margin:20px 0">
-      <a href="#" onclick="goHome()" style="font-size:0.9rem">← 返回首页</a>
-    </div>
+  document.getElementById('mainContent').innerHTML = `
+    <div style="margin:16px 0"><a href="#" onclick="goHome()" class="back-link">← 返回首页</a></div>
     <div class="section-title">📂 我上传的资料</div>
     <div class="grid" id="paperGrid"></div>
   `;
-  await loadPapers('', '', '', currentUser.id);
+  const {data:papers} = await supabase.from('papers').select('*').eq('user_id',currentUser.id).order('created_at',{ascending:false});
+  const grid = document.getElementById('paperGrid');
+  if (!papers||papers.length===0) { grid.innerHTML='<div class="empty-state"><div class="icon">📭</div><p>你还没有上传资料</p></div>'; return; }
+  grid.innerHTML = papers.map(p => `<div class="card" onclick="showDetail('${p.id}')"><div class="card-body"><div class="card-title">${esc(p.title)}</div><div class="card-tags"><span class="tag">${esc(p.subject)}</span><span class="tag year">${p.year}</span></div><div class="card-footer"><span>⬇ ${p.downloads||0}</span><span>⭐ ${p.rating_count?p.avg_rating.toFixed(1):'-'}</span><span>${timeAgo(p.created_at)}</span></div></div></div>`).join('');
 }
 
-function goHome() { renderHome(); }
+function goHome() { document.getElementById('heroSection').style.display=''; renderHome(); }
 
+// ===== Detail =====
 async function showDetail(id) {
-  currentDetailId = id;
   currentView = 'detail';
-  const {data: paper, error} = await supabase.from('papers').select('*').eq('id', id).single();
-  if (error || !paper) { toast('资料不存在'); renderHome(); return; }
+  document.getElementById('heroSection').style.display = 'none';
+  const {data:paper} = await supabase.from('papers').select('*').eq('id',id).single();
+  if (!paper) { toast('资料不存在'); renderHome(); return; }
+  const {data:reviews} = await supabase.from('reviews').select('*').eq('paper_id',id).order('created_at',{ascending:false});
 
-  // Increment view / get reviews
-  const {data: reviews} = await supabase.from('reviews').select('*').eq('paper_id', id).order('created_at', {ascending:false});
-
-  const main = document.getElementById('mainContent');
-  main.innerHTML = `
-    <div style="margin:20px 0"><a href="#" onclick="goHome()" style="font-size:0.9rem">← 返回首页</a></div>
-    <div class="detail-header">
-      <h1>${esc(paper.title)}</h1>
+  document.getElementById('mainContent').innerHTML = `
+    <a href="#" onclick="goHome()" class="back-link">← 返回首页</a>
+    <div class="detail-card">
+      <h1 class="detail-title">${esc(paper.title)}</h1>
       <div class="detail-meta">
-        <span class="badge badge-subject">${esc(paper.subject)}</span>
-        <span class="badge badge-year">${paper.year}</span>
-        ${paper.file_type ? `<span class="badge badge-pdf">${paper.file_type.toUpperCase()}</span>` : ''}
-        <span>⬇ ${paper.downloads || 0} 次下载</span>
-        <span>⭐ ${paper.avg_rating ? paper.avg_rating.toFixed(1)+' ('+paper.rating_count+')' : '暂无评分'}</span>
-        <span>上传于 ${timeAgo(paper.created_at)}</span>
+        <span class="tag">${esc(paper.subject)}</span><span class="tag year">${paper.year}</span>
+        ${paper.file_type?`<span class="tag file">${paper.file_type.toUpperCase()}</span>`:''}
+        <span style="font-size:0.85rem;color:var(--text2)">⬇ ${paper.downloads||0} 次下载</span>
+        <span style="font-size:0.85rem;color:var(--text2)">⭐ ${paper.rating_count?paper.avg_rating.toFixed(1)+' ('+paper.rating_count+')':'暂无评分'}</span>
+        <span style="font-size:0.85rem;color:var(--text3)">${timeAgo(paper.created_at)}</span>
       </div>
-      ${paper.tags ? `<div style="margin:4px 0;font-size:0.85rem;color:var(--text2)">🏷️ ${esc(paper.tags)}</div>` : ''}
-      ${paper.description ? `<p style="margin:12px 0;font-size:0.95rem;color:var(--text2);white-space:pre-wrap">${esc(paper.description)}</p>` : ''}
+      ${paper.tags?`<div style="margin:8px 0;font-size:0.85rem;color:var(--text2)">🏷️ ${esc(paper.tags)}</div>`:''}
+      ${paper.description?`<div class="detail-desc">${esc(paper.description)}</div>`:''}
       <div class="detail-actions">
         <button class="btn btn-primary download-btn" data-id="${paper.id}" data-path="${esc(paper.file_path||'')}">⬇ 下载文件</button>
-        ${currentUser ? `<button class="btn btn-outline" onclick="showReviewInput('${paper.id}')">⭐ 评分</button>` : ''}
-        ${currentUser && currentUser.id === paper.user_id ? `<button class="btn btn-danger btn-sm" onclick="deletePaper('${paper.id}')">🗑 删除</button>` : ''}
+        ${currentUser?`<button class="btn btn-outline btn-sm" onclick="showReviewInput('${paper.id}')">⭐ 评分</button>`:''}
+        ${currentUser&&currentUser.id===paper.user_id?`<button class="btn btn-danger btn-sm" onclick="deletePaper('${paper.id}')">🗑 删除</button>`:''}
       </div>
     </div>
-
-    <div class="section-title">💬 评价 (${reviews?.length || 0})</div>
-    <div id="reviewList">
-      ${!reviews || reviews.length === 0 ? '<p style="color:var(--text2);font-size:0.9rem">暂无评价</p>' : ''}
-      ${reviews ? reviews.map(r => `
-        <div class="review-card">
-          <div class="review-header">
-            <span>${esc(r.user_email || '匿名')}</span>
-            <span class="stars">${'★'.repeat(r.rating)}${'☆'.repeat(5-r.rating)}</span>
-            <span>${timeAgo(r.created_at)}</span>
-          </div>
-          ${r.comment ? `<p style="font-size:0.9rem">${esc(r.comment)}</p>` : ''}
-        </div>
-      `).join('') : ''}
-    </div>
-    <div id="reviewInputArea" style="margin-top:12px"></div>
+    <div class="section-title">💬 评价 (${reviews?.length||0})</div>
+    <div id="reviewList">${!reviews||reviews.length===0?'<p style="color:var(--text2);font-size:0.9rem">暂无评价</p>':''}${reviews?reviews.map(r=>`<div class="review-card"><div class="review-header"><span>${esc(r.user_email||'匿名')}</span><span class="stars">${'★'.repeat(r.rating)}${'☆'.repeat(5-r.rating)}</span><span>${timeAgo(r.created_at)}</span></div>${r.comment?`<p style="font-size:0.9rem">${esc(r.comment)}</p>`:''}</div>`).join(''):''}</div>
+    <div id="reviewInputArea"></div>
   `;
 }
 
 function showReviewInput(paperId) {
-  const area = document.getElementById('reviewInputArea');
-  area.innerHTML = `
-    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 18px">
-      <div style="margin-bottom:8px;font-weight:500">留下你的评价</div>
-      <div style="margin-bottom:8px">
-        ${[1,2,3,4,5].map(n => `<button class="btn btn-ghost" onclick="setRating(${n})" id="star${n}" style="font-size:1.4rem;padding:2px 6px">☆</button>`).join('')}
-      </div>
-      <div class="form-group"><textarea id="reviewComment" placeholder="写点评论（可选）" rows="2"></textarea></div>
-      <button class="btn btn-primary btn-sm" onclick="submitReview('${paperId}')">提交评价</button>
-    </div>
-  `;
-  window._rating = 0;
+  document.getElementById('reviewInputArea').innerHTML = `<div class="review-card">
+    <div style="font-weight:600;margin-bottom:8px">留下你的评价</div>
+    <div style="margin-bottom:8px">${[1,2,3,4,5].map(n=>`<button class="btn btn-ghost" onclick="setRating(${n})" id="star${n}" style="font-size:1.4rem;padding:2px 6px">☆</button>`).join('')}</div>
+    <div class="form-group"><textarea id="reviewComment" placeholder="写点评论（可选）" rows="2"></textarea></div>
+    <button class="btn btn-primary btn-sm" onclick="submitReview('${paperId}')">提交评价</button>
+  </div>`; window._rating=0;
 }
 
-function setRating(n) {
-  window._rating = n;
-  for (let i=1;i<=5;i++) {
-    document.getElementById('star'+i).textContent = i <= n ? '★' : '☆';
-  }
-}
+function setRating(n) { window._rating=n; for(let i=1;i<=5;i++) document.getElementById('star'+i).textContent=i<=n?'★':'☆'; }
 
 async function submitReview(paperId) {
   if (!currentUser) { toast('请先登录'); return; }
-  const rating = window._rating;
-  if (!rating) { toast('请选择评分'); return; }
-  const comment = document.getElementById('reviewComment')?.value?.trim() || '';
-  const {error} = await supabase.from('reviews').insert({
-    paper_id: paperId,
-    user_id: currentUser.id,
-    user_email: currentUser.email,
-    rating: rating,
-    comment: comment
-  });
-  if (error) { toast('提交失败: ' + error.message); return; }
-  // Update paper avg
+  if (!window._rating) { toast('请选择评分'); return; }
+  const c = document.getElementById('reviewComment')?.value?.trim()||'';
+  const {error} = await supabase.from('reviews').insert({paper_id:paperId,user_id:currentUser.id,user_email:currentUser.email,rating:window._rating,comment:c});
+  if (error) { toast('提交失败: '+error.message); return; }
   await updatePaperRating(paperId);
-  toast('评价已提交！');
-  showDetail(paperId);
+  toast('评价已提交！'); showDetail(paperId);
 }
 
 async function updatePaperRating(paperId) {
-  const {data: reviews} = await supabase.from('reviews').select('rating').eq('paper_id', paperId);
-  if (!reviews || reviews.length === 0) return;
-  const avg = reviews.reduce((s,r) => s + r.rating, 0) / reviews.length;
-  await supabase.from('papers').update({
-    avg_rating: Math.round(avg * 10) / 10,
-    rating_count: reviews.length
-  }).eq('id', paperId);
+  const {data:reviews} = await supabase.from('reviews').select('rating').eq('paper_id',paperId);
+  if (!reviews||!reviews.length) return;
+  const avg = reviews.reduce((s,r)=>s+r.rating,0)/reviews.length;
+  await supabase.from('papers').update({avg_rating:Math.round(avg*10)/10,rating_count:reviews.length}).eq('id',paperId);
 }
 
 async function downloadPaper(paperId, filePath) {
   if (!filePath) { toast('文件路径无效'); return; }
-  // Increment download count
-  await supabase.rpc('increment_downloads', {paper_id: paperId});
-  window.open(filePath, '_blank');
-  toast('开始下载！');
-  setTimeout(() => showDetail(paperId), 500);
+  await supabase.rpc('increment_downloads',{paper_id:paperId});
+  window.open(filePath,'_blank'); toast('开始下载！');
+  setTimeout(()=>{ if(currentView==='detail') showDetail(paperId); },500);
 }
 
 async function deletePaper(paperId) {
-  if (!confirm('确定要删除这份资料吗？此操作不可撤销。')) return;
-  await supabase.from('reviews').delete().eq('paper_id', paperId);
-  await supabase.from('papers').delete().eq('id', paperId);
-  toast('已删除（文件保留在 GitHub）');
-  renderHome();
+  if (!confirm('确定要删除这份资料吗？')) return;
+  await supabase.from('reviews').delete().eq('paper_id',paperId);
+  await supabase.from('papers').delete().eq('id',paperId);
+  toast('已删除'); renderHome();
 }
 
-// ====== Upload ======
+// ===== Upload =====
 function showUploadModal() {
   if (!currentUser) { toast('请先登录'); return; }
   document.getElementById('uploadModal').classList.add('active');
-  document.getElementById('upTitle').value = '';
-  document.getElementById('upTags').value = '';
-  document.getElementById('upDesc').value = '';
-  document.getElementById('upFile').value = '';
+  document.getElementById('upTitle').value='';
+  document.getElementById('upTags').value='';
+  document.getElementById('upFile').value='';
+  document.getElementById('fileInfo').textContent='';
 }
 
-function closeUploadModal() {
-  document.getElementById('uploadModal').classList.remove('active');
-}
+function closeUploadModal() { document.getElementById('uploadModal').classList.remove('active'); }
+
+// Drag and drop
+document.addEventListener('DOMContentLoaded',()=>{
+  const zone = document.getElementById('dropZone');
+  if (!zone) return;
+  zone.addEventListener('dragover',e=>{e.preventDefault();zone.classList.add('drag')});
+  zone.addEventListener('dragleave',()=>zone.classList.remove('drag'));
+  zone.addEventListener('drop',e=>{
+    e.preventDefault(); zone.classList.remove('drag');
+    const file = e.dataTransfer.files[0];
+    if (file) {
+      document.getElementById('upFile').files = e.dataTransfer.files;
+      document.getElementById('fileInfo').textContent = `已选择: ${file.name} (${(file.size/1024/1024).toFixed(1)}MB)`;
+    }
+  });
+  document.getElementById('upFile').addEventListener('change',function(){
+    const f = this.files[0];
+    if (f) document.getElementById('fileInfo').textContent = `已选择: ${f.name} (${(f.size/1024/1024).toFixed(1)}MB)`;
+  });
+});
 
 async function doUpload() {
   if (!currentUser) { toast('请先登录'); return; }
@@ -725,85 +747,67 @@ async function doUpload() {
   const subject = document.getElementById('upSubject').value;
   const year = document.getElementById('upYear').value;
   const tags = document.getElementById('upTags').value.trim();
-  const desc = document.getElementById('upDesc').value.trim();
-  const fileInput = document.getElementById('upFile');
-  const file = fileInput.files[0];
-
+  const file = document.getElementById('upFile').files[0];
   if (!title) { toast('请输入标题'); return; }
   if (!file) { toast('请选择文件'); return; }
-  if (file.size > 20 * 1024 * 1024) { toast('文件不能超过20MB'); return; }
+  if (file.size > 100*1024*1024) { toast('文件不能超过100MB'); return; }
 
   const ext = file.name.split('.').pop().toLowerCase();
   const filePath = `${currentUser.id}/${Date.now()}.${ext}`;
+  document.getElementById('uploadBtn').textContent = '上传中...';
+  document.getElementById('uploadBtn').disabled = true;
 
-  // Upload file to GitHub via Netlify function
-  const form = new FormData();
-  form.append('file', file);
-  form.append('path', filePath);
-  const upRes = await fetch('/api/upload', { method: 'POST', body: form });
+  const form = new FormData(); form.append('file',file); form.append('path',filePath);
+  const upRes = await fetch('/api/upload',{method:'POST',body:form});
   const upData = await upRes.json();
-  if (!upRes.ok) { toast('上传失败: ' + (upData.error || upRes.statusText)); return; }
-  const downloadUrl = upData.url;
+  if (!upRes.ok) {
+    document.getElementById('uploadBtn').textContent = '上传';
+    document.getElementById('uploadBtn').disabled = false;
+    toast('上传失败: '+(upData.error||upRes.statusText)); return;
+  }
 
-  // Insert record
-  const {error: insertError} = await supabase.from('papers').insert({
-    title, subject, year: parseInt(year), tags, description: desc,
-    file_path: downloadUrl, file_type: ext, file_size: file.size,
-    user_id: currentUser.id, user_email: currentUser.email
+  const {error:dbErr} = await supabase.from('papers').insert({
+    title,subject,year:parseInt(year),tags,description:'',
+    file_path:upData.url,file_type:ext,file_size:file.size,
+    user_id:currentUser.id,user_email:currentUser.email
   });
+  if (dbErr) { toast('保存失败: '+dbErr.message); return; }
 
+  document.getElementById('uploadBtn').textContent = '上传';
+  document.getElementById('uploadBtn').disabled = false;
   toast('上传成功！🎉');
   closeUploadModal();
   renderHome();
 }
 
-// ====== Helpers ======
+// ===== Helpers =====
 function esc(s) {
   if (!s) return '';
-  const div = document.createElement('div');
-  div.textContent = String(s);
-  return div.innerHTML;
+  const d = document.createElement('div'); d.textContent = String(s); return d.innerHTML;
+}
+function timeAgo(d) {
+  if (!d) return ''; const diff = Date.now()-new Date(d).getTime();
+  const min = Math.floor(diff/60000);
+  if (min<1) return '刚刚'; if (min<60) return min+'分钟前';
+  const h = Math.floor(min/60); if (h<24) return h+'小时前';
+  const days = Math.floor(h/24); if (days<30) return days+'天前';
+  if (days<365) return Math.floor(days/30)+'个月前';
+  return Math.floor(days/365)+'年前';
 }
 
-function timeAgo(dateStr) {
-  if (!dateStr) return '';
-  const now = new Date();
-  const d = new Date(dateStr);
-  const diff = now - d;
-  const min = Math.floor(diff / 60000);
-  if (min < 1) return '刚刚';
-  if (min < 60) return min + '分钟前';
-  const h = Math.floor(min / 60);
-  if (h < 24) return h + '小时前';
-  const days = Math.floor(h / 24);
-  if (days < 30) return days + '天前';
-  if (days < 365) return Math.floor(days / 30) + '个月前';
-  return Math.floor(days / 365) + '年前';
-}
-
-// ====== Close modals on overlay click ======
-document.getElementById('authModal').addEventListener('click', function(e) {
-  if (e.target === this) this.classList.remove('active');
-});
-document.getElementById('uploadModal').addEventListener('click', function(e) {
-  if (e.target === this) this.classList.remove('active');
-});
-
-// ====== Event Delegation ======
-document.getElementById('mainContent').addEventListener('click', function(e) {
+// ===== Event Delegation =====
+document.getElementById('mainContent').addEventListener('click',function(e){
   const btn = e.target.closest('.download-btn');
-  if (btn) {
-    const id = btn.getAttribute('data-id');
-    const path = btn.getAttribute('data-path');
-    if (id && path) downloadPaper(id, path);
-  }
+  if (btn) { const id=btn.getAttribute('data-id'), path=btn.getAttribute('data-path'); if(id&&path) downloadPaper(id,path); }
 });
+document.getElementById('authModal').addEventListener('click',function(e){ if(e.target===this) this.classList.remove('active'); });
+document.getElementById('uploadModal').addEventListener('click',function(e){ if(e.target===this) this.classList.remove('active'); });
 
-// ====== Init ======
+// ===== Init =====
 (async function init() {
   await checkAuth();
   renderHome();
-  console.log('📚 PaperHub 已就绪', currentUser ? `(已登录: ${currentUser.email})` : '(未登录)');
+  console.log('📚 PaperHub v2 就绪', currentUser?`(${currentUser.email})`:'');
 })();
 </script>
 </body>
