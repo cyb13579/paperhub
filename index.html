@@ -3,463 +3,555 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PaperHub · 试卷共享平台</title>
+<title>PaperHub · 试卷共享平台 v3</title>
+<script src="https://cdn.bmob.cn/sdk/Bmob-2.2.8.min.js"></script>
 <style>
-:root{--bg:#f5f6fa;--card:#fff;--border:#e8ecf1;--text:#1e293b;--text2:#64748b;--text3:#94a3b8;--primary:#6366f1;--primary2:#4f46e5;--green:#10b981;--red:#ef4444;--orange:#f59e0b;--radius:14px;--radius-sm:8px;--shadow:0 1px 3px rgba(0,0,0,.06)}
+:root{--bg:#f5f6fa;--card:#fff;--border:#e8ecf1;--text:#1e293b;--text2:#64748b;--text3:#94a3b8;--accent:#6366f1;--accent2:#4f46e5;--green:#10b981;--red:#ef4444;--orange:#f59e0b;--r:14px;--rs:8px;--sh:0 1px 3px rgba(0,0,0,.06)}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans SC',system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh}
-a{color:var(--primary);text-decoration:none}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans SC',sans-serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh}
+a{color:var(--accent);text-decoration:none}
 
 .header{background:linear-gradient(135deg,#312e81,#4f46e5,#6366f1);color:#fff}
-.header-inner{max-width:1200px;margin:0 auto;padding:12px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
-.logo{font-size:1.4rem;font-weight:800;color:#fff}
-.logo span{color:#c7d2fe}
-.nav-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.user-email{font-size:0.82rem;color:#c7d2fe;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hi{max-width:1200px;margin:0 auto;padding:12px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.logo{font-size:1.4rem;font-weight:800;color:#fff}.logo span{color:#c7d2fe}
+.nr{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.ue{font-size:0.82rem;color:#c7d2fe;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
 .btn{padding:7px 15px;border-radius:20px;font-size:0.85rem;font-weight:500;cursor:pointer;border:none;transition:all .15s;display:inline-flex;align-items:center;gap:4px;white-space:nowrap}
-.btn-white{background:rgba(255,255,255,.2);color:#fff}.btn-white:hover{background:rgba(255,255,255,.35)}
-.btn-primary{background:var(--primary);color:#fff}.btn-primary:hover{background:var(--primary2)}
-.btn-outline{background:transparent;border:1px solid var(--border);color:var(--text)}.btn-outline:hover{background:var(--bg)}
-.btn-ghost{background:transparent;color:var(--text2)}.btn-ghost:hover{color:var(--text)}
-.btn-sm{padding:4px 11px;font-size:0.76rem;border-radius:14px}
-.btn-danger{background:var(--red);color:#fff}
+.btn-w{background:rgba(255,255,255,.2);color:#fff}.btn-w:hover{background:rgba(255,255,255,.35)}
+.btn-p{background:var(--accent);color:#fff}.btn-p:hover{background:var(--accent2)}
+.btn-o{background:transparent;border:1px solid var(--border);color:var(--text)}.btn-o:hover{background:var(--bg)}
+.btn-g{background:transparent;color:var(--text2)}.btn-g:hover{color:var(--text)}
+.btn-s{padding:4px 11px;font-size:0.76rem;border-radius:14px}
+.btn-d{background:var(--red);color:#fff}
 
 .container{max-width:1200px;margin:0 auto;padding:0 20px}
 .hero{background:linear-gradient(135deg,#312e81,#4f46e5,#6366f1);padding:0 0 32px}
-.hero-inner{max-width:1200px;margin:0 auto;padding:0 20px}
-.hero-title{font-size:1.8rem;font-weight:800;color:#fff;padding:16px 0 4px}
-.hero-sub{color:#c7d2fe;font-size:0.9rem;margin-bottom:20px}
-.stat-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
-.stat-card{background:rgba(255,255,255,.12);border-radius:var(--radius);padding:16px 18px;color:#fff;border:1px solid rgba(255,255,255,.1)}
-.stat-val{font-size:1.4rem;font-weight:700}.stat-lbl{font-size:0.75rem;color:#c7d2fe}
+.hri{max-width:1200px;margin:0 auto;padding:0 20px}
+.ht{font-size:1.8rem;font-weight:800;color:#fff;padding:16px 0 4px}
+.hs{color:#c7d2fe;font-size:0.9rem;margin-bottom:20px}
+.sc{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.scd{background:rgba(255,255,255,.12);border-radius:var(--r);padding:16px 18px;color:#fff;border:1px solid rgba(255,255,255,.1)}
+.sv{font-size:1.4rem;font-weight:700}.sl{font-size:0.75rem;color:#c7d2fe}
 
 .content{padding:20px 0 60px}
-.search-row{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
-.search-box{flex:1;min-width:200px;display:flex;align-items:center;background:var(--card);border:1px solid var(--border);border-radius:24px;padding:0 14px;transition:all .15s}
-.search-box:focus-within{border-color:var(--primary);box-shadow:0 0 0 3px rgba(99,102,241,.1)}
-.search-box input{flex:1;border:none;padding:11px 0;font-size:0.9rem;outline:none;background:transparent;color:var(--text)}
-.search-box input::placeholder{color:var(--text3)}
-.search-icon{color:var(--text3);margin-right:6px}
-.filter-select{padding:10px 30px 10px 12px;border:1px solid var(--border);border-radius:24px;font-size:0.85rem;outline:none;background:var(--card);color:var(--text);cursor:pointer;appearance:none;background-image:url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2364748b' d='M6 8L1 3h10z'/%3E%3C/svg%3E\");background-repeat:no-repeat;background-position:right 10px center}
-.filter-select:focus{border-color:var(--primary);outline:none}
+.sr{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.sb{flex:1;min-width:200px;display:flex;align-items:center;background:var(--card);border:1px solid var(--border);border-radius:24px;padding:0 14px;transition:all .15s}
+.sb:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px rgba(99,102,241,.1)}
+.sb input{flex:1;border:none;padding:11px 0;font-size:0.9rem;outline:none;background:transparent;color:var(--text)}
+.sb input::placeholder{color:var(--text3)}
+.fs{padding:10px 30px 10px 12px;border:1px solid var(--border);border-radius:24px;font-size:0.85rem;outline:none;background:var(--card);color:var(--text);cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2364748b' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center}
+.fs:focus{border-color:var(--accent);outline:none}
 
-.subject-pills{display:flex;gap:5px;margin-bottom:16px;flex-wrap:wrap}
+.sp{display:flex;gap:5px;margin-bottom:16px;flex-wrap:wrap}
 .pill{padding:5px 14px;border-radius:20px;font-size:0.8rem;font-weight:500;cursor:pointer;border:1px solid var(--border);background:var(--card);color:var(--text2);transition:all .12s;white-space:nowrap}
-.pill.active,.pill:hover{background:var(--primary);color:#fff;border-color:var(--primary)}
+.pill.active,.pill:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
 
-.section-title{font-size:1rem;font-weight:700;margin:16px 0 10px;display:flex;align-items:center;justify-content:space-between}
-.section-title .count{font-size:0.8rem;color:var(--text3);font-weight:400}
+.st{font-size:1rem;font-weight:700;margin:16px 0 10px;display:flex;justify-content:space-between}
+.st .c{font-size:0.8rem;color:var(--text3);font-weight:400}
 
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:12px;margin-bottom:20px}
-.card{background:var(--card);border-radius:var(--radius);border:1px solid var(--border);overflow:hidden;transition:all .15s;cursor:pointer;box-shadow:var(--shadow)}
+.card{background:var(--card);border-radius:var(--r);border:1px solid var(--border);overflow:hidden;transition:all .15s;cursor:pointer;box-shadow:var(--sh)}
 .card:hover{transform:translateY(-1px);box-shadow:0 6px 24px rgba(0,0,0,.07);border-color:#c7d2fe}
-.card-top{height:70px;display:flex;align-items:center;justify-content:center;font-size:2.2rem}
-.card-top.m{background:linear-gradient(135deg,#eef2ff,#e0e7ff)}.card-top.c{background:linear-gradient(135deg,#fef3c7,#fef9c3)}.card-top.e{background:linear-gradient(135deg,#fce7f3,#fbcfe8)}.card-top.p{background:linear-gradient(135deg,#e0f2fe,#bae6fd)}.card-top.ch{background:linear-gradient(135deg,#f0fdf4,#dcfce7)}.card-top.b{background:linear-gradient(135deg,#ecfdf5,#d1fae5)}.card-top.h{background:linear-gradient(135deg,#fef2f2,#fecaca)}.card-top.g{background:linear-gradient(135deg,#f0fdfa,#99f6e4)}.card-top.po{background:linear-gradient(135deg,#fefce8,#fef08a)}.card-top.cs{background:linear-gradient(135deg,#f5f3ff,#ddd6fe)}.card-top.ot{background:linear-gradient(135deg,#f8fafc,#e2e8f0)}
-.card-body{padding:14px 16px}
-.card-title{font-size:0.92rem;font-weight:600;line-height:1.4;margin-bottom:6px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.card-tags{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:8px}
-.tag{padding:2px 9px;border-radius:12px;font-size:0.7rem;font-weight:500;background:#eef2ff;color:var(--primary)}
+.ct{height:70px;display:flex;align-items:center;justify-content:center;font-size:2.2rem}
+.ct.m{background:linear-gradient(135deg,#eef2ff,#e0e7ff)}.ct.c{background:linear-gradient(135deg,#fef3c7,#fef9c3)}.ct.e{background:linear-gradient(135deg,#fce7f3,#fbcfe8)}.ct.p{background:linear-gradient(135deg,#e0f2fe,#bae6fd)}.ct.ch{background:linear-gradient(135deg,#f0fdf4,#dcfce7)}.ct.b{background:linear-gradient(135deg,#ecfdf5,#d1fae5)}.ct.h{background:linear-gradient(135deg,#fef2f2,#fecaca)}.ct.g{background:linear-gradient(135deg,#f0fdfa,#99f6e4)}.ct.po{background:linear-gradient(135deg,#fefce8,#fef08a)}.ct.cs{background:linear-gradient(135deg,#f5f3ff,#ddd6fe)}.ct.ot{background:linear-gradient(135deg,#f8fafc,#e2e8f0)}
+.cb{padding:14px 16px}
+.cti{font-size:0.92rem;font-weight:600;line-height:1.4;margin-bottom:6px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.ctg{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:8px}
+.tag{padding:2px 9px;border-radius:12px;font-size:0.7rem;font-weight:500;background:#eef2ff;color:var(--accent)}
 .tag.yr{background:#fef3c7;color:#92400e}.tag.fl{background:#fee2e2;color:#991b1b}
-.card-footer{display:flex;align-items:center;justify-content:space-between;font-size:0.76rem;color:var(--text3);padding-top:8px;border-top:1px solid var(--border)}
+.cf{display:flex;align-items:center;justify-content:space-between;font-size:0.76rem;color:var(--text3);padding-top:8px;border-top:1px solid var(--border)}
 
-.load-more{text-align:center;padding:16px}
-.pagination{display:flex;gap:6px;justify-content:center}
-.pagination button{width:34px;height:34px;border-radius:50%;border:1px solid var(--border);background:var(--card);cursor:pointer;font-size:0.82rem}
-.pagination button.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+.lm{text-align:center;padding:16px}
+.pg{display:flex;gap:6px;justify-content:center}
+.pg button{width:34px;height:34px;border-radius:50%;border:1px solid var(--border);background:var(--card);cursor:pointer;font-size:0.82rem}
+.pg button.active{background:var(--accent);color:#fff;border-color:var(--accent)}
 
-.empty-state{text-align:center;padding:60px 20px;color:var(--text2)}.empty-state .icon{font-size:3rem;margin-bottom:10px}
+.empty{text-align:center;padding:60px 20px;color:var(--text2)}.empty .ic{font-size:3rem;margin-bottom:10px}
 
-.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;align-items:center;justify-content:center}
-.modal-overlay.active{display:flex}
-.modal{background:var(--card);border-radius:var(--radius);padding:24px 28px;max-width:460px;width:94%;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.15)}
+.mo{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;align-items:center;justify-content:center}
+.mo.active{display:flex}
+.modal{background:var(--card);border-radius:var(--r);padding:24px 28px;max-width:460px;width:94%;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.15)}
 .modal h2{font-size:1.1rem;font-weight:700;margin-bottom:16px}
-.form-group{margin-bottom:12px}
-.form-group label{display:block;font-size:0.82rem;font-weight:600;margin-bottom:3px;color:var(--text2)}
-.form-group input,.form-group select,.form-group textarea{width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:0.88rem;outline:none;background:var(--bg);color:var(--text);transition:border .12s}
-.form-group input:focus,.form-group textarea:focus,.form-group select:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(99,102,241,.06)}
-.form-group textarea{resize:vertical;min-height:60px}
-.form-row{display:flex;gap:8px}.form-row .form-group{flex:1}
-.modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:18px}
+.fg{margin-bottom:12px}
+.fg label{display:block;font-size:0.82rem;font-weight:600;margin-bottom:3px;color:var(--text2)}
+.fg input,.fg select,.fg textarea{width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:var(--rs);font-size:0.88rem;outline:none;background:var(--bg);color:var(--text)}
+.fg input:focus,.fg textarea:focus,.fg select:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(99,102,241,.06)}
+.fg textarea{resize:vertical;min-height:60px}
+.fr{display:flex;gap:8px}.fr .fg{flex:1}
+.ma{display:flex;gap:8px;justify-content:flex-end;margin-top:18px}
 
-.upload-zone{border:2px dashed var(--border);border-radius:var(--radius);padding:28px;text-align:center;cursor:pointer;transition:all .15s;background:var(--bg);margin-bottom:10px}
-.upload-zone:hover,.upload-zone.drag{border-color:var(--primary);background:#eef2ff}
-.upload-zone .icon{font-size:2.5rem;margin-bottom:6px}
-.upload-zone .hint{font-size:0.85rem;color:var(--text2)}.upload-zone .hint strong{color:var(--primary)}
+.uz{border:2px dashed var(--border);border-radius:var(--r);padding:28px;text-align:center;cursor:pointer;transition:all .15s;background:var(--bg);margin-bottom:10px}
+.uz:hover,.uz.drag{border-color:var(--accent);background:#eef2ff}
+.uz .ic{font-size:2.5rem;margin-bottom:6px}
+.uz .hi{font-size:0.85rem;color:var(--text2)}.uz .hi strong{color:var(--accent)}
 
-.detail-card{background:var(--card);border-radius:var(--radius);border:1px solid var(--border);padding:24px 26px;box-shadow:var(--shadow);margin-bottom:16px}
-.detail-title{font-size:1.3rem;font-weight:700;margin-bottom:8px}
-.detail-meta{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
-.detail-desc{color:var(--text2);font-size:0.9rem;white-space:pre-wrap;margin-bottom:14px}
-.detail-actions{display:flex;gap:7px;flex-wrap:wrap}
-.back-link{display:inline-flex;align-items:center;gap:4px;color:var(--text2);font-size:0.88rem;margin:14px 0}.back-link:hover{color:var(--text)}
-.review-card{background:var(--card);border-radius:var(--radius);border:1px solid var(--border);padding:12px 16px;margin-bottom:6px}
-.review-header{display:flex;justify-content:space-between;font-size:0.78rem;color:var(--text2);margin-bottom:2px}
+.dc{background:var(--card);border-radius:var(--r);border:1px solid var(--border);padding:24px 26px;box-shadow:var(--sh);margin-bottom:16px}
+.dt{font-size:1.3rem;font-weight:700;margin-bottom:8px}
+.dm{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.dd{color:var(--text2);font-size:0.9rem;white-space:pre-wrap;margin-bottom:14px}
+.da{display:flex;gap:7px;flex-wrap:wrap}
+.bl{display:inline-flex;align-items:center;gap:4px;color:var(--text2);font-size:0.88rem;margin:14px 0}.bl:hover{color:var(--text)}
+.rc{background:var(--card);border-radius:var(--r);border:1px solid var(--border);padding:12px 16px;margin-bottom:6px}
+.rh{display:flex;justify-content:space-between;font-size:0.78rem;color:var(--text2);margin-bottom:2px}
 .stars{color:var(--orange)}
 
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1e293b;color:#fff;padding:10px 22px;border-radius:30px;font-size:0.85rem;z-index:300;opacity:0;transition:opacity .2s;pointer-events:none}
 .toast.show{opacity:1}
 
-@media(max-width:768px){.stat-cards{grid-template-columns:repeat(2,1fr)}.grid{grid-template-columns:1fr}.search-row{flex-direction:column}.detail-card{padding:16px}.form-row{flex-direction:column}}
+@media(max-width:768px){.sc{grid-template-columns:repeat(2,1fr)}.grid{grid-template-columns:1fr}.sr{flex-direction:column}.dc{padding:16px}.fr{flex-direction:column}}
 </style>
 </head>
 <body>
 
-<header class="header"><div class="header-inner">
-<a href="#" class="logo" onclick="goHome()">Paper<span>Hub</span></a>
-<div class="nav-right">
-<span class="user-email" id="userInfo"></span>
-<button class="btn btn-white btn-sm" onclick="showUploadModal()">+ 上传</button>
-<button class="btn btn-white btn-sm" onclick="showSettingsModal()">⚙️</button>
-<button class="btn btn-white btn-sm" onclick="showAuthModal()" id="loginBtn">登录</button>
-<button class="btn btn-white btn-sm" onclick="logout()" id="logoutBtn" style="display:none">退出</button>
+<header class="header"><div class="hi">
+<a href="#" class="logo" onclick="goHome()">Paper<span>Hub</span> v3</a>
+<div class="nr">
+<span class="ue" id="userInfo"></span>
+<button class="btn btn-w btn-s" onclick="showUploadModal()">+ 上传</button>
+<button class="btn btn-w btn-s" onclick="showAuthModal()" id="loginBtn">登录</button>
+<button class="btn btn-w btn-s" onclick="logout()" id="logoutBtn" style="display:none">退出</button>
 </div>
 </div></header>
 
-<div class="hero" id="heroSection"><div class="hero-inner">
-<div class="hero-title">知识共享，从这里开始</div>
-<div class="hero-sub">上传试卷、搜索资料、交流学习</div>
-<div class="stat-cards">
-<div class="stat-card"><div class="stat-val" id="hTotal">-</div><div class="stat-lbl">资料总数</div></div>
-<div class="stat-card"><div class="stat-val" id="hDownloads">-</div><div class="stat-lbl">累计下载</div></div>
-<div class="stat-card"><div class="stat-val" id="hUsers">-</div><div class="stat-lbl">贡献用户</div></div>
-<div class="stat-card"><div class="stat-val" id="hSubjects">11</div><div class="stat-lbl">涵盖学科</div></div>
+<div class="hero" id="heroSection"><div class="hri">
+<div class="ht">知识共享，从这里开始</div>
+<div class="hs">上传试卷、搜索资料、交流学习 — Bmob 驱动，国内秒开</div>
+<div class="sc">
+<div class="scd"><div class="sv" id="hTotal">-</div><div class="sl">资料总数</div></div>
+<div class="scd"><div class="sv" id="hDownloads">-</div><div class="sl">累计下载</div></div>
+<div class="scd"><div class="sv" id="hUsers">-</div><div class="sl">贡献用户</div></div>
+<div class="scd"><div class="sv">11</div><div class="sl">涵盖学科</div></div>
 </div>
 </div></div>
 
 <div class="container content" id="mainContent"></div>
 
-<div class="modal-overlay" id="authModal"><div class="modal">
+<!-- Auth Modal -->
+<div class="mo" id="authModal"><div class="modal">
 <h2 id="authTitle">登录</h2>
-<div class="form-group"><label>邮箱</label><input type="email" id="authEmail" placeholder="your@email.com"></div>
-<div class="form-group"><label>密码（至少6位）</label><input type="password" id="authPassword" placeholder="···"></div>
-<div class="modal-actions">
-<button class="btn btn-ghost" id="authToggle" onclick="toggleAuthMode()">去注册</button>
-<button class="btn btn-primary" onclick="doAuth()">登录</button>
+<div class="fg"><label>邮箱</label><input type="email" id="authEmail" placeholder="your@email.com"></div>
+<div class="fg"><label>密码（至少6位）</label><input type="password" id="authPassword" placeholder="···"></div>
+<div class="ma">
+<button class="btn btn-g" id="authToggle" onclick="toggleAuthMode()">去注册</button>
+<button class="btn btn-p" onclick="doAuth()">登录</button>
 </div>
 </div></div>
 
-<div class="modal-overlay" id="uploadModal"><div class="modal">
+<!-- Upload Modal -->
+<div class="mo" id="uploadModal"><div class="modal">
 <h2>上传资料</h2>
-<div class="form-group"><label>标题</label><input type="text" id="upTitle" placeholder="例如：2024年高考数学真题" maxlength="100"></div>
-<div class="form-row">
-<div class="form-group"><label>学科</label><select id="upSubject"><option value="数学">数学</option><option value="语文">语文</option><option value="英语">英语</option><option value="物理">物理</option><option value="化学">化学</option><option value="生物">生物</option><option value="历史">历史</option><option value="地理">地理</option><option value="政治">政治</option><option value="计算机">计算机</option><option value="其他">其他</option></select></div>
-<div class="form-group"><label>年份</label><select id="upYear"><script>for(let y=new Date().getFullYear();y>=2000;y--)document.write(`<option value="${y}">${y}</option>`);</script></select></div>
+<div class="fg"><label>标题</label><input type="text" id="upTitle" placeholder="例如：2024年高考数学真题" maxlength="100"></div>
+<div class="fr">
+<div class="fg"><label>学科</label><select id="upSubject"><option value="数学">数学</option><option value="语文">语文</option><option value="英语">英语</option><option value="物理">物理</option><option value="化学">化学</option><option value="生物">生物</option><option value="历史">历史</option><option value="地理">地理</option><option value="政治">政治</option><option value="计算机">计算机</option><option value="其他">其他</option></select></div>
+<div class="fg"><label>年份</label><select id="upYear"><script>for(let y=new Date().getFullYear();y>=2000;y--)document.write(`<option value="${y}">${y}</option>`);</script></select></div>
 </div>
-<div class="form-group"><label>标签（逗号分隔）</label><input type="text" id="upTags" placeholder="高考,真题,全国卷"></div>
-<div class="form-group"><label>文件（最大50MB）</label>
-<div class="upload-zone" id="dropZone" onclick="document.getElementById('upFile').click()">
-<div class="icon"></div>
-<div class="hint">拖拽文件到此处，或<strong>点击选择</strong></div>
+<div class="fg"><label>标签（逗号分隔）</label><input type="text" id="upTags" placeholder="高考,真题,全国卷"></div>
+<div class="fg"><label>文件（最大50MB）</label>
+<div class="uz" id="dropZone" onclick="document.getElementById('upFile').click()">
+<div class="ic"></div>
+<div class="hi">拖拽文件到此处，或<strong>点击选择</strong></div>
 <div style="font-size:0.75rem;color:var(--text3);margin-top:4px" id="fileInfo"></div>
 </div>
 <input type="file" id="upFile" accept=".pdf,.jpg,.jpeg,.png,.zip,.doc,.docx,.ppt,.pptx" style="display:none">
 </div>
-<div class="modal-actions">
-<button class="btn btn-ghost" onclick="closeUploadModal()">取消</button>
-<button class="btn btn-primary" onclick="doUpload()" id="uploadBtn">上传</button>
-</div>
-</div></div>
-
-<div class="modal-overlay" id="settingsModal"><div class="modal">
-<h2>设置</h2>
-<div class="form-group"><label>GitHub Token（可选，加速上传）</label><input type="password" id="ghTokenInput" placeholder="ghp_..."></div>
-<p style="font-size:0.75rem;color:var(--text3);margin-bottom:12px">Token 仅存浏览器本地。留空则使用 Supabase Storage 上传。</p>
-<div class="modal-actions">
-<button class="btn btn-ghost" onclick="closeSettingsModal()">取消</button>
-<button class="btn btn-primary" onclick="saveSettings()">保存</button>
+<div class="ma">
+<button class="btn btn-g" onclick="closeUploadModal()">取消</button>
+<button class="btn btn-p" onclick="doUpload()" id="uploadBtn">上传</button>
 </div>
 </div></div>
 
 <div class="toast" id="toast"></div>
 
 <script>
-const SUPABASE_URL='https://ugkyvcevycpmcbrqucla.supabase.co';
-const SUPABASE_KEY='sb_publishable_L-cWMAfLnZ1jw-S3yscfdQ_B5lmiElK';
-
-// Simple Supabase client (fetch-based, no CDN needed)
-function mkClient(url,key){
-  let session=null,listeners=[];
-  function hdr(){return{'apikey':key,'Authorization':`Bearer ${key}`,'Content-Type':'application/json'}}
-  function authHdr(){const h={'apikey':key};if(session?.access_token)h.Authorization=`Bearer ${session.access_token}`;else h.Authorization=`Bearer ${key}`;return h}
-  function notify(){const s=session?{user:session.user}:null;listeners.forEach(f=>f('AUTH_CHANGE',s))}
-
-  const auth={
-    async getSession(){try{const s=localStorage.getItem('sb_session');if(s)session=JSON.parse(s)}catch{}{return{data:{session}}}},
-    async signUp({email,password}){
-      const r=await fetch(`${url}/auth/v1/signup`,{method:'POST',headers:hdr(),body:JSON.stringify({email,password})});
-      const d=await r.json().catch(()=>({}));if(!r.ok)return{error:{message:d.msg||r.statusText}};
-      if(d.session){session={access_token:d.session.access_token,user:d.user||d.session.user};localStorage.setItem('sb_session',JSON.stringify(session));notify();return{data:{session,user:session.user},error:null}}
-      return{data:d,error:null}
-    },
-    async signInWithPassword({email,password}){
-      const r=await fetch(`${url}/auth/v1/token?grant_type=password`,{method:'POST',headers:hdr(),body:JSON.stringify({email,password})});
-      const d=await r.json().catch(()=>({}));if(!r.ok)return{error:{message:d.error_description||d.msg||'Login failed'}};
-      session={access_token:d.access_token,user:d.user};localStorage.setItem('sb_session',JSON.stringify(session));notify();
-      return{data:{session,user:d.user},error:null}
-    },
-    async signOut(){
-      if(session?.access_token)await fetch(`${url}/auth/v1/logout`,{method:'POST',headers:{...hdr(),Authorization:`Bearer ${session.access_token}`}}).catch(()=>{});
-      session=null;localStorage.removeItem('sb_session');notify();return{error:null}
-    },
-    onAuthStateChange(fn){listeners.push(fn)}
-  };
-
-  function from(table){
-    let q={table,method:'GET',filters:[],params:{},body:null,cols:'*',single:false,count:false};
-    const chain={
-      select(cols,opts){q.cols=cols||'*';if(opts?.count)q.count=true;return this},
-      insert(body){q.method='POST';q.body=body;return this},
-      delete(){q.method='DELETE';return this},
-      update(body){q.method='PATCH';q.body=body;return this},
-      eq(f,v){q.filters.push([f,'eq',v]);return this},
-      ilike(f,v){q.filters.push([f,'ilike',v]);return this},
-      order(f,opts){q.params.order=`${f}.${opts?.ascending===false?'desc':'asc'}`;return this},
-      limit(n){q.params.limit=n;return this},
-      range(a,b){q.params.offset=a;q.params.limit=b-a+1;return this},
-      single(){q.single=true;return this},
-      async then(resolve){
-        try{
-          const p=new URLSearchParams();
-          for(const[k,v]of Object.entries(q.params))p.set(k,v);
-          for(const[f,op,v]of q.filters)p.set(f,`${op}.${encodeURIComponent(v)}`);
-          if(q.cols&&q.cols!=='*')p.set('select',q.cols);
-          const h=authHdr();
-          if(q.method!=='GET'&&q.method!=='DELETE'){h['Content-Type']='application/json';if(q.method==='POST')h['Prefer']='return=representation'}
-          if(q.count)h['Prefer']=(h['Prefer']?h['Prefer']+',':'')+'count=exact';
-          const opts={method:q.method,headers:h};if(q.body)opts.body=JSON.stringify(q.body);
-          const ps=p.toString();const r=await fetch(ps?`${url}/rest/v1/${q.table}?${ps}`:`${url}/rest/v1/${q.table}`,opts);
-          if(!r.ok){resolve({data:null,error:{message:await r.text().catch(()=>r.statusText)}});return}
-          let data=r.status!==204?await r.json():[];if(!Array.isArray(data))data=[data];if(q.single)data=data[0]||null;
-          const cnt=r.headers.get('content-range')?.split('/')?.pop();
-          resolve({data,error:null,count:cnt?parseInt(cnt):(Array.isArray(data)?data.length:0)});
-        }catch(e){resolve({data:null,error:{message:e.message}})}
-      }
-    };return chain
-  }
-
-  const storage={
-    from(bucket){return{
-      async upload(fp,file){
-        const fd=new FormData();fd.append('file',file);
-        const h={'apikey':key,'Authorization':`Bearer ${key}`};
-        if(session?.access_token)h.Authorization=`Bearer ${session.access_token}`;
-        const r=await fetch(`${url}/storage/v1/object/${bucket}/${fp}`,{method:'POST',headers:h,body:fd});
-        if(!r.ok){const e=await r.json().catch(()=>({}));return{error:{message:e.error||e.message||'Upload failed'}}}
-        return{data:await r.json().catch(()=>null),error:null}
-      },
-      getPublicUrl(fp){return{data:{publicUrl:`${url}/storage/v1/object/public/${bucket}/${fp}`}}},
-      async remove(ps){const qs=ps.map(p=>`paths=${encodeURIComponent(p)}`).join('&');const h=authHdr();const r=await fetch(`${url}/storage/v1/object/${bucket}?${qs}`,{method:'DELETE',headers:h});return{error:r.ok?null:{message:await r.text().catch(()=>'')}}}
-    }}
-  };
-
-  async function rpc(fn,params){const h=authHdr();h['Content-Type']='application/json';const r=await fetch(`${url}/rest/v1/rpc/${fn}`,{method:'POST',headers:h,body:JSON.stringify(params)});return r.ok?{data:null,error:null}:{error:{message:await r.text().catch(()=>'RPC error')}}}
-  return{auth,from,storage,rpc}
-}
-const supabase=mkClient(SUPABASE_URL,SUPABASE_KEY);
+// ⚠️ 请替换为你的 Bmob Application ID 和 REST API Key
+const BMOB_APP_ID = '45244749ebc7c2013806b1b7ee7e4e70';
+const BMOB_REST_KEY = 'fe110bcc84d9efeb106a94a5a4516592';
+Bmob.initialize(BMOB_APP_ID, BMOB_REST_KEY);
 
 // State
-let currentUser=null,currentView='home',currentPage=0,currentSubject='';
-const PAGE_SIZE=12;
+let currentUser = Bmob.User.current();
+let currentView = 'home', currentPage = 0, currentSubject = '';
+const PAGE_SIZE = 12;
 
 // Auth
-async function checkAuth(){const{data:{session}}=await supabase.auth.getSession();currentUser=session?.user||null;updateAuthUI();return currentUser}
-supabase.auth.onAuthStateChange((_e,session)=>{currentUser=session?.user||null;updateAuthUI();if(currentView==='home')renderHome()});
-
-function updateAuthUI(){
-  document.getElementById('loginBtn').style.display=currentUser?'none':'';
-  document.getElementById('logoutBtn').style.display=currentUser?'':'none';
-  document.getElementById('userInfo').textContent=currentUser?.email||'';
+function updateAuthUI() {
+  currentUser = Bmob.User.current();
+  document.getElementById('loginBtn').style.display = currentUser ? 'none' : '';
+  document.getElementById('logoutBtn').style.display = currentUser ? '' : 'none';
+  document.getElementById('userInfo').textContent = currentUser ? (currentUser.get('email') || currentUser.get('username')) : '';
 }
 
-function showAuthModal(){
-  document.getElementById('authTitle').textContent='登录';document.getElementById('authToggle').textContent='去注册';
-  document.getElementById('authEmail').value='';document.getElementById('authPassword').value='';
-  document.getElementById('authModal').classList.add('active');document.getElementById('authModal')._mode='login';
+function showAuthModal() {
+  document.getElementById('authTitle').textContent = '登录';
+  document.getElementById('authToggle').textContent = '去注册';
+  document.getElementById('authEmail').value = '';
+  document.getElementById('authPassword').value = '';
+  document.getElementById('authModal').classList.add('active');
+  document.getElementById('authModal')._mode = 'login';
 }
-function toggleAuthMode(){
-  const m=document.getElementById('authModal');
-  if(m._mode==='login'){m._mode='signup';document.getElementById('authTitle').textContent='注册';document.getElementById('authToggle').textContent='去登录'}
-  else{m._mode='login';document.getElementById('authTitle').textContent='登录';document.getElementById('authToggle').textContent='去注册'}
-}
-async function doAuth(){
-  const email=document.getElementById('authEmail').value.trim(),pw=document.getElementById('authPassword').value;
-  if(!email||!pw){toast('请填写邮箱和密码');return}
-  const m=document.getElementById('authModal');let r;
-  if(m._mode==='signup'){r=await supabase.auth.signUp({email,password:pw});if(r.error){toast('注册失败: '+r.error.message);return};toast(r.data?.session?'注册成功！':'注册成功！请查收邮箱确认')}
-  else{r=await supabase.auth.signInWithPassword({email,password:pw});if(r.error){toast('登录失败: '+r.error.message);return};toast('登录成功！')}
-  document.getElementById('authModal').classList.remove('active');renderHome();
-}
-async function logout(){await supabase.auth.signOut();toast('已退出');renderHome()}
 
-function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2500)}
+function toggleAuthMode() {
+  const m = document.getElementById('authModal');
+  if (m._mode === 'login') {
+    m._mode = 'signup';
+    document.getElementById('authTitle').textContent = '注册';
+    document.getElementById('authToggle').textContent = '去登录';
+  } else {
+    m._mode = 'login';
+    document.getElementById('authTitle').textContent = '登录';
+    document.getElementById('authToggle').textContent = '去注册';
+  }
+}
 
-// Settings
-function showSettingsModal(){document.getElementById('ghTokenInput').value=localStorage.getItem('gh_token')||'';document.getElementById('settingsModal').classList.add('active')}
-function closeSettingsModal(){document.getElementById('settingsModal').classList.remove('active')}
-function saveSettings(){localStorage.setItem('gh_token',document.getElementById('ghTokenInput').value.trim());document.getElementById('settingsModal').classList.remove('active');toast('设置已保存')}
+async function doAuth() {
+  const email = document.getElementById('authEmail').value.trim();
+  const pw = document.getElementById('authPassword').value;
+  if (!email || !pw) { toast('请填写邮箱和密码'); return; }
+  const m = document.getElementById('authModal');
+  try {
+    if (m._mode === 'signup') {
+      await Bmob.User.register(email, pw, { email: email });
+      toast('注册成功！请登录');
+      m._mode = 'login';
+      document.getElementById('authTitle').textContent = '登录';
+      document.getElementById('authToggle').textContent = '去注册';
+      return;
+    } else {
+      await Bmob.User.login(email, pw);
+      toast('登录成功！');
+    }
+    currentUser = Bmob.User.current();
+    updateAuthUI();
+    document.getElementById('authModal').classList.remove('active');
+    renderHome();
+  } catch (e) {
+    toast('失败: ' + (e.message || e.error || JSON.stringify(e)));
+  }
+}
+
+async function logout() {
+  await Bmob.User.logout();
+  currentUser = null;
+  updateAuthUI();
+  toast('已退出');
+  renderHome();
+}
+
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(t._t); t._t = setTimeout(() => t.classList.remove('show'), 2500);
+}
 
 // Home
-async function renderHome(){
-  currentView='home';currentPage=0;currentSubject='';
-  document.getElementById('authModal').classList.remove('active');document.getElementById('uploadModal').classList.remove('active');
-  document.getElementById('heroSection').style.display='';
-  document.getElementById('mainContent').innerHTML=`
-<div class="search-row">
-<div class="search-box"><span class="search-icon"></span><input type="text" id="searchInput" placeholder="搜索试卷标题、标签..." onkeydown="if(event.key==='Enter')doSearch()"></div>
-<select class="filter-select" id="searchSubject" onchange="doSearch()"><option value="">全部学科</option>${['数学','语文','英语','物理','化学','生物','历史','地理','政治','计算机','其他'].map(s=>`<option value="${s}">${s}</option>`).join('')}</select>
-<select class="filter-select" id="searchYear" onchange="doSearch()"><option value="">全部年份</option>${(()=>{let o='';for(let y=new Date().getFullYear();y>=2000;y--)o+=`<option value="${y}">${y}</option>`;return o})()}</select>
-<select class="filter-select" id="searchSort" onchange="doSearch()"><option value="created_at.desc">最新</option><option value="downloads.desc">最多下载</option><option value="avg_rating.desc">最高评分</option></select>
-<button class="btn btn-primary btn-sm" onclick="doSearch()">搜索</button>
-${currentUser?'<button class="btn btn-outline btn-sm" onclick="showMyPapers()">我的上传</button>':''}
+async function renderHome() {
+  currentView = 'home'; currentPage = 0; currentSubject = '';
+  document.getElementById('authModal').classList.remove('active');
+  document.getElementById('uploadModal').classList.remove('active');
+  document.getElementById('heroSection').style.display = '';
+  updateAuthUI();
+
+  document.getElementById('mainContent').innerHTML = `<div class="sr">
+<div class="sb"><span style="color:var(--text3);margin-right:6px"></span><input type="text" id="searchInput" placeholder="搜索试卷标题、标签..." onkeydown="if(event.key==='Enter')doSearch()"></div>
+<select class="fs" id="searchSubject" onchange="doSearch()"><option value="">全部学科</option>${['数学','语文','英语','物理','化学','生物','历史','地理','政治','计算机','其他'].map(s=>`<option value="${s}">${s}</option>`).join('')}</select>
+<select class="fs" id="searchYear" onchange="doSearch()"><option value="">全部年份</option>${(()=>{let o='';for(let y=new Date().getFullYear();y>=2000;y--)o+=`<option value="${y}">${y}</option>`;return o})()}</select>
+<button class="btn btn-p btn-s" onclick="doSearch()">搜索</button>
+${currentUser?'<button class="btn btn-o btn-s" onclick="showMyPapers()">我的上传</button>':''}
 </div>
-<div class="subject-pills" id="subjectPills">
-<span class="pill active" onclick="filterSubject('',this)">全部</span>
-${['数学','语文','英语','物理','化学','生物','计算机'].map(s=>`<span class="pill" onclick="filterSubject('${s}',this)">${s}</span>`).join('')}
-</div>
-<div class="section-title"><span>资料列表</span><span class="count" id="resultCount"></span></div>
+<div class="sp" id="subjectPills"><span class="pill active" onclick="filterSubject('',this)">全部</span>${['数学','语文','英语','物理','化学','生物','计算机'].map(s=>`<span class="pill" onclick="filterSubject('${s}',this)">${s}</span>`).join('')}</div>
+<div class="st"><span>资料列表</span><span class="c" id="resultCount"></span></div>
 <div class="grid" id="paperGrid"></div>
-<div class="load-more" id="loadMore"></div>`;
-  await loadStats();await loadPapers();
+<div class="lm" id="loadMore"></div>`;
+
+  await loadStats();
+  await loadPapers();
 }
 
-async function loadStats(){
-  try{const{count:t}=await supabase.from('papers').select('id',{count:'exact'}).limit(1);document.getElementById('hTotal').textContent=t??'0'}catch{}
-  try{const{data:d}=await supabase.from('papers').select('downloads,user_id').limit(500);
-    const dl=d?d.reduce((s,p)=>s+(p.downloads||0),0):0,users=d?new Set(d.map(p=>p.user_id).filter(Boolean)).size:0;
-    document.getElementById('hDownloads').textContent=dl.toLocaleString();document.getElementById('hUsers').textContent=users||'0'}catch{}
+async function loadStats() {
+  try {
+    const q = new Bmob.Query('papers');
+    const count = await q.count();
+    document.getElementById('hTotal').textContent = count || '0';
+  } catch { document.getElementById('hTotal').textContent = '-'; }
+
+  try {
+    const q = new Bmob.Query('papers');
+    q.limit(500);
+    const all = await q.find();
+    const dl = all.reduce((s, p) => s + (p.get('downloads') || 0), 0);
+    const users = new Set(all.map(p => p.get('userId')).filter(Boolean)).size;
+    document.getElementById('hDownloads').textContent = dl.toLocaleString();
+    document.getElementById('hUsers').textContent = users || '0';
+  } catch { document.getElementById('hDownloads').textContent = '-'; }
 }
 
-async function loadPapers(reset=true){
-  if(reset)currentPage=0;
-  const grid=document.getElementById('paperGrid');if(!grid)return;
-  const search=document.getElementById('searchInput')?.value?.trim()||'',subject=document.getElementById('searchSubject')?.value||currentSubject||'';
-  const year=document.getElementById('searchYear')?.value||'',sort=(document.getElementById('searchSort')?.value||'created_at.desc').split('.');
+async function loadPapers(reset = true) {
+  if (reset) currentPage = 0;
+  const grid = document.getElementById('paperGrid');
+  if (!grid) return;
 
-  if(reset)grid.innerHTML=Array(6).fill(0).map(()=>`<div class="card"><div class="card-body"><div style="height:16px;background:#f1f5f9;border-radius:4px;margin-bottom:8px"></div><div style="height:16px;width:60%;background:#f1f5f9;border-radius:4px"></div></div></div>`).join('');
+  const search = document.getElementById('searchInput')?.value?.trim() || '';
+  const subject = document.getElementById('searchSubject')?.value || currentSubject || '';
+  const year = document.getElementById('searchYear')?.value || '';
 
-  let q=supabase.from('papers').select('*',{count:'exact'}).order(sort[0],{ascending:sort[1]==='asc'}).range(currentPage*PAGE_SIZE,(currentPage+1)*PAGE_SIZE-1);
-  if(subject)q=q.eq('subject',subject);if(year)q=q.eq('year',parseInt(year));if(search)q=q.ilike('title',`*${search}*`);
+  if (reset) grid.innerHTML = Array(6).fill(0).map(() => `<div class="card"><div class="cb"><div style="height:16px;background:#f1f5f9;border-radius:4px;margin-bottom:8px"></div><div style="height:16px;width:60%;background:#f1f5f9;border-radius:4px"></div></div></div>`).join('');
 
-  const{data:papers,error,count}=await q;
-  if(error){grid.innerHTML=`<div class="empty-state"><div class="icon"></div><p>加载失败</p></div>`;return}
-  document.getElementById('resultCount').textContent=count?`共 ${count} 份`:'';
-  if(!papers||papers.length===0){grid.innerHTML=`<div class="empty-state"><div class="icon"></div><p>${currentUser?'快来上传第一份！':'还没有资料'}</p></div>`;return}
+  const query = new Bmob.Query('papers');
+  query.order('-createdAt');
+  query.limit(PAGE_SIZE);
+  query.skip(currentPage * PAGE_SIZE);
+  if (subject) query.equalTo('subject', subject);
+  if (year) query.equalTo('year', parseInt(year));
 
-  const subjMap={数学:'m',语文:'c',英语:'e',物理:'p',化学:'ch',生物:'b',历史:'h',地理:'g',政治:'po',计算机:'cs'};
-  const emoji={数学:'',语文:'',英语:'',物理:'',化学:'',生物:'',历史:'',地理:'',政治:'',计算机:''};
-  grid.innerHTML=papers.map(p=>`<div class="card" onclick="showDetail('${p.id}')"><div class="card-top ${subjMap[p.subject]||'ot'}">${emoji[p.subject]||''}</div><div class="card-body"><div class="card-title">${esc(p.title)}</div><div class="card-tags"><span class="tag">${esc(p.subject)}</span><span class="tag yr">${p.year}</span>${p.file_type?`<span class="tag fl">${p.file_type.toUpperCase()}</span>`:''}</div><div class="card-footer"><span> ${p.downloads||0}</span><span> ${p.rating_count?p.avg_rating.toFixed(1):'-'}</span><span>${timeAgo(p.created_at)}</span></div></div></div>`).join('');
+  try {
+    let papers = await query.find();
+    const total = await query.count();
 
-  const tp=Math.ceil((count||0)/PAGE_SIZE);
-  document.getElementById('loadMore').innerHTML=tp>1?`<div class="pagination">${Array.from({length:Math.min(tp,8)},(_,i)=>`<button class="${i===currentPage?'active':''}" onclick="goPage(${i})">${i+1}</button>`).join('')}</div>`:'';
+    if (search) {
+      const q = search.toLowerCase();
+      papers = papers.filter(p => {
+        const title = (p.get('title') || '').toLowerCase();
+        const tags = (p.get('tags') || '').toLowerCase();
+        return title.includes(q) || tags.includes(q);
+      });
+    }
+
+    document.getElementById('resultCount').textContent = papers.length ? `共 ${papers.length} 份` : '';
+
+    if (!papers.length) {
+      grid.innerHTML = `<div class="empty"><div class="ic"></div><p>${currentUser ? '快来上传第一份！' : '还没有资料，登录后可上传'}</p></div>`;
+      document.getElementById('loadMore').innerHTML = '';
+      return;
+    }
+
+    const subjMap = { 数学: 'm', 语文: 'c', 英语: 'e', 物理: 'p', 化学: 'ch', 生物: 'b', 历史: 'h', 地理: 'g', 政治: 'po', 计算机: 'cs' };
+    const emoji = { 数学: '', 语文: '', 英语: '', 物理: '', 化学: '', 生物: '', 历史: '', 地理: '', 政治: '', 计算机: '' };
+
+    grid.innerHTML = papers.map(p => `<div class="card" onclick="showDetail('${p.id}')"><div class="ct ${subjMap[p.get('subject')] || 'ot'}">${emoji[p.get('subject')] || ''}</div><div class="cb"><div class="cti">${esc(p.get('title')||'')}</div><div class="ctg"><span class="tag">${esc(p.get('subject')||'')}</span><span class="tag yr">${p.get('year')}</span>${p.get('file_type')?`<span class="tag fl">${p.get('file_type').toUpperCase()}</span>`:''}</div><div class="cf"><span> ${p.get('downloads')||0}</span><span> ${p.get('rating_count')?p.get('avg_rating').toFixed(1):'-'}</span><span>${timeAgo(p.createdAt)}</span></div></div></div>`).join('');
+
+    const tp = Math.ceil(papers.length / PAGE_SIZE);
+    document.getElementById('loadMore').innerHTML = tp > 1 ? `<div class="pg">${Array.from({ length: Math.min(tp, 8) }, (_, i) => `<button class="${i === currentPage ? 'active' : ''}" onclick="goPage(${i})">${i + 1}</button>`).join('')}</div>` : '';
+  } catch (e) {
+    grid.innerHTML = `<div class="empty"><div class="ic"></div><p>加载失败: ${e.message || e.error}</p></div>`;
+  }
 }
 
-function filterSubject(s,el){currentSubject=s;document.querySelectorAll('.pill').forEach(p=>p.classList.remove('active'));if(el)el.classList.add('active');const sel=document.getElementById('searchSubject');if(sel)sel.value=s;loadPapers(true)}
-function doSearch(){currentSubject='';loadPapers(true)}
-function goPage(n){currentPage=n;loadPapers(false);scrollTo({top:400,behavior:'smooth'})}
-
-async function showMyPapers(){
-  if(!currentUser){toast('请先登录');return}
-  currentView='mine';document.getElementById('heroSection').style.display='none';
-  document.getElementById('mainContent').innerHTML=`<a href="#" onclick="goHome()" class="back-link"> 返回首页</a><div class="section-title"> 我上传的资料</div><div class="grid" id="paperGrid"></div>`;
-  const{data:papers}=await supabase.from('papers').select('*').eq('user_id',currentUser.id).order('created_at',{ascending:false});
-  const grid=document.getElementById('paperGrid');
-  if(!papers?.length){grid.innerHTML='<div class="empty-state"><div class="icon"></div><p>还没有上传资料</p></div>';return}
-  grid.innerHTML=papers.map(p=>`<div class="card" onclick="showDetail('${p.id}')"><div class="card-body"><div class="card-title">${esc(p.title)}</div><div class="card-tags"><span class="tag">${esc(p.subject)}</span><span class="tag yr">${p.year}</span></div><div class="card-footer"><span> ${p.downloads||0}</span><span> ${p.rating_count?p.avg_rating.toFixed(1):'-'}</span><span>${timeAgo(p.created_at)}</span></div></div></div>`).join('');
+function filterSubject(s, el) {
+  currentSubject = s;
+  document.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+  if (el) el.classList.add('active');
+  const sel = document.getElementById('searchSubject');
+  if (sel) sel.value = s;
+  loadPapers(true);
 }
 
-function goHome(){document.getElementById('heroSection').style.display='';renderHome()}
+function doSearch() { currentSubject = ''; loadPapers(true); }
+function goPage(n) { currentPage = n; loadPapers(false); scrollTo({ top: 400, behavior: 'smooth' }); }
+
+async function showMyPapers() {
+  if (!currentUser) { toast('请先登录'); return; }
+  currentView = 'mine';
+  document.getElementById('heroSection').style.display = 'none';
+  document.getElementById('mainContent').innerHTML = `<a href="#" onclick="goHome()" class="bl"> 返回首页</a><div class="st"> 我上传的资料</div><div class="grid" id="paperGrid"></div>`;
+  const grid = document.getElementById('paperGrid');
+  try {
+    const query = new Bmob.Query('papers');
+    query.equalTo('userId', currentUser.id);
+    query.order('-createdAt');
+    const papers = await query.find();
+    if (!papers.length) { grid.innerHTML = '<div class="empty"><div class="ic"></div><p>还没有上传资料</p></div>'; return; }
+    grid.innerHTML = papers.map(p => `<div class="card" onclick="showDetail('${p.id}')"><div class="cb"><div class="cti">${esc(p.get('title')||'')}</div><div class="ctg"><span class="tag">${esc(p.get('subject')||'')}</span><span class="tag yr">${p.get('year')}</span></div><div class="cf"><span> ${p.get('downloads')||0}</span><span> ${p.get('rating_count')?p.get('avg_rating').toFixed(1):'-'}</span><span>${timeAgo(p.createdAt)}</span></div></div></div>`).join('');
+  } catch (e) { grid.innerHTML = `<div class="empty"><p>加载失败</p></div>`; }
+}
+
+function goHome() { document.getElementById('heroSection').style.display = ''; renderHome(); }
 
 // Detail
-async function showDetail(id){
-  currentView='detail';document.getElementById('heroSection').style.display='none';
-  const{data:p}=await supabase.from('papers').select('*').eq('id',id).single();
-  if(!p){toast('资料不存在');renderHome();return}
-  const{data:reviews}=await supabase.from('reviews').select('*').eq('paper_id',id).order('created_at',{ascending:false});
-  document.getElementById('mainContent').innerHTML=`
-<a href="#" onclick="goHome()" class="back-link"> 返回首页</a>
-<div class="detail-card">
-<h1 class="detail-title">${esc(p.title)}</h1>
-<div class="detail-meta"><span class="tag">${esc(p.subject)}</span><span class="tag yr">${p.year}</span>${p.file_type?`<span class="tag fl">${p.file_type.toUpperCase()}</span>`:''}<span style="font-size:0.85rem;color:var(--text2)"> ${p.downloads||0} 下载</span><span style="font-size:0.85rem;color:var(--text2)"> ${p.rating_count?p.avg_rating.toFixed(1)+' ('+p.rating_count+')':'暂无评分'}</span></div>
-${p.tags?`<div style="margin:6px 0;font-size:0.84rem;color:var(--text2)"> ${esc(p.tags)}</div>`:''}
-${p.description?`<div class="detail-desc">${esc(p.description)}</div>`:''}
-<div class="detail-actions">
-<button class="btn btn-primary" onclick="downloadFile('${p.id}','${p.file_path||''}')"> 下载</button>
-${currentUser?`<button class="btn btn-ghost btn-sm" onclick="showReviewInput('${p.id}')"> 评分</button>`:''}
-${currentUser&&currentUser.id===p.user_id?`<button class="btn btn-danger btn-sm" onclick="deletePaper('${p.id}')"> 删除</button>`:''}
+async function showDetail(id) {
+  currentView = 'detail';
+  document.getElementById('heroSection').style.display = 'none';
+  try {
+    const query = new Bmob.Query('papers');
+    const p = await query.get(id);
+    if (!p) { toast('资料不存在'); renderHome(); return; }
+
+    const rq = new Bmob.Query('reviews');
+    rq.equalTo('paperId', id);
+    rq.order('-createdAt');
+    const reviews = await rq.find();
+
+    document.getElementById('mainContent').innerHTML = `<a href="#" onclick="goHome()" class="bl"> 返回首页</a>
+<div class="dc">
+<h1 class="dt">${esc(p.get('title')||'')}</h1>
+<div class="dm"><span class="tag">${esc(p.get('subject')||'')}</span><span class="tag yr">${p.get('year')}</span>${p.get('file_type')?`<span class="tag fl">${p.get('file_type').toUpperCase()}</span>`:''}<span style="font-size:0.85rem;color:var(--text2)"> ${p.get('downloads')||0} 下载</span><span style="font-size:0.85rem;color:var(--text2)"> ${p.get('rating_count')?p.get('avg_rating').toFixed(1)+' ('+p.get('rating_count')+')':'暂无评分'}</span></div>
+${p.get('tags')?`<div style="margin:6px 0;font-size:0.84rem;color:var(--text2)"> ${esc(p.get('tags'))}</div>`:''}
+<div class="da">
+<button class="btn btn-p" onclick="downloadFile('${p.id}','${p.get('file_url')||''}')"> 下载</button>
+${currentUser?`<button class="btn btn-g btn-s" onclick="showReviewInput('${p.id}')"> 评分</button>`:''}
+${currentUser && currentUser.id === p.get('userId') ? `<button class="btn btn-d btn-s" onclick="deletePaper('${p.id}')"> 删除</button>` : ''}
 </div></div>
-<div class="section-title"> 评价 (${reviews?.length||0})</div>
-<div id="reviewList">${!reviews?.length?'<p style="color:var(--text2);font-size:0.9rem">暂无评价</p>':''}${reviews?reviews.map(r=>`<div class="review-card"><div class="review-header"><span>${esc(r.user_email||'匿名')}</span><span class="stars">${''.repeat(r.rating)}${''.repeat(5-r.rating)}</span><span>${timeAgo(r.created_at)}</span></div>${r.comment?`<p style="font-size:0.88rem">${esc(r.comment)}</p>`:''}</div>`).join(''):''}</div>
+<div class="st"> 评价 (${reviews.length})</div>
+<div id="reviewList">${!reviews.length ? '<p style="color:var(--text2);font-size:0.9rem">暂无评价</p>' : ''}${reviews.map(r => `<div class="rc"><div class="rh"><span>${esc(r.get('userEmail')||'匿名')}</span><span class="stars">${'★'.repeat(r.get('rating')||0)}${'☆'.repeat(5-(r.get('rating')||0))}</span><span>${timeAgo(r.createdAt)}</span></div>${r.get('comment')?`<p style="font-size:0.88rem">${esc(r.get('comment'))}</p>`:''}</div>`).join('')}</div>
 <div id="reviewInputArea"></div>`;
+  } catch (e) { toast('加载失败'); renderHome(); }
 }
 
-function showReviewInput(pid){
-  document.getElementById('reviewInputArea').innerHTML=`<div class="review-card"><div style="font-weight:600;margin-bottom:6px">留下评价</div><div style="margin-bottom:6px">${[1,2,3,4,5].map(n=>`<button class="btn btn-ghost" onclick="setRating(${n})" id="star${n}" style="font-size:1.3rem;padding:2px 5px"></button>`).join('')}</div><div class="form-group"><textarea id="reviewComment" placeholder="写点评论（可选）" rows="2"></textarea></div><button class="btn btn-primary btn-sm" onclick="submitReview('${pid}')">提交评价</button></div>`;window._rating=0;
-}
-function setRating(n){window._rating=n;for(let i=1;i<=5;i++)document.getElementById('star'+i).textContent=i<=n?'':''}
-async function submitReview(pid){
-  if(!currentUser){toast('请先登录');return}if(!window._rating){toast('请选择评分');return}
-  const c=document.getElementById('reviewComment')?.value?.trim()||'';
-  const{error}=await supabase.from('reviews').insert({paper_id:pid,user_id:currentUser.id,user_email:currentUser.email,rating:window._rating,comment:c});
-  if(error){toast('提交失败: '+error.message);return}
-  const{data:reviews}=await supabase.from('reviews').select('rating').eq('paper_id',pid);
-  if(reviews?.length){const avg=reviews.reduce((s,r)=>s+r.rating,0)/reviews.length;await supabase.from('papers').update({avg_rating:Math.round(avg*10)/10,rating_count:reviews.length}).eq('id',pid)}
-  toast('评价已提交');showDetail(pid)
+function showReviewInput(pid) {
+  document.getElementById('reviewInputArea').innerHTML = `<div class="rc"><div style="font-weight:600;margin-bottom:6px">留下评价</div><div style="margin-bottom:6px">${[1,2,3,4,5].map(n => `<button class="btn btn-g" onclick="setRating(${n})" id="star${n}" style="font-size:1.3rem;padding:2px 5px"></button>`).join('')}</div><div class="fg"><textarea id="reviewComment" placeholder="写点评论（可选）" rows="2"></textarea></div><button class="btn btn-p btn-s" onclick="submitReview('${pid}')">提交评价</button></div>`;
+  window._rating = 0;
 }
 
-function downloadFile(pid,url){if(!url){toast('文件路径无效');return}supabase.rpc('increment_downloads',{paper_id:pid}).catch(()=>{});const a=document.createElement('a');a.href=url;a.download='';a.click();toast('开始下载')}
+function setRating(n) { window._rating = n; for (let i = 1; i <= 5; i++) document.getElementById('star' + i).textContent = i <= n ? '' : ''; }
 
-async function deletePaper(pid){if(!confirm('确定删除？'))return;await supabase.from('reviews').delete().eq('paper_id',pid);await supabase.from('papers').delete().eq('id',pid);toast('已删除');renderHome()}
+async function submitReview(pid) {
+  if (!currentUser) { toast('请先登录'); return; }
+  if (!window._rating) { toast('请选择评分'); return; }
+  const comment = document.getElementById('reviewComment')?.value?.trim() || '';
+  try {
+    const Review = Bmob.Object.extend('reviews');
+    const r = new Review();
+    r.set('paperId', pid);
+    r.set('userId', currentUser.id);
+    r.set('userEmail', currentUser.get('email') || currentUser.get('username'));
+    r.set('rating', window._rating);
+    r.set('comment', comment);
+    await r.save();
+
+    // Update paper average
+    const rq = new Bmob.Query('reviews');
+    rq.equalTo('paperId', pid);
+    const reviews = await rq.find();
+    const avg = reviews.reduce((s, r) => s + (r.get('rating') || 0), 0) / reviews.length;
+    const pq = new Bmob.Query('papers');
+    const paper = await pq.get(pid);
+    paper.set('avg_rating', Math.round(avg * 10) / 10);
+    paper.set('rating_count', reviews.length);
+    await paper.save();
+
+    toast('评价已提交');
+    showDetail(pid);
+  } catch (e) { toast('提交失败: ' + (e.message || e.error)); }
+}
+
+function downloadFile(pid, url) {
+  if (!url) { toast('文件路径无效'); return; }
+  // Increment download count
+  try {
+    const pq = new Bmob.Query('papers');
+    pq.get(pid).then(p => {
+      p.set('downloads', (p.get('downloads') || 0) + 1);
+      p.save();
+    }).catch(() => { });
+  } catch { }
+  window.open(url, '_blank');
+  toast('开始下载');
+}
+
+async function deletePaper(pid) {
+  if (!confirm('确定删除？')) return;
+  try {
+    const pq = new Bmob.Query('papers');
+    const p = await pq.get(pid);
+    await p.destroy();
+
+    // Delete reviews
+    const rq = new Bmob.Query('reviews');
+    rq.equalTo('paperId', pid);
+    const reviews = await rq.find();
+    for (const r of reviews) await r.destroy();
+
+    toast('已删除');
+    renderHome();
+  } catch (e) { toast('删除失败: ' + (e.message || e.error)); }
+}
 
 // Upload
-function showUploadModal(){if(!currentUser){toast('请先登录');return}document.getElementById('uploadModal').classList.add('active');document.getElementById('upTitle').value='';document.getElementById('upTags').value='';document.getElementById('upFile').value='';document.getElementById('fileInfo').textContent=''}
-function closeUploadModal(){document.getElementById('uploadModal').classList.remove('active')}
+function showUploadModal() {
+  if (!currentUser) { toast('请先登录'); return; }
+  document.getElementById('uploadModal').classList.add('active');
+  document.getElementById('upTitle').value = '';
+  document.getElementById('upTags').value = '';
+  document.getElementById('upFile').value = '';
+  document.getElementById('fileInfo').textContent = '';
+}
 
-// Drag & drop
-document.addEventListener('DOMContentLoaded',()=>{
-  const dz=document.getElementById('dropZone');if(!dz)return;
-  dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('drag')});
-  dz.addEventListener('dragleave',()=>dz.classList.remove('drag'));
-  dz.addEventListener('drop',e=>{e.preventDefault();dz.classList.remove('drag');const f=e.dataTransfer.files[0];if(f){document.getElementById('upFile').files=e.dataTransfer.files;document.getElementById('fileInfo').textContent=`已选择: ${f.name} (${(f.size/1024/1024).toFixed(1)}MB)`}});
-  document.getElementById('upFile').addEventListener('change',function(){const f=this.files[0];if(f)document.getElementById('fileInfo').textContent=`已选择: ${f.name} (${(f.size/1024/1024).toFixed(1)}MB)`});
-});
+function closeUploadModal() { document.getElementById('uploadModal').classList.remove('active'); }
 
-async function doUpload(){
-  if(!currentUser){toast('请先登录');return}
-  const title=document.getElementById('upTitle').value.trim(),subject=document.getElementById('upSubject').value;
-  const year=document.getElementById('upYear').value,tags=document.getElementById('upTags').value.trim();
-  const file=document.getElementById('upFile').files[0];
-  if(!title){toast('请输入标题');return}if(!file){toast('请选择文件');return}
-  if(file.size>50*1024*1024){toast('文件不能超过50MB');return}
+async function doUpload() {
+  if (!currentUser) { toast('请先登录'); return; }
+  const title = document.getElementById('upTitle').value.trim();
+  const subject = document.getElementById('upSubject').value;
+  const year = document.getElementById('upYear').value;
+  const tags = document.getElementById('upTags').value.trim();
+  const fileInput = document.getElementById('upFile');
+  const file = fileInput.files[0];
+  if (!title) { toast('请输入标题'); return; }
+  if (!file) { toast('请选择文件'); return; }
+  if (file.size > 50 * 1024 * 1024) { toast('文件不能超过50MB'); return; }
 
-  const ext=file.name.split('.').pop().toLowerCase();
-  const safePath=`${currentUser.id}/${Date.now()}.${ext}`;
-  document.getElementById('uploadBtn').textContent='上传中...';document.getElementById('uploadBtn').disabled=true;
+  const btn = document.getElementById('uploadBtn');
+  btn.textContent = '上传中...'; btn.disabled = true;
 
-  try{
-    const{error:upErr}=await supabase.storage.from('papers').upload(safePath,file);
-    if(upErr)throw new Error(upErr.message||'Upload failed');
-    const{data:urlData}=supabase.storage.from('papers').getPublicUrl(safePath);
-    const downloadUrl=urlData?.publicUrl||'';
+  try {
+    // Upload file to Bmob
+    const ext = file.name.split('.').pop().toLowerCase();
+    const bmobFile = Bmob.File(file.name, file);
+    const savedFile = await bmobFile.save();
+    const fileUrl = savedFile.url();
 
-    const{error:dbErr}=await supabase.from('papers').insert({title,subject,year:parseInt(year),tags,description:'',file_path:downloadUrl,file_type:ext,file_size:file.size,user_id:currentUser.id,user_email:currentUser.email});
-    if(dbErr)throw new Error(dbErr.message);
-    toast('上传成功！');closeUploadModal();renderHome();
-  }catch(e){toast('上传失败: '+e.message)}
-  document.getElementById('uploadBtn').textContent='上传';document.getElementById('uploadBtn').disabled=false;
+    // Save paper record
+    const Paper = Bmob.Object.extend('papers');
+    const paper = new Paper();
+    paper.set('title', title);
+    paper.set('subject', subject);
+    paper.set('year', parseInt(year));
+    paper.set('tags', tags);
+    paper.set('file_url', fileUrl);
+    paper.set('file_type', ext);
+    paper.set('file_size', file.size);
+    paper.set('userId', currentUser.id);
+    paper.set('userEmail', currentUser.get('email') || currentUser.get('username'));
+    paper.set('downloads', 0);
+    paper.set('avg_rating', 0);
+    paper.set('rating_count', 0);
+    await paper.save();
+
+    toast('上传成功！');
+    closeUploadModal();
+    renderHome();
+  } catch (e) {
+    toast('上传失败: ' + (e.message || e.error || JSON.stringify(e)));
+  }
+  btn.textContent = '上传'; btn.disabled = false;
 }
 
 // Helpers
-function esc(s){if(!s)return'';const d=document.createElement('div');d.textContent=String(s);return d.innerHTML}
-function timeAgo(d){if(!d)return'';const m=Math.floor((Date.now()-new Date(d).getTime())/60000);if(m<1)return'刚刚';if(m<60)return m+'分钟前';const h=Math.floor(m/60);if(h<24)return h+'小时前';const days=Math.floor(h/24);if(days<30)return days+'天前';if(days<365)return Math.floor(days/30)+'个月前';return Math.floor(days/365)+'年前'}
+function esc(s) { if (!s) return ''; const d = document.createElement('div'); d.textContent = String(s); return d.innerHTML; }
+function timeAgo(d) { if (!d) return ''; const m = Math.floor((Date.now() - new Date(d).getTime()) / 60000); if (m < 1) return '刚刚'; if (m < 60) return m + '分钟前'; const h = Math.floor(m / 60); if (h < 24) return h + '小时前'; const days = Math.floor(h / 24); if (days < 30) return days + '天前'; if (days < 365) return Math.floor(days / 30) + '个月前'; return Math.floor(days / 365) + '年前'; }
+
+// Drag & drop
+document.addEventListener('DOMContentLoaded', () => {
+  const dz = document.getElementById('dropZone'); if (!dz) return;
+  dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('drag'); });
+  dz.addEventListener('dragleave', () => dz.classList.remove('drag'));
+  dz.addEventListener('drop', e => {
+    e.preventDefault(); dz.classList.remove('drag');
+    const f = e.dataTransfer.files[0];
+    if (f) { document.getElementById('upFile').files = e.dataTransfer.files; document.getElementById('fileInfo').textContent = `已选择: ${f.name} (${(f.size / 1024 / 1024).toFixed(1)}MB)`; }
+  });
+  document.getElementById('upFile').addEventListener('change', function () { const f = this.files[0]; if (f) document.getElementById('fileInfo').textContent = `已选择: ${f.name} (${(f.size / 1024 / 1024).toFixed(1)}MB)`; });
+});
 
 // Modal close
-document.getElementById('authModal').addEventListener('click',function(e){if(e.target===this)this.classList.remove('active')});
-document.getElementById('uploadModal').addEventListener('click',function(e){if(e.target===this)this.classList.remove('active')});
-document.getElementById('settingsModal').addEventListener('click',function(e){if(e.target===this)this.classList.remove('active')});
+['authModal', 'uploadModal'].forEach(id => {
+  document.getElementById(id).addEventListener('click', function (e) { if (e.target === this) this.classList.remove('active'); });
+});
 
 // Init
-(async function(){await checkAuth();renderHome();console.log('PaperHub ready')})();
+updateAuthUI();
+renderHome();
+console.log('PaperHub v3 ready');
 </script>
 </body>
 </html>
