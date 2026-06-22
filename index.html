@@ -842,6 +842,13 @@ async function doUpload() {
       const assetData = await assetRes.json();
       downloadUrl = assetData.browser_download_url;
     } else {
+      // 兜底：Netlify 函数上传
+      const form = new FormData(); form.append('file',file); form.append('path',safePath);
+      const upRes = await fetch('/api/upload',{method:'POST',body:form});
+      const upData = await upRes.json();
+      if (!upRes.ok) throw new Error(upData.error||'上传失败');
+      downloadUrl = upData.url;
+    }
 
     const {error:dbErr} = await supabase.from('papers').insert({
       title,subject,year:parseInt(year),tags,description:'',
