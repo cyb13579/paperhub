@@ -221,7 +221,10 @@ async function renderHome(){
   await loadStats();await loadPapers();
 }
 async function loadStats(){
-  try{const n=await supa.db.q('papers',{count:true});document.getElementById('statTotal').textContent=n||'0'}catch(e){}
+  try{
+    const r=await fetch(SUPA+'/rest/v1/papers?limit=1&select=id',{headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Prefer':'count=exact'}});
+    const cr=r.headers.get('content-range')||'';document.getElementById('statTotal').textContent=cr.split('/').pop()||'0';
+  }catch(e){}
   try{
     const papers=await supa.db.q('papers',{limit:200});let dl=0;const users=new Set();
     papers.forEach(p=>{dl+=p.downloads||0;if(p.user_id)users.add(p.user_id)});
@@ -238,11 +241,19 @@ async function loadPapers(){
   try{
     const where={};if(s)where.subject=s;if(y)where.year=parseInt(y);
     let papers=await supa.db.q('papers',{where:Object.keys(where).length?where:undefined,order:sort[0]+'.'+(sort[1]||'desc'),limit:100});
-    if(search)papers=papers.filter(p=>(p.title||'').toLowerCase().includes(search)||(p.tags||'').toLowerCase().includes(search));
+    if(search)papers=papers.filter(p=>(p.title||'').toLowerCase().includes(search)||(p.tags||'').toLowerCase().includes(search)||(p.description||'').toLowerCase().includes(search));
     document.getElementById('rc').textContent='共 '+papers.length+' 份';
-    if(!papers.length){grid.innerHTML='<div class="empty"><div class="ic">📭</div><p>'+(U?'快来上传第一份！':'还没有资料')+'</p></div>';return}
-    grid.innerHTML=papers.map(p=>'<div class="card" onclick="showDetail(\''+p.id+'\')"><div class="ct '+(SUBS[p.subject]||'ot')+'">'+(EMOJI[p.subject]||'📄')+'</div><div class="cb"><div class="cti">'+esc(p.title||'')+'</div><div class="ctg"><span class="tag">'+esc(p.subject||'')+'</span><span class="tag yr">'+p.year+'</span>'+(p.file_type?'<span class="tag fl">'+p.file_type.toUpperCase()+' '+(p.file_size?(p.file_size/1048576).toFixed(1)+'MB':'')+'</span>':'')+'</div><div class="cf"><span>⬇ '+(p.downloads||0)+'</span><span>⭐ '+(p.rating_count?p.avg_rating.toFixed(1):'-')+'</span><span>'+timeAgo(p.created_at)+'</span></div></div></div>').join('');
+    if(!papers.length){grid.innerHTML='<div class="empty"><div class="ic">📭</div><p>'+(U?'快来上传第一份！':'还没有资料，登录后可上传')+'</p>'+(U?'<br><button class=\"btn btn-p btn-s\" style=\"margin-top:12px\" onclick=\"showUpload()\">+ 上传资料</button>':'')+'</div>';return}
+    // Show first 20, then load more
+    const shown=papers.slice(0,20);const hasMore=papers.length>20;
+    grid.innerHTML=shown.map(p=>'<div class="card" onclick="showDetail(\''+p.id+'\')"><div class="ct '+(SUBS[p.subject]||'ot')+'">'+(EMOJI[p.subject]||'📄')+'</div><div class="cb"><div class="cti">'+esc(p.title||'')+'</div><div class="ctg"><span class="tag">'+esc(p.subject||'')+'</span><span class="tag yr">'+p.year+'</span>'+(p.file_type?'<span class="tag fl">'+p.file_type.toUpperCase()+' '+(p.file_size?(p.file_size/1048576).toFixed(1)+'MB':'')+'</span>':'')+'</div><div class="cf"><span>⬇ '+(p.downloads||0)+'</span><span>⭐ '+(p.rating_count?p.avg_rating.toFixed(1):'-')+'</span><span>'+timeAgo(p.created_at)+'</span></div></div></div>').join('');
+    if(hasMore)grid.innerHTML+='<div class="empty" style="padding:20px"><button class="btn btn-o btn-s" onclick="showAll()">📂 加载全部 ('+papers.length+' 份)</button></div>';
+    window._allPapers=papers;
   }catch(e){grid.innerHTML='<div class="empty"><p>加载失败</p></div>'}
+}
+function showAll(){
+  const all=window._allPapers||[];const grid=document.getElementById('grid');if(!grid||!all.length)return;
+  grid.innerHTML=all.map(p=>'<div class="card" onclick="showDetail(\''+p.id+'\')"><div class="ct '+(SUBS[p.subject]||'ot')+'">'+(EMOJI[p.subject]||'📄')+'</div><div class="cb"><div class="cti">'+esc(p.title||'')+'</div><div class="ctg"><span class="tag">'+esc(p.subject||'')+'</span><span class="tag yr">'+p.year+'</span>'+(p.file_type?'<span class="tag fl">'+p.file_type.toUpperCase()+' '+(p.file_size?(p.file_size/1048576).toFixed(1)+'MB':'')+'</span>':'')+'</div><div class="cf"><span>⬇ '+(p.downloads||0)+'</span><span>⭐ '+(p.rating_count?p.avg_rating.toFixed(1):'-')+'</span><span>'+timeAgo(p.created_at)+'</span></div></div></div>').join('');document.getElementById('rc').textContent='共 '+all.length+' 份';
 }
 function pickSubj(s,el){subj=s;document.querySelectorAll('.pill').forEach(p=>p.classList.remove('active'));if(el)el.classList.add('active');document.getElementById('searchSubj').value=s;loadPapers()}
 function doSearch(){subj='';loadPapers()}
