@@ -5,49 +5,45 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PaperHub · 试卷共享</title>
 <style>
-:root{--bg:#f5f6fa;--card:#fff;--border:#e8ecf1;--text:#1e293b;--t2:#64748b;--t3:#94a3b8;--p:#6366f1;--p2:#4f46e5;--g:#10b981;--r:#ef4444;--o:#f59e0b;--rad:14px;--rs:8px}
+:root{--bg:#f5f6fa;--card:#fff;--bo:#e8ecf1;--tx:#1e293b;--t2:#64748b;--t3:#94a3b8;--p:#6366f1;--p2:#4f46e5;--g:#10b981;--r:#ef4444;--o:#f59e0b;--ra:14px;--rs:8px}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans SC',sans-serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans SC',sans-serif;background:var(--bg);color:var(--tx);line-height:1.6;min-height:100vh}
 a{color:var(--p);text-decoration:none}
-
 .hd{background:linear-gradient(135deg,#312e81,#4f46e5,#6366f1);color:#fff}
 .hi{max-width:1200px;margin:0 auto;padding:12px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
 .lg{font-size:1.4rem;font-weight:800;color:#fff}.lg span{color:#c7d2fe}
 .nr{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .ue{font-size:0.82rem;color:#c7d2fe;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-
 .btn{padding:7px 15px;border-radius:20px;font-size:0.85rem;font-weight:500;cursor:pointer;border:none;transition:all .15s;display:inline-flex;align-items:center;gap:4px;white-space:nowrap}
 .btn-w{background:rgba(255,255,255,.2);color:#fff}.btn-w:hover{background:rgba(255,255,255,.35)}
 .btn-p{background:var(--p);color:#fff}.btn-p:hover{background:var(--p2)}
-.btn-o{background:transparent;border:1px solid var(--border);color:var(--text)}.btn-o:hover{background:var(--bg)}
-.btn-g{background:transparent;color:var(--t2)}.btn-g:hover{color:var(--text)}
+.btn-o{background:transparent;border:1px solid var(--bo);color:var(--tx)}.btn-o:hover{background:var(--bg)}
+.btn-g{background:transparent;color:var(--t2)}.btn-g:hover{color:var(--tx)}
 .btn-s{padding:4px 11px;font-size:0.76rem;border-radius:14px}
 .btn-d{background:var(--r);color:#fff}
-
 .ctr{max-width:1200px;margin:0 auto;padding:0 20px}
 .hero{background:linear-gradient(135deg,#312e81,#4f46e5,#6366f1);padding:0 0 32px}
 .hri{max-width:1200px;margin:0 auto;padding:0 20px}
 .ht{font-size:1.8rem;font-weight:800;color:#fff;padding:16px 0 4px}
 .hs{color:#c7d2fe;font-size:0.9rem;margin-bottom:20px}
 .sc{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
-.scd{background:rgba(255,255,255,.12);border-radius:var(--rad);padding:16px 18px;color:#fff;border:1px solid rgba(255,255,255,.1)}
+.scd{background:rgba(255,255,255,.12);border-radius:var(--ra);padding:16px 18px;color:#fff;border:1px solid rgba(255,255,255,.1)}
 .sv{font-size:1.4rem;font-weight:700}.sl{font-size:0.75rem;color:#c7d2fe}
-
 .content{padding:20px 0 60px}
 .sr{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
-.sb{flex:1;min-width:200px;display:flex;align-items:center;background:var(--card);border:1px solid var(--border);border-radius:24px;padding:0 14px;transition:all .15s}
+.sb{flex:1;min-width:200px;display:flex;align-items:center;background:var(--card);border:1px solid var(--bo);border-radius:24px;padding:0 14px;transition:all .15s}
 .sb:focus-within{border-color:var(--p);box-shadow:0 0 0 3px rgba(99,102,241,.1)}
-.sb input{flex:1;border:none;padding:11px 0;font-size:0.9rem;outline:none;background:transparent;color:var(--text)}
+.sb input{flex:1;border:none;padding:11px 0;font-size:0.9rem;outline:none;background:transparent;color:var(--tx)}
 .sb input::placeholder{color:var(--t3)}
-.fs{padding:10px 30px 10px 12px;border:1px solid var(--border);border-radius:24px;font-size:0.85rem;outline:none;background:var(--card);color:var(--text);cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2364748b' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center}
+.fs{padding:10px 30px 10px 12px;border:1px solid var(--bo);border-radius:24px;font-size:0.85rem;outline:none;background:var(--card);color:var(--tx);cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2364748b' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center}
 .fs:focus{border-color:var(--p);outline:none}
 .sp{display:flex;gap:5px;margin-bottom:16px;flex-wrap:wrap}
-.pill{padding:5px 14px;border-radius:20px;font-size:0.8rem;font-weight:500;cursor:pointer;border:1px solid var(--border);background:var(--card);color:var(--t2);transition:all .12s;white-space:nowrap}
+.pill{padding:5px 14px;border-radius:20px;font-size:0.8rem;font-weight:500;cursor:pointer;border:1px solid var(--bo);background:var(--card);color:var(--t2);transition:all .12s;white-space:nowrap}
 .pill.active,.pill:hover{background:var(--p);color:#fff;border-color:var(--p)}
 .st{font-size:1rem;font-weight:700;margin:16px 0 10px;display:flex;justify-content:space-between}
 .st .c{font-size:0.8rem;color:var(--t3);font-weight:400}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:12px;margin-bottom:20px}
-.card{background:var(--card);border-radius:var(--rad);border:1px solid var(--border);overflow:hidden;transition:all .15s;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.card{background:var(--card);border-radius:var(--ra);border:1px solid var(--bo);overflow:hidden;transition:all .15s;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,.06)}
 .card:hover{transform:translateY(-1px);box-shadow:0 6px 24px rgba(0,0,0,.07);border-color:#c7d2fe}
 .ct{height:70px;display:flex;align-items:center;justify-content:center;font-size:2.2rem}
 .ct.m{background:linear-gradient(135deg,#eef2ff,#e0e7ff)}.ct.cn{background:linear-gradient(135deg,#fef3c7,#fef9c3)}.ct.en{background:linear-gradient(135deg,#fce7f3,#fbcfe8)}.ct.ph{background:linear-gradient(135deg,#e0f2fe,#bae6fd)}.ct.ch{background:linear-gradient(135deg,#f0fdf4,#dcfce7)}.ct.bi{background:linear-gradient(135deg,#ecfdf5,#d1fae5)}.ct.hi{background:linear-gradient(135deg,#fef2f2,#fecaca)}.ct.ge{background:linear-gradient(135deg,#f0fdfa,#99f6e4)}.ct.po{background:linear-gradient(135deg,#fefce8,#fef08a)}.ct.cs{background:linear-gradient(135deg,#f5f3ff,#ddd6fe)}.ct.ot{background:linear-gradient(135deg,#f8fafc,#e2e8f0)}
@@ -56,31 +52,29 @@ a{color:var(--p);text-decoration:none}
 .ctg{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:8px}
 .tag{padding:2px 9px;border-radius:12px;font-size:0.7rem;font-weight:500;background:#eef2ff;color:var(--p)}
 .tag.yr{background:#fef3c7;color:#92400e}.tag.fl{background:#fee2e2;color:#991b1b}
-.cf{display:flex;align-items:center;justify-content:space-between;font-size:0.76rem;color:var(--t3);padding-top:8px;border-top:1px solid var(--border)}
-.lm{text-align:center;padding:16px}
+.cf{display:flex;align-items:center;justify-content:space-between;font-size:0.76rem;color:var(--t3);padding-top:8px;border-top:1px solid var(--bo)}
 .empty{text-align:center;padding:60px 20px;color:var(--t2)}.empty .ic{font-size:3rem;margin-bottom:10px}
-
 .mo{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;align-items:center;justify-content:center}
 .mo.active{display:flex}
-.modal{background:var(--card);border-radius:var(--rad);padding:24px 28px;max-width:460px;width:94%;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.15)}
+.modal{background:var(--card);border-radius:var(--ra);padding:24px 28px;max-width:460px;width:94%;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.15)}
 .modal h2{font-size:1.1rem;font-weight:700;margin-bottom:16px}
 .fg{margin-bottom:12px}
 .fg label{display:block;font-size:0.82rem;font-weight:600;margin-bottom:3px;color:var(--t2)}
-.fg input,.fg select,.fg textarea{width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:var(--rs);font-size:0.88rem;outline:none;background:var(--bg);color:var(--text)}
+.fg input,.fg select,.fg textarea{width:100%;padding:9px 12px;border:1px solid var(--bo);border-radius:var(--rs);font-size:0.88rem;outline:none;background:var(--bg);color:var(--tx)}
 .fg input:focus,.fg textarea:focus,.fg select:focus{border-color:var(--p);box-shadow:0 0 0 3px rgba(99,102,241,.06)}
 .fg textarea{resize:vertical;min-height:60px}
 .fr{display:flex;gap:8px}.fr .fg{flex:1}
 .ma{display:flex;gap:8px;justify-content:flex-end;margin-top:18px}
-.uz{border:2px dashed var(--border);border-radius:var(--rad);padding:28px;text-align:center;cursor:pointer;transition:all .15s;background:var(--bg);margin-bottom:10px}
+.uz{border:2px dashed var(--bo);border-radius:var(--ra);padding:28px;text-align:center;cursor:pointer;transition:all .15s;background:var(--bg);margin-bottom:10px}
 .uz:hover,.uz.drag{border-color:var(--p);background:#eef2ff}
 .uz .ic{font-size:2.5rem;margin-bottom:6px}
 .uz .hi{font-size:0.85rem;color:var(--t2)}.uz .hi strong{color:var(--p)}
-.dc{background:var(--card);border-radius:var(--rad);border:1px solid var(--border);padding:24px 26px;box-shadow:0 1px 3px rgba(0,0,0,.06);margin-bottom:16px}
+.dc{background:var(--card);border-radius:var(--ra);border:1px solid var(--bo);padding:24px 26px;box-shadow:0 1px 3px rgba(0,0,0,.06);margin-bottom:16px}
 .dt{font-size:1.3rem;font-weight:700;margin-bottom:8px}
 .dm{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
 .da{display:flex;gap:7px;flex-wrap:wrap}
-.bl{display:inline-flex;align-items:center;gap:4px;color:var(--t2);font-size:0.88rem;margin:14px 0}.bl:hover{color:var(--text)}
-.rc{background:var(--card);border-radius:var(--rad);border:1px solid var(--border);padding:12px 16px;margin-bottom:6px}
+.bl{display:inline-flex;align-items:center;gap:4px;color:var(--t2);font-size:0.88rem;margin:14px 0}.bl:hover{color:var(--tx)}
+.rc{background:var(--card);border-radius:var(--ra);border:1px solid var(--bo);padding:12px 16px;margin-bottom:6px}
 .rh{display:flex;justify-content:space-between;font-size:0.78rem;color:var(--t2);margin-bottom:2px}
 .stars{color:var(--o)}
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1e293b;color:#fff;padding:10px 22px;border-radius:30px;font-size:0.85rem;z-index:300;opacity:0;transition:opacity .2s;pointer-events:none}
@@ -94,368 +88,252 @@ a{color:var(--p);text-decoration:none}
 <a href="#" class="lg" onclick="goHome()">📚 Paper<span>Hub</span></a>
 <div class="nr">
 <span class="ue" id="userInfo"></span>
-<button class="btn btn-w btn-s" onclick="showUploadModal()" id="uploadNavBtn" style="display:none">+ 上传</button>
-<button class="btn btn-w btn-s" onclick="showAuthModal()" id="loginBtn">登录</button>
+<button class="btn btn-w btn-s" onclick="showUpload()" id="upBtn" style="display:none">+ 上传</button>
+<button class="btn btn-w btn-s" onclick="showLogin()" id="loginBtn">登录</button>
 <button class="btn btn-w btn-s" onclick="doLogout()" id="logoutBtn" style="display:none">退出</button>
 </div>
 </div></header>
 
-<div class="hero" id="heroSection"><div class="hri">
+<div class="hero" id="hero"><div class="hri">
 <div class="ht">知识共享，从这里开始</div>
 <div class="hs">上传试卷、搜索资料、交流学习</div>
 <div class="sc">
-<div class="scd"><div class="sv" id="hTotal">-</div><div class="sl">资料总数</div></div>
-<div class="scd"><div class="sv" id="hDownloads">-</div><div class="sl">累计下载</div></div>
-<div class="scd"><div class="sv" id="hUsers">-</div><div class="sl">贡献用户</div></div>
+<div class="scd"><div class="sv" id="statTotal">-</div><div class="sl">资料总数</div></div>
+<div class="scd"><div class="sv" id="statDL">-</div><div class="sl">累计下载</div></div>
+<div class="scd"><div class="sv" id="statUsers">-</div><div class="sl">贡献用户</div></div>
 <div class="scd"><div class="sv">11</div><div class="sl">涵盖学科</div></div>
 </div>
 </div></div>
 
-<div class="ctr content" id="mainContent"></div>
+<div class="ctr content" id="main"></div>
 
-<div class="mo" id="authModal"><div class="modal">
+<div class="mo" id="authMo"><div class="modal">
 <h2 id="authTitle">登录</h2>
 <div class="fg"><label>邮箱</label><input type="email" id="authEmail" placeholder="your@email.com"></div>
-<div class="fg"><label>密码（至少6位）</label><input type="password" id="authPassword" placeholder="···"></div>
-<div class="ma"><button class="btn btn-g" id="authToggle" onclick="toggleAuthMode()">去注册</button><button class="btn btn-p" onclick="doAuth()">登录</button></div>
+<div class="fg"><label>密码（至少6位）</label><input type="password" id="authPW" placeholder="···"></div>
+<div class="ma"><button class="btn btn-g" id="authSwitch" onclick="switchAuth()">去注册</button><button class="btn btn-p" onclick="doAuth()">登录</button></div>
 </div></div>
 
-<div class="mo" id="uploadModal"><div class="modal">
+<div class="mo" id="upMo"><div class="modal">
 <h2>📤 上传资料</h2>
 <div class="fg"><label>标题</label><input type="text" id="upTitle" placeholder="例如：2024年高考数学真题" maxlength="100"></div>
-<div class="fr"><div class="fg"><label>学科</label><select id="upSubject"><option value="数学">数学</option><option value="语文">语文</option><option value="英语">英语</option><option value="物理">物理</option><option value="化学">化学</option><option value="生物">生物</option><option value="历史">历史</option><option value="地理">地理</option><option value="政治">政治</option><option value="计算机">计算机</option><option value="其他">其他</option></select></div>
-<div class="fg"><label>年份</label><select id="upYear"><script>for(let y=new Date().getFullYear();y>=2000;y--)document.write(`<option value="${y}">${y}</option>`);</script></select></div></div>
-<div class="fg"><label>描述（可选）</label><textarea id="upDesc" placeholder="简要描述..." rows="2"></textarea></div><div class="fg"><label>标签（逗号分隔）</label><input type="text" id="upTags" placeholder="高考,真题,全国卷"></div>
-<div class="fg"><label>文件（最大100MB）</label><div class="uz" id="dropZone" onclick="document.getElementById('upFile').click()"><div class="ic">📁</div><div class="hi">拖拽文件到此处，或<strong>点击选择</strong></div><div style="font-size:0.75rem;color:var(--t3);margin-top:4px" id="fileInfo"></div></div><input type="file" id="upFile" accept=".pdf,.jpg,.jpeg,.png,.zip,.doc,.docx,.ppt,.pptx" style="display:none"></div>
-<div class="ma"><button class="btn btn-g" onclick="document.getElementById('uploadModal').classList.remove('active')">取消</button><button class="btn btn-p" onclick="doUpload()" id="uploadBtn">上传</button></div>
+<div class="fr"><div class="fg"><label>学科</label><select id="upSubj"><option value="数学">数学</option><option value="语文">语文</option><option value="英语">英语</option><option value="物理">物理</option><option value="化学">化学</option><option value="生物">生物</option><option value="历史">历史</option><option value="地理">地理</option><option value="政治">政治</option><option value="计算机">计算机</option><option value="其他">其他</option></select></div>
+<div class="fg"><label>年份</label><select id="upYear"><script>for(let y=new Date().getFullYear();y>=2000;y--)document.write('<option value="'+y+'">'+y+'</option>');</script></select></div></div>
+<div class="fg"><label>标签（逗号分隔）</label><input type="text" id="upTags" placeholder="高考,真题,全国卷"></div>
+<div class="fg"><label>描述（可选）</label><textarea id="upDesc" placeholder="简要描述..." rows="2"></textarea></div>
+<div class="fg"><label>文件（最大100MB）</label><div class="uz" id="dropZ" onclick="document.getElementById('upFile').click()"><div class="ic">📁</div><div class="hi">拖拽文件到此处，或<strong>点击选择</strong></div><div style="font-size:0.75rem;color:var(--t3);margin-top:4px" id="fileInfo"></div></div><input type="file" id="upFile" accept=".pdf,.jpg,.jpeg,.png,.zip,.doc,.docx,.ppt,.pptx" style="display:none"></div>
+<div class="ma"><button class="btn btn-g" onclick="closeUp()">取消</button><button class="btn btn-p" onclick="doUpload()" id="upBtn2">上传</button></div>
 </div></div>
 
 <div class="toast" id="toast"></div>
 
 <script>
-// ===================================================
-// PaperHub — Supabase Backend
-// ===================================================
-const SUPA_URL='https://ugkyvcevycpmcbrqucla.supabase.co';
+const SUPA='https://ugkyvcevycpmcbrqucla.supabase.co';
 const SUPA_KEY='sb_publishable_L-cWMAfLnZ1jw-S3yscfdQ_B5lmiElK';
+const SUBS={数学:'m',语文:'cn',英语:'en',物理:'ph',化学:'ch',生物:'bi',历史:'hi',地理:'ge',政治:'po',计算机:'cs'};
+const EMOJI={数学:'📐',语文:'📖',英语:'🌍',物理:'⚡',化学:'🧪',生物:'🧬',历史:'📜',地理:'🗺️',政治:'⚖️',计算机:'💻'};
 
-// ===== Supabase Client (fetch-based, zero dependencies) =====
-function mkClient(url,key){
-  let session=null,listeners=[];
-  function jh(){return{'apikey':key,'Authorization':'Bearer '+key,'Content-Type':'application/json'}}
-  function ah(){const h={'apikey':key};if(session?.access_token)h.Authorization='Bearer '+session.access_token;else h.Authorization='Bearer '+key;return h}
-  function notify(){const s=session?{user:session.user}:null;listeners.forEach(f=>f('CHANGE',s))}
-
-  const auth={
-    async getSession(){try{const s=localStorage.getItem('sb');if(s)session=JSON.parse(s)}catch{}return{data:{session}}},
-    async signUp(e,p){
-      const r=await fetch(url+'/auth/v1/signup',{method:'POST',headers:jh(),body:JSON.stringify({email:e,password:p})});
-      const d=await r.json().catch(()=>({}));if(!r.ok)return{error:{message:d.msg||r.statusText}};
-      if(d.session){session={access_token:d.session.access_token,user:d.user};localStorage.setItem('sb',JSON.stringify(session));notify();return{data:{session,user:session.user},error:null}}
-      return{data:d,error:null}
+let S=null;
+function api(){
+  function hd(){
+    const h={'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json'};
+    if(S)h.Authorization='Bearer '+S.access_token;
+    return h;
+  }
+  return{
+    auth:{
+      async getSession(){try{S=JSON.parse(localStorage.getItem('sb_sess')||'null')}catch(e){}return S},
+      async signUp(e,p){
+        const r=await fetch(SUPA+'/auth/v1/signup',{method:'POST',headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json'},body:JSON.stringify({email:e,password:p})});
+        const d=await r.json();if(!r.ok)throw new Error(d.msg||'注册失败');
+        if(d.session){S={access_token:d.session.access_token,user:d.user};localStorage.setItem('sb_sess',JSON.stringify(S))}
+      },
+      async signIn(e,p){
+        const r=await fetch(SUPA+'/auth/v1/token?grant_type=password',{method:'POST',headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json'},body:JSON.stringify({email:e,password:p})});
+        const d=await r.json();if(!r.ok)throw new Error(d.error_description||d.msg||'登录失败');
+        S={access_token:d.access_token,user:d.user};localStorage.setItem('sb_sess',JSON.stringify(S));
+      },
+      async signOut(){if(S)await fetch(SUPA+'/auth/v1/logout',{method:'POST',headers:hd()}).catch(()=>{});S=null;localStorage.removeItem('sb_sess')}
     },
-    async signIn(e,p){
-      const r=await fetch(url+'/auth/v1/token?grant_type=password',{method:'POST',headers:jh(),body:JSON.stringify({email:e,password:p})});
-      const d=await r.json().catch(()=>({}));if(!r.ok)return{error:{message:d.error_description||d.msg||'登录失败'}};
-      session={access_token:d.access_token,user:d.user};localStorage.setItem('sb',JSON.stringify(session));notify();
-      return{data:{session,user:d.user},error:null}
+    db:{
+      async q(table,{where,order,limit,count}={}){
+        const p=new URLSearchParams();
+        if(where)for(const[k,v]of Object.entries(where))p.set(k,'eq.'+v);
+        if(order)p.set('order',order);if(limit)p.set('limit',limit);
+        if(count){p.set('limit','0');p.set('count','exact')}
+        const ps=p.toString(),url=SUPA+'/rest/v1/'+table+(ps?'?'+ps:'');
+        const r=await fetch(url,{headers:count?{...hd(),Prefer:'count=exact'}:hd()});
+        if(!r.ok)throw new Error(await r.text());
+        if(count){const cr=r.headers.get('content-range');return cr?parseInt(cr.split('/').pop()):0}
+        return await r.json();
+      },
+      async get(table,id){const r=await fetch(SUPA+'/rest/v1/'+table+'?id=eq.'+id,{headers:hd()});const d=await r.json();return d&&d[0]?d[0]:null},
+      async create(table,data){const r=await fetch(SUPA+'/rest/v1/'+table,{method:'POST',headers:{...hd(),Prefer:'return=representation'},body:JSON.stringify(data)});if(!r.ok)throw new Error(await r.text());return await r.json()},
+      async upd(table,id,data){const r=await fetch(SUPA+'/rest/v1/'+table+'?id=eq.'+id,{method:'PATCH',headers:{...hd(),'Content-Type':'application/json'},body:JSON.stringify(data)});if(!r.ok)throw new Error(await r.text())},
+      async del(table,id){await fetch(SUPA+'/rest/v1/'+table+'?id=eq.'+id,{method:'DELETE',headers:hd()})}
     },
-    async signOut(){if(session?.access_token)await fetch(url+'/auth/v1/logout',{method:'POST',headers:{...jh(),Authorization:'Bearer '+session.access_token}}).catch(()=>{});session=null;localStorage.removeItem('sb');notify();return{error:null}},
-    onAuthStateChange(fn){listeners.push(fn)}
+    storage:{
+      async upload(path,file){
+        const fd=new FormData();fd.append('file',file);
+        const h={'apikey':SUPA_KEY,'Authorization':S?'Bearer '+S.access_token:'Bearer '+SUPA_KEY};
+        const r=await fetch(SUPA+'/storage/v1/object/papers/'+path,{method:'POST',headers:h,body:fd});
+        if(!r.ok)throw new Error(((await r.json()).message)||'上传失败');
+      },
+      url(path){return SUPA+'/storage/v1/object/public/papers/'+path}
+    }
   };
-
-  const storage={from(b){return{
-    async upload(fp,file){const fd=new FormData();fd.append('file',file);const h={'apikey':key,'Authorization':'Bearer '+key};if(session?.access_token)h.Authorization='Bearer '+session.access_token;const r=await fetch(url+'/storage/v1/object/'+b+'/'+fp,{method:'POST',headers:h,body:fd});if(!r.ok){const e=await r.json().catch(()=>({}));return{error:{message:e.error||e.message||'上传失败'}}}return{data:await r.json().catch(()=>null),error:null}},
-    getPublicUrl(fp){return{data:{publicUrl:url+'/storage/v1/object/public/'+b+'/'+fp}}}
-  }}};
-
-  function from(table){
-    let q={table,method:'GET',filters:[],params:{},body:null,cols:'*',single:false,count:false};
-    const chain={
-      select(cols,opts){q.cols=cols||'*';if(opts?.count)q.count=true;return this},
-      insert(body){q.method='POST';q.body=body;return this},
-      delete(){q.method='DELETE';return this},
-      update(body){q.method='PATCH';q.body=body;return this},
-      eq(f,v){q.filters.push([f,'eq',v]);return this},
-      ilike(f,v){q.filters.push([f,'ilike',v]);return this},
-      order(f,opts){q.params.order=f+'.'+(opts?.ascending===false?'desc':'asc');return this},
-      limit(n){q.params.limit=n;return this},
-      range(a,b){q.params.offset=a;q.params.limit=b-a+1;return this},
-      single(){q.single=true;return this},
-      async then(resolve){
-        try{
-          const p=new URLSearchParams();
-          for(const[k,v]of Object.entries(q.params))p.set(k,v);
-          for(const[f,op,v]of q.filters)p.set(f,op+'.'+v);
-          if(q.cols&&q.cols!=='*')p.set('select',q.cols);
-          const h=ah();
-          if(q.method!=='GET'&&q.method!=='DELETE'){h['Content-Type']='application/json';if(q.method==='POST')h['Prefer']='return=representation'}
-          if(q.count)h['Prefer']=(h['Prefer']?h['Prefer']+',':'')+'count=exact';
-          const opt={method:q.method,headers:h};if(q.body)opt.body=JSON.stringify(q.body);
-          const ps=p.toString();const r=await fetch(ps?url+'/rest/v1/'+q.table+'?'+ps:url+'/rest/v1/'+q.table,opt);
-          if(!r.ok){resolve({data:null,error:{message:await r.text().catch(()=>r.statusText)}});return}
-          let data=r.status!==204?await r.json():[];if(!Array.isArray(data))data=[data];if(q.single)data=data[0]||null;
-          const cnt=r.headers.get('content-range')?.split('/')?.pop();
-          resolve({data,error:null,count:cnt?parseInt(cnt):(Array.isArray(data)?data.length:0)});
-        }catch(e){resolve({data:null,error:{message:e.message}})}
-      }
-    };return chain
-  }
-
-  async function rpc(fn,params){const h=ah();h['Content-Type']='application/json';const r=await fetch(url+'/rest/v1/rpc/'+fn,{method:'POST',headers:h,body:JSON.stringify(params)});return r.ok?{data:null,error:null}:{error:{message:await r.text().catch(()=>'RPC error')}}}
-  return{auth,from,storage,rpc}
 }
+const supa=api();
 
-const supabase=mkClient(SUPA_URL,SUPA_KEY);
-
-// ===== State =====
-let currentUser=null,currentView='home',currentSubject='',paperCache=null,cacheTime=0;
-
-async function checkAuth(){
-  const{data:{session}}=await supabase.auth.getSession();
-  currentUser=session?.user||null;updateAuthUI();return currentUser
-}
-supabase.auth.onAuthStateChange((_e,session)=>{currentUser=session?.user||null;updateAuthUI();if(currentView==='home')renderHome()});
-
-function updateAuthUI(){
-  document.getElementById('loginBtn').style.display=currentUser?'none':'';
-  document.getElementById('logoutBtn').style.display=currentUser?'':'none';
-  document.getElementById('uploadNavBtn').style.display=currentUser?'':'none';
-  document.getElementById('userInfo').textContent=currentUser?.email||'';
-}
-
-// ===== Auth =====
-function showAuthModal(){
-  document.getElementById('authTitle').textContent='登录';document.getElementById('authToggle').textContent='去注册';
-  document.getElementById('authEmail').value='';document.getElementById('authPassword').value='';
-  document.getElementById('authModal').classList.add('active');document.getElementById('authModal')._mode='login';
-}
-function toggleAuthMode(){
-  const m=document.getElementById('authModal');
-  if(m._mode==='login'){m._mode='signup';document.getElementById('authTitle').textContent='注册';document.getElementById('authToggle').textContent='去登录'}
-  else{m._mode='login';document.getElementById('authTitle').textContent='登录';document.getElementById('authToggle').textContent='去注册'}
-}
-async function doAuth(){
-  const e=document.getElementById('authEmail').value.trim(),p=document.getElementById('authPassword').value;
-  if(!e||!p){toast('请填写邮箱和密码');return}
-  const m=document.getElementById('authModal');let r;
-  if(m._mode==='signup'){
-    r=await supabase.auth.signUp(e,p);
-    if(r.error){toast('注册失败: '+r.error.message);return}
-    if(r.data?.session){toast('注册成功！')}
-    else{toast('注册成功！正在登录...');r=await supabase.auth.signIn(e,p);if(r.error){toast('请查收邮箱确认');return}}
-  }else{
-    r=await supabase.auth.signIn(e,p);
-    if(r.error){toast('登录失败: '+r.error.message);return}
-    toast('登录成功！')
-  }
-  document.getElementById('authModal').classList.remove('active');renderHome();
-}
-async function doLogout(){await supabase.auth.signOut();toast('已退出');renderHome()}
-
+let U=null,view='home',subj='';
 function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2500)}
 
-// ===== Home =====
+function initAuth(){U=supa.auth.getSession()?.user||null;updateNav()}
+function updateNav(){
+  document.getElementById('loginBtn').style.display=U?'none':'';document.getElementById('logoutBtn').style.display=U?'':'none';
+  document.getElementById('upBtn').style.display=U?'':'none';document.getElementById('userInfo').textContent=U?(U.email||''):'';
+}
+function showLogin(){
+  document.getElementById('authTitle').textContent='登录';document.getElementById('authSwitch').textContent='去注册';
+  document.getElementById('authEmail').value='';document.getElementById('authPW').value='';
+  document.getElementById('authMo').classList.add('active');document.getElementById('authMo')._m='login';
+}
+function switchAuth(){
+  const m=document.getElementById('authMo');
+  if(m._m==='login'){m._m='signup';document.getElementById('authTitle').textContent='注册';document.getElementById('authSwitch').textContent='去登录'}
+  else{m._m='login';document.getElementById('authTitle').textContent='登录';document.getElementById('authSwitch').textContent='去注册'}
+}
+async function doAuth(){
+  const e=document.getElementById('authEmail').value.trim(),p=document.getElementById('authPW').value;
+  if(!e||!p){toast('请填写邮箱和密码');return}
+  const m=document.getElementById('authMo');
+  try{
+    if(m._m==='signup'){await supa.auth.signUp(e,p);if(!S){toast('注册成功！正在登录...');await supa.auth.signIn(e,p)}}
+    else{await supa.auth.signIn(e,p)}
+    U=S.user;updateNav();toast('登录成功！');document.getElementById('authMo').classList.remove('active');renderHome();
+  }catch(err){toast(err.message)}
+}
+async function doLogout(){await supa.auth.signOut();U=null;updateNav();toast('已退出');renderHome()}
+
 async function renderHome(){
-  currentView='home';currentSubject='';
-  document.getElementById('authModal')?.classList.remove('active');
-  document.getElementById('uploadModal')?.classList.remove('active');
-  document.getElementById('heroSection').style.display='';updateAuthUI();
-  document.getElementById('mainContent').innerHTML=`<div class="sr">
-<div class="sb"><span style="color:var(--t3);margin-right:6px">🔍</span><input type="text" id="searchInput" placeholder="搜索试卷..." onkeydown="if(event.key==='Enter')doSearch()"></div>
-<select class="fs" id="searchSubject" onchange="doSearch()"><option value="">全部学科</option>${['数学','语文','英语','物理','化学','生物','历史','地理','政治','计算机','其他'].map(s=>'<option value="'+s+'">'+s+'</option>').join('')}</select>
-<select class="fs" id="searchYear" onchange="doSearch()"><option value="">全部年份</option>${Array.from({length:26},(_,i)=>'<option value="'+(new Date().getFullYear()-i)+'">'+(new Date().getFullYear()-i)+'</option>').join('')}</select>
-<select class="fs" id="searchSort" onchange="doSearch()"><option value="created_at.desc">🕐 最新</option><option value="downloads.desc">⬇ 下载最多</option><option value="avg_rating.desc">⭐ 评分最高</option></select>
-<button class="btn btn-p btn-s" onclick="doSearch()">搜索</button>
-${currentUser?'<button class="btn btn-o btn-s" onclick="showMyPapers()">📂 我的上传</button>':''}
-</div>
-<div class="sp" id="subjectPills"><span class="pill active" onclick="filterSubject('',this)">全部</span>${['数学','语文','英语','物理','化学','生物','计算机'].map(s=>'<span class="pill" onclick="filterSubject(\''+s+'\',this)">'+s+'</span>').join('')}</div>
-<div class="st"><span>📄 资料列表</span><span class="c" id="resultCount"></span></div>
-<div class="grid" id="paperGrid"></div>`;
+  view='home';subj='';document.getElementById('hero').style.display='';
+  document.getElementById('main').innerHTML='<div class="sr"><div class="sb"><span style="color:var(--t3);margin-right:6px">🔍</span><input type="text" id="searchInp" placeholder="搜索试卷标题、标签..." onkeydown="if(event.key===\'Enter\')doSearch()"></div><select class="fs" id="searchSubj" onchange="doSearch()"><option value="">全部学科</option>'+['数学','语文','英语','物理','化学','生物','历史','地理','政治','计算机','其他'].map(s=>'<option value="'+s+'">'+s+'</option>').join('')+'</select><select class="fs" id="searchYear" onchange="doSearch()"><option value="">全部年份</option>'+Array.from({length:26},(_,i)=>'<option value="'+(new Date().getFullYear()-i)+'">'+(new Date().getFullYear()-i)+'</option>').join('')+'</select><select class="fs" id="searchSort" onchange="doSearch()"><option value="created_at.desc">🕐 最新</option><option value="downloads.desc">⬇ 下载最多</option><option value="avg_rating.desc">⭐ 评分最高</option></select><button class="btn btn-p btn-s" onclick="doSearch()">搜索</button>'+(U?'<button class="btn btn-o btn-s" onclick="showMine()">📂 我的上传</button>':'')+'</div><div class="sp" id="pills"><span class="pill active" onclick="pickSubj(\'\',this)">全部</span>'+['数学','语文','英语','物理','化学','生物','计算机'].map(s=>'<span class="pill" onclick="pickSubj(\''+s+'\',this)">'+s+'</span>').join('')+'</div><div class="st"><span>📄 资料列表</span><span class="c" id="rc"></span></div><div class="grid" id="grid"></div>';
   await loadStats();await loadPapers();
 }
-
-function loadStats(){
-  // Run stats in background after page loads
-  setTimeout(async()=>{
-    try{const{count:t}=await supabase.from('papers').select('id',{count:'exact'}).limit(1);document.getElementById('hTotal').textContent=t??'0'}catch{}
-    try{const{data:all}=await supabase.from('papers').select('downloads,user_id').limit(100);if(all){document.getElementById('hDownloads').textContent=all.reduce((s,p)=>s+(p.downloads||0),0).toLocaleString();document.getElementById('hUsers').textContent=new Set(all.map(p=>p.user_id).filter(Boolean)).size+''}}catch{}
-  },500);
-}
-
-async function loadPapers(reset=true){
-  const grid=document.getElementById('paperGrid');if(!grid)return;
-  const search=(document.getElementById('searchInput')?.value||'').trim().toLowerCase();
-  const subject=document.getElementById('searchSubject')?.value||currentSubject||'';
-  const year=document.getElementById('searchYear')?.value||'';
-
-  // Cache hit: skip API call, re-render from cache
-  const sort=(document.getElementById('searchSort')?.value||'created_at.desc').split('.');const cacheKey=subject+'|'+year+'|'+sort[0];
-  if(reset&&!search&&paperCache&&cacheKey===paperCache.key&&Date.now()-cacheTime<30000){
-    renderPapersFromCache(paperCache.data,search);return;
-  }
-
-  if(reset)grid.innerHTML=Array(6).fill(0).map(()=>'<div class="card"><div class="cb"><div style="height:16px;background:#f1f5f9;border-radius:4px;margin-bottom:8px"></div><div style="height:16px;width:60%;background:#f1f5f9;border-radius:4px"></div></div></div>').join('');
+async function loadStats(){
+  try{const n=await supa.db.q('papers',{count:true});document.getElementById('statTotal').textContent=n||'0'}catch(e){}
   try{
-    let q=supabase.from('papers').select('*').order(sort[0],{ascending:sort[1]==='asc'}).limit(100);
-    if(subject)q=q.eq('subject',subject);if(year)q=q.eq('year',parseInt(year));
-    const{data:papers,error}=await q;
-
-    // Update cache for non-search queries
-    if(!search){paperCache={key:cacheKey,data:papers||[]};cacheTime=Date.now()}
-
-    renderPapersFromCache(papers||[],search);
+    const papers=await supa.db.q('papers',{limit:200});let dl=0;const users=new Set();
+    papers.forEach(p=>{dl+=p.downloads||0;if(p.user_id)users.add(p.user_id)});
+    document.getElementById('statDL').textContent=dl.toLocaleString();document.getElementById('statUsers').textContent=users.size||'0';
+  }catch(e){}
+}
+async function loadPapers(){
+  const grid=document.getElementById('grid');if(!grid)return;
+  const search=(document.getElementById('searchInp')?.value||'').trim().toLowerCase();
+  const s=document.getElementById('searchSubj')?.value||subj||'';
+  const y=document.getElementById('searchYear')?.value||'';
+  const sort=(document.getElementById('searchSort')?.value||'created_at.desc').split('.');
+  grid.innerHTML=Array(6).fill(0).map(()=>'<div class="card"><div class="cb"><div style="height:16px;background:#f1f5f9;border-radius:4px;margin-bottom:8px"></div><div style="height:16px;width:60%;background:#f1f5f9;border-radius:4px"></div></div></div>').join('');
+  try{
+    const where={};if(s)where.subject=s;if(y)where.year=parseInt(y);
+    let papers=await supa.db.q('papers',{where:Object.keys(where).length?where:undefined,order:sort[0]+'.'+(sort[1]||'desc'),limit:100});
+    if(search)papers=papers.filter(p=>(p.title||'').toLowerCase().includes(search)||(p.tags||'').toLowerCase().includes(search));
+    document.getElementById('rc').textContent='共 '+papers.length+' 份';
+    if(!papers.length){grid.innerHTML='<div class="empty"><div class="ic">📭</div><p>'+(U?'快来上传第一份！':'还没有资料')+'</p></div>';return}
+    grid.innerHTML=papers.map(p=>'<div class="card" onclick="showDetail(\''+p.id+'\')"><div class="ct '+(SUBS[p.subject]||'ot')+'">'+(EMOJI[p.subject]||'📄')+'</div><div class="cb"><div class="cti">'+esc(p.title||'')+'</div><div class="ctg"><span class="tag">'+esc(p.subject||'')+'</span><span class="tag yr">'+p.year+'</span>'+(p.file_type?'<span class="tag fl">'+p.file_type.toUpperCase()+' '+(p.file_size?(p.file_size/1048576).toFixed(1)+'MB':'')+'</span>':'')+'</div><div class="cf"><span>⬇ '+(p.downloads||0)+'</span><span>⭐ '+(p.rating_count?p.avg_rating.toFixed(1):'-')+'</span><span>'+timeAgo(p.created_at)+'</span></div></div></div>').join('');
   }catch(e){grid.innerHTML='<div class="empty"><p>加载失败</p></div>'}
 }
+function pickSubj(s,el){subj=s;document.querySelectorAll('.pill').forEach(p=>p.classList.remove('active'));if(el)el.classList.add('active');document.getElementById('searchSubj').value=s;loadPapers()}
+function doSearch(){subj='';loadPapers()}
 
-function renderPapersFromCache(papers,search){
-  const grid=document.getElementById('paperGrid');if(!grid)return;
-  let filtered=papers||[];
-  if(search)filtered=filtered.filter(p=>(p.title||'').toLowerCase().includes(search)||(p.tags||'').toLowerCase().includes(search));
-  document.getElementById('resultCount').textContent=filtered.length?'共 '+filtered.length+' 份':'';
-  if(!filtered.length){grid.innerHTML='<div class="empty"><div class="ic">📭</div><p>'+(currentUser?'快来上传第一份！':'还没有资料')+'</p></div>';return}
-  const sm={数学:'m',语文:'cn',英语:'en',物理:'ph',化学:'ch',生物:'bi',历史:'hi',地理:'ge',政治:'po',计算机:'cs'};
-  const em={数学:'📐',语文:'📖',英语:'🌍',物理:'⚡',化学:'🧪',生物:'🧬',历史:'📜',地理:'🗺️',政治:'⚖️',计算机:'💻'};
-  grid.innerHTML=filtered.map(p=>'<div class="card" onclick="showDetail(\''+p.id+'\')"><div class="ct '+(sm[p.subject]||'ot')+'">'+(em[p.subject]||'📄')+'</div><div class="cb"><div class="cti">'+esc(p.title||'')+'</div><div class="ctg"><span class="tag">'+esc(p.subject||'')+'</span><span class="tag yr">'+p.year+'</span>'+(p.file_type?'<span class="tag fl">'+p.file_type.toUpperCase()+' '+(p.file_size?(p.file_size/1024/1024).toFixed(1)+'MB':'')+'</span>':'')+'</div><div class="cf"><span>⬇ '+(p.downloads||0)+'</span><span>⭐ '+(p.rating_count?p.avg_rating.toFixed(1):'-')+'</span><span>'+timeAgo(p.created_at)+'</span></div></div></div>').join('');
-}
-
-// Legacy wrapper for old code paths
-function filterSubject(s,el){currentSubject=s;document.querySelectorAll('.pill').forEach(p=>p.classList.remove('active'));if(el)el.classList.add('active');const sel=document.getElementById('searchSubject');if(sel)sel.value=s;loadPapers(true)}
-function doSearch(){currentSubject='';loadPapers(true)}
-
-// ===== Detail =====
-async function showDetail(id){
-  currentView='detail';document.getElementById('heroSection').style.display='none';
+async function showMine(){
+  if(!U){toast('请先登录');return}view='mine';document.getElementById('hero').style.display='none';
+  document.getElementById('main').innerHTML='<a href="#" onclick="goHome()" class="bl">← 返回首页</a><div class="st">📂 我上传的资料</div><div class="grid" id="grid"></div>';
+  const grid=document.getElementById('grid');
   try{
-    const{data:p}=await supabase.from('papers').select('*').eq('id',id).single();
-    if(!p){toast('资料不存在');renderHome();return}
-    const{data:reviews}=await supabase.from('reviews').select('*').eq('paper_id',id).order('created_at',{ascending:false});
-    const isOwner=currentUser&&currentUser.id===p.user_id;
-    const title=esc(p.title||''),subject=esc(p.subject||''),tags=p.tags?esc(p.tags):'';
-    const fileUrl=p.file_path||'',fileType=p.file_type||'';
-    const downloads=p.downloads||0,rating=p.rating_count?p.avg_rating.toFixed(1)+' ('+p.rating_count+')':'暂无评分';
-    const fileSize=p.file_size?(p.file_size/1024/1024).toFixed(1)+'MB':'';
-    const uploader=esc(p.user_email||'');
+    const papers=await supa.db.q('papers',{where:{user_id:U.id},order:'created_at.desc',limit:100});
+    if(!papers.length){grid.innerHTML='<div class="empty"><div class="ic">📭</div><p>还没有上传</p></div>';return}
+    grid.innerHTML=papers.map(p=>'<div class="card" onclick="showDetail(\''+p.id+'\')"><div class="cb"><div class="cti">'+esc(p.title||'')+'</div><div class="ctg"><span class="tag">'+esc(p.subject||'')+'</span><span class="tag yr">'+p.year+'</span></div><div class="cf"><span>⬇ '+(p.downloads||0)+'</span><span>⭐ '+(p.rating_count?p.avg_rating.toFixed(1):'-')+'</span><span>'+timeAgo(p.created_at)+'</span></div></div></div>').join('');
+  }catch(e){grid.innerHTML='<div class="empty"><p>加载失败</p></div>'}
+}
+function goHome(){document.getElementById('hero').style.display='';renderHome()}
 
-    let html='<a href="#" onclick="goHome()" class="bl">← 返回首页</a>';
-    html+='<div class="dc"><h1 class="dt">'+title+'</h1>';
-    html+='<div class="dm"><span class="tag">'+subject+'</span><span class="tag yr">'+p.year+'</span>';
-    if(fileType)html+='<span class="tag fl">'+fileType.toUpperCase()+' '+fileSize+'</span>';
-    html+='<span style="font-size:0.85rem;color:var(--t2)">⬇ '+downloads+' 下载</span>';
-    html+='<span style="font-size:0.85rem;color:var(--t2)">⭐ '+rating+'</span></div>';
-    if(tags)html+='<div style="margin:6px 0;font-size:0.84rem;color:var(--t2)">🏷️ '+tags+'</div>';
-    if(p.description)html+='<div class="detail-desc">'+esc(p.description)+'</div>';
-    html+='<div class="da">';
-    if(currentUser){
-      html+='<button class="btn btn-p" onclick="downloadFile(''+p.id+'',''+fileUrl+'')">⬇ 下载</button>';
-      if(fileType==='pdf')html+='<button class="btn btn-o btn-s" onclick="previewFile(''+fileUrl+'')">👁 预览</button>';
-      html+='<button class="btn btn-g btn-s" onclick="copyLink(''+fileUrl+'')">🔗 复制链接</button>';
-      html+='<button class="btn btn-g btn-s" onclick="showReviewInput(''+p.id+'')">⭐ 评分</button>';
-    }else{
-      html+='<p style="color:var(--o)">🔒 请登录后下载</p>';
-    }
-    if(isOwner)html+='<button class="btn btn-d btn-s" onclick="deletePaper(''+p.id+'')">🗑 删除</button>';
-    html+='</div></div>';
-    html+='<div class="st">💬 评价 ('+(reviews?reviews.length:0)+')</div>';
-    html+='<div id="reviewList">';
-    if(!reviews||!reviews.length)html+='<p style="color:var(--t2);font-size:0.9rem">暂无评价</p>';
-    else reviews.forEach(r=>{html+='<div class="rc"><div class="rh"><span>'+esc(r.user_email||'匿名')+'</span><span class="stars">'+'★'.repeat(r.rating||0)+'☆'.repeat(5-(r.rating||0))+'</span><span>'+timeAgo(r.created_at)+'</span></div>'+(r.comment?'<p style="font-size:0.88rem">'+esc(r.comment)+'</p>':'')+'</div>';});
-    html+='</div><div id="reviewInputArea"></div>';
-    document.getElementById('mainContent').innerHTML=html;
+async function showDetail(id){
+  view='detail';document.getElementById('hero').style.display='none';
+  try{
+    const p=await supa.db.get('papers',id);if(!p){toast('资料不存在');renderHome();return}
+    let reviews=[];try{reviews=await supa.db.q('reviews',{where:{paper_id:id},order:'created_at.desc'});}catch(e){}
+    const isOwner=U&&U.id===p.user_id,fu=p.file_url||'',ft=p.file_type||'',fs=p.file_size?(p.file_size/1048576).toFixed(1)+'MB':'';
+    const rating=p.rating_count?p.avg_rating.toFixed(1)+' ('+p.rating_count+')':'暂无评分';
+    let h='<a href="#" onclick="goHome()" class="bl">← 返回首页</a><div class="dc"><h1 class="dt">'+esc(p.title||'')+'</h1>';
+    h+='<div class="dm"><span class="tag">'+esc(p.subject||'')+'</span><span class="tag yr">'+p.year+'</span>';
+    if(ft)h+='<span class="tag fl">'+ft.toUpperCase()+' '+fs+'</span>';
+    h+='<span style="font-size:0.85rem;color:var(--t2)">⬇ '+(p.downloads||0)+' 下载</span><span style="font-size:0.85rem;color:var(--t2)">⭐ '+rating+'</span>';
+    if(p.user_email)h+='<span style="font-size:0.85rem;color:var(--t2)">· '+esc(p.user_email)+'</span></div>';
+    if(p.tags)h+='<div style="margin:6px 0;font-size:0.84rem;color:var(--t2)">🏷️ '+esc(p.tags)+'</div>';
+    if(p.description)h+='<div class="detail-desc">'+esc(p.description)+'</div>';
+    h+='<div class="da">';
+    if(U){h+='<button class="btn btn-p" onclick="dl(\''+p.id+'\',\''+fu+'\')">⬇ 下载</button>';
+    if(ft==='pdf')h+='<button class="btn btn-o btn-s" onclick="preview(\''+fu+'\')">👁 预览</button>';
+    h+='<button class="btn btn-g btn-s" onclick="copyUrl(\''+fu+'\')">🔗 复制链接</button><button class="btn btn-g btn-s" onclick="ratePaper(\''+p.id+'\')">⭐ 评分</button>';}
+    else{h+='<p style="color:var(--o)">🔒 请登录后下载</p>'}
+    if(isOwner)h+='<button class="btn btn-d btn-s" onclick="delPaper(\''+p.id+'\')">🗑 删除</button>';
+    h+='</div></div><div class="st">💬 评价 ('+reviews.length+')</div><div id="reviewList">';
+    if(!reviews.length)h+='<p style="color:var(--t2);font-size:0.9rem">暂无评价</p>';
+    else reviews.forEach(r=>{h+='<div class="rc"><div class="rh"><span>'+esc(r.user_email||'匿名')+'</span><span class="stars">'+'★'.repeat(r.rating||0)+'☆'.repeat(5-(r.rating||0))+'</span><span>'+timeAgo(r.created_at)+'</span></div>'+(r.comment?'<p style="font-size:0.88rem">'+esc(r.comment)+'</p>':'')+'</div>'});
+    h+='</div><div id="reviewInp"></div>';document.getElementById('main').innerHTML=h;
   }catch(e){toast('加载失败');renderHome()}
 }
-
-function showReviewInput(pid){
-  document.getElementById('reviewInputArea').innerHTML=`<div class="rc"><div style="font-weight:600;margin-bottom:6px">留下评价</div><div style="margin-bottom:6px">${[1,2,3,4,5].map(n=>'<button class="btn btn-g" onclick="setRating('+n+')" id="star'+n+'" style="font-size:1.3rem;padding:2px 5px">☆</button>').join('')}</div><div class="fg"><textarea id="reviewComment" placeholder="写点评论（可选）" rows="2"></textarea></div><button class="btn btn-p btn-s" onclick="submitReview('${pid}')">提交评价</button></div>`;
-  window._rating=0;
-}
-function setRating(n){window._rating=n;for(let i=1;i<=5;i++)document.getElementById('star'+i).textContent=i<=n?'★':'☆'}
+function ratePaper(pid){document.getElementById('reviewInp').innerHTML='<div class="rc"><div style="font-weight:600;margin-bottom:6px">留下评价</div><div style="margin-bottom:6px">'+[1,2,3,4,5].map(n=>'<button class="btn btn-g" onclick="setStar('+n+')" id="s'+n+'" style="font-size:1.3rem;padding:2px 5px">☆</button>').join('')+'</div><div class="fg"><textarea id="rvComment" placeholder="写点评论（可选）" rows="2"></textarea></div><button class="btn btn-p btn-s" onclick="submitReview(\''+pid+'\')">提交评价</button></div>';window._star=0}
+function setStar(n){window._star=n;for(let i=1;i<=5;i++)document.getElementById('s'+i).textContent=i<=n?'★':'☆'}
 async function submitReview(pid){
-  if(!currentUser){toast('请先登录');return}if(!window._rating){toast('请选择评分');return}
-  const c=document.getElementById('reviewComment')?.value?.trim()||'';
-  const{error}=await supabase.from('reviews').insert({paper_id:pid,user_id:currentUser.id,user_email:currentUser.email,rating:window._rating,comment:c});
-  if(error){toast('提交失败: '+error.message);return}
-  const{data:reviews}=await supabase.from('reviews').select('rating').eq('paper_id',pid);
-  if(reviews&&reviews.length){const avg=reviews.reduce((s,r)=>s+r.rating,0)/reviews.length;await supabase.from('papers').update({avg_rating:Math.round(avg*10)/10,rating_count:reviews.length}).eq('id',pid)}
-  toast('评价已提交');showDetail(pid)
-}
-
-function copyLink(url){if(!url)return;navigator.clipboard.writeText(url).then(()=>toast('链接已复制！')).catch(()=>toast('复制失败'))}
-function previewFile(url){if(url)window.open(url,'_blank')}
-async function downloadFile(pid,url){
-  if(!currentUser){toast('请先登录');return}
-  if(!url){toast('文件路径无效');return}
-  supabase.rpc('increment_downloads',{paper_id:pid}).catch(()=>{});
-  window.open(url,'_blank');toast('开始下载')
-}
-async function deletePaper(pid){
-  if(!confirm('确定删除？'))return;
-  await supabase.from('reviews').delete().eq('paper_id',pid);
-  await supabase.from('papers').delete().eq('id',pid);
-  toast('已删除');renderHome()
-}
-
-async function showMyPapers(){
-  if(!currentUser){toast('请先登录');return}
-  currentView='mine';document.getElementById('heroSection').style.display='none';
-  document.getElementById('mainContent').innerHTML='<a href="#" onclick="goHome()" class="bl">← 返回首页</a><div class="st">📂 我上传的资料</div><div class="grid" id="paperGrid"></div>';
-  const grid=document.getElementById('paperGrid');
+  if(!U){toast('请先登录');return}if(!window._star){toast('请选择评分');return}
+  const c=document.getElementById('rvComment')?.value?.trim()||'';
   try{
-    const{data:papers}=await supabase.from('papers').select('*').eq('user_id',currentUser.id).order('created_at',{ascending:false});
-    if(!papers||!papers.length){grid.innerHTML='<div class="empty"><div class="ic">📭</div><p>还没有上传资料</p></div>';return}
-    const sm={数学:'m',语文:'cn',英语:'en',物理:'ph',化学:'ch',生物:'bi',历史:'hi',地理:'ge',政治:'po',计算机:'cs'};
-    const em={数学:'📐',语文:'📖',英语:'🌍',物理:'⚡',化学:'🧪',生物:'🧬',历史:'📜',地理:'🗺️',政治:'⚖️',计算机:'💻'};
-    grid.innerHTML=papers.map(p=>'<div class="card" onclick="showDetail(''+p.id+'')"><div class="cb"><div class="cti">'+esc(p.title||'')+'</div><div class="ctg"><span class="tag">'+esc(p.subject||'')+'</span><span class="tag yr">'+p.year+'</span></div><div class="cf"><span>⬇ '+(p.downloads||0)+'</span><span>⭐ '+(p.rating_count?p.avg_rating.toFixed(1):'-')+'</span><span>'+timeAgo(p.created_at)+'</span></div></div></div>').join('');
-  }catch(e){grid.innerHTML='<div class="empty"><p>加载失败</p></div>'}
+    await supa.db.create('reviews',{paper_id:pid,user_id:U.id,user_email:U.email,rating:window._star,comment:c});
+    const revs=await supa.db.q('reviews',{where:{paper_id:pid}});
+    const avg=revs.reduce((s,r)=>s+(r.rating||0),0)/revs.length;
+    await supa.db.upd('papers',pid,{avg_rating:Math.round(avg*10)/10,rating_count:revs.length});toast('评价已提交');showDetail(pid)
+  }catch(e){toast('提交失败: '+e.message)}
 }
-function goHome(){document.getElementById('heroSection').style.display='';renderHome()}
+function dl(pid,url){if(!url)return;supa.db.get('papers',pid).then(p=>{if(p)supa.db.upd('papers',pid,{downloads:(p.downloads||0)+1})}).catch(()=>{});window.open(url,'_blank');toast('开始下载')}
+function preview(url){if(url)window.open(url,'_blank')}
+function copyUrl(url){navigator.clipboard.writeText(url).then(()=>toast('链接已复制！')).catch(()=>toast('复制失败'))}
+async function delPaper(pid){if(!confirm('确定删除？'))return;try{await supa.db.del('papers',pid);const revs=await supa.db.q('reviews',{where:{paper_id:pid}});for(const r of revs)await supa.db.del('reviews',r.id);toast('已删除');renderHome()}catch(e){toast('删除失败')}}
 
-
-// ===== Upload =====
-function showUploadModal(){
-  if(!currentUser){toast('请先登录');return}
-  document.getElementById('uploadModal').classList.add('active');
-  document.getElementById('upTitle').value='';document.getElementById('upTags').value='';document.getElementById('upFile').value='';document.getElementById('fileInfo').textContent='';
-}
+function showUpload(){if(!U){toast('请先登录');return}document.getElementById('upMo').classList.add('active');document.getElementById('upTitle').value='';document.getElementById('upTags').value='';document.getElementById('upDesc').value='';document.getElementById('upFile').value='';document.getElementById('fileInfo').textContent=''}
+function closeUp(){document.getElementById('upMo').classList.remove('active')}
 async function doUpload(){
-  if(!currentUser){toast('请先登录');return}
-  const title=document.getElementById('upTitle').value.trim(),subject=document.getElementById('upSubject').value;
-  const year=document.getElementById('upYear').value,tags=document.getElementById('upTags').value.trim(),desc=document.getElementById('upDesc')?.value?.trim()||'';
+  if(!U){toast('请先登录');return}
+  const title=document.getElementById('upTitle').value.trim(),subject=document.getElementById('upSubj').value;
+  const year=document.getElementById('upYear').value,tags=document.getElementById('upTags').value.trim(),desc=document.getElementById('upDesc').value.trim();
   const file=document.getElementById('upFile').files[0];
   if(!title){toast('请输入标题');return}if(!file){toast('请选择文件');return}
-  if(file.size>100*1024*1024){toast('文件不能超过100MB');return}
-  const ext=file.name.split('.').pop().toLowerCase();
-  const safePath=currentUser.id+'/'+Date.now()+'.'+ext;
-  const btn=document.getElementById('uploadBtn');btn.textContent='上传中...';btn.disabled=true;
+  if(file.size>104857600){toast('文件不能超过100MB');return}
+  const btn=document.getElementById('upBtn2');btn.textContent='上传中...';btn.disabled=true;
   try{
-    const{error:upErr}=await supabase.storage.from('papers').upload(safePath,file);
-    if(upErr)throw new Error(upErr.message||'上传失败');
-    const{data:urlData}=supabase.storage.from('papers').getPublicUrl(safePath);
-    const downloadUrl=urlData?.publicUrl||'';
-    const{error:dbErr}=await supabase.from('papers').insert({title,subject,year:parseInt(year),tags,description:desc,file_path:downloadUrl,file_type:ext,file_size:file.size,user_id:currentUser.id,user_email:currentUser.email});
-    if(dbErr)throw new Error(dbErr.message);
-    toast('上传成功！🎉');document.getElementById('uploadModal').classList.remove('active');renderHome();
-  }catch(e){toast('上传失败: '+(e.message||''))}
+    const ext=file.name.split('.').pop().toLowerCase(),path=U.id+'/'+Date.now()+'.'+ext;
+    await supa.storage.upload(path,file);const url=supa.storage.url(path);
+    await supa.db.create('papers',{title,subject,year:parseInt(year),tags,description:desc,file_path:url,file_type:ext,file_size:file.size,user_id:U.id,user_email:U.email,downloads:0,avg_rating:0,rating_count:0});
+    toast('上传成功！🎉');closeUp();renderHome();
+  }catch(e){toast('上传失败: '+e.message)}
   btn.textContent='上传';btn.disabled=false;
 }
 
-// ===== Helpers =====
 function esc(s){if(!s)return'';const d=document.createElement('div');d.textContent=String(s);return d.innerHTML}
-function timeAgo(d){if(!d)return'';const m=Math.floor((Date.now()-new Date(d).getTime())/60000);if(m<1)return'刚刚';if(m<60)return m+'分钟前';const h=Math.floor(m/60);if(h<24)return h+'小时前';const days=Math.floor(h/24);if(days<30)return days+'天前';if(days<365)return Math.floor(days/30)+'个月前';return Math.floor(days/365)+'年前'}
+function timeAgo(d){if(!d)return'';const m=Math.floor((Date.now()-new Date(d).getTime())/60000);if(m<1)return'刚刚';if(m<60)return m+'分前';const h=Math.floor(m/60);if(h<24)return h+'时前';const days=Math.floor(h/24);if(days<30)return days+'天前';if(days<365)return Math.floor(days/30)+'月前';return Math.floor(days/365)+'年前'}
 
-// Drag & drop
 document.addEventListener('DOMContentLoaded',()=>{
-  const dz=document.getElementById('dropZone');if(!dz)return;
+  const dz=document.getElementById('dropZ');if(!dz)return;
   dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('drag')});
   dz.addEventListener('dragleave',()=>dz.classList.remove('drag'));
-  dz.addEventListener('drop',e=>{e.preventDefault();dz.classList.remove('drag');const f=e.dataTransfer.files[0];if(f){document.getElementById('upFile').files=e.dataTransfer.files;document.getElementById('fileInfo').textContent='已选择: '+f.name+' ('+(f.size/1024/1024).toFixed(1)+'MB)'}});
-  document.getElementById('upFile').addEventListener('change',function(){const f=this.files[0];if(f)document.getElementById('fileInfo').textContent='已选择: '+f.name+' ('+(f.size/1024/1024).toFixed(1)+'MB)'});
+  dz.addEventListener('drop',e=>{e.preventDefault();dz.classList.remove('drag');const f=e.dataTransfer.files[0];if(f){document.getElementById('upFile').files=e.dataTransfer.files;document.getElementById('fileInfo').textContent='已选择: '+f.name+' ('+(f.size/1048576).toFixed(1)+'MB)'}});
+  document.getElementById('upFile').addEventListener('change',function(){const f=this.files[0];if(f)document.getElementById('fileInfo').textContent='已选择: '+f.name+' ('+(f.size/1048576).toFixed(1)+'MB)'});
 });
+['authMo','upMo'].forEach(id=>{document.getElementById(id).addEventListener('click',function(e){if(e.target===this)this.classList.remove('active')})});
 
-['authModal','uploadModal'].forEach(id=>{document.getElementById(id).addEventListener('click',function(e){if(e.target===this)this.classList.remove('active')})});
-
-// Init
-(async function(){await checkAuth();renderHome();console.log('PaperHub ready')})();
+initAuth();renderHome();console.log('PaperHub OK');
 </script>
 </body>
 </html>
