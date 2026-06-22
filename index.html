@@ -146,7 +146,7 @@ a{color:var(--p);text-decoration:none}
 <div class="fr"><div class="fg"><label>学科</label><select id="upSubject"><option value="数学">数学</option><option value="语文">语文</option><option value="英语">英语</option><option value="物理">物理</option><option value="化学">化学</option><option value="生物">生物</option><option value="历史">历史</option><option value="地理">地理</option><option value="政治">政治</option><option value="计算机">计算机</option><option value="其他">其他</option></select></div>
 <div class="fg"><label>年份</label><select id="upYear"><script>for(let y=new Date().getFullYear();y>=2000;y--)document.write(`<option value="${y}">${y}</option>`);</script></select></div></div>
 <div class="fg"><label>标签（逗号分隔）</label><input type="text" id="upTags" placeholder="高考,真题,全国卷"></div>
-<div class="fg"><label>文件（最大50MB）</label><div class="uz" id="dropZone" onclick="document.getElementById('upFile').click()"><div class="ic">📁</div><div class="hi">拖拽文件到此处，或<strong>点击选择</strong></div><div style="font-size:0.75rem;color:var(--text3);margin-top:4px" id="fileInfo"></div></div><input type="file" id="upFile" accept=".pdf,.jpg,.jpeg,.png,.zip,.doc,.docx,.ppt,.pptx" style="display:none"></div>
+<div class="fg"><label>文件（最大100MB）</label><div class="uz" id="dropZone" onclick="document.getElementById('upFile').click()"><div class="ic">📁</div><div class="hi">拖拽文件到此处，或<strong>点击选择</strong></div><div style="font-size:0.75rem;color:var(--text3);margin-top:4px" id="fileInfo"></div></div><input type="file" id="upFile" accept=".pdf,.jpg,.jpeg,.png,.zip,.doc,.docx,.ppt,.pptx" style="display:none"></div>
 <div class="ma"><button class="btn btn-g" onclick="closeUploadModal()">取消</button><button class="btn btn-p" onclick="doUpload()" id="uploadBtn">上传</button></div>
 </div></div>
 
@@ -321,7 +321,7 @@ async function showDetail(id){
     if(!p){toast('资料不存在');renderHome();return}
     const{data:reviews}=await supabase.from('reviews').select('*').eq('paper_id',id).order('created_at',{ascending:false});
     const isOwner=currentUser&&currentUser.id===p.user_id;
-    document.getElementById('mainContent').innerHTML='<a href="#" onclick="goHome()" class="bl">← 返回首页</a><div class="dc"><h1 class="dt">'+esc(p.title||'')+'</h1><div class="dm"><span class="tag">'+esc(p.subject||'')+'</span><span class="tag yr">'+p.year+'</span>'+(p.file_type?'<span class="tag fl">'+p.file_type.toUpperCase()+'</span>':'')+'<span style="font-size:0.85rem;color:var(--text2)">⬇ '+(p.downloads||0)+' 下载</span><span style="font-size:0.85rem;color:var(--text2)">⭐ '+(p.rating_count?p.avg_rating.toFixed(1)+' ('+p.rating_count+')':'暂无评分')+'</span></div>'+(p.tags?'<div style="margin:6px 0;font-size:0.84rem;color:var(--text2)">🏷️ '+esc(p.tags)+'</div>':'')+'<div class="da"><button class="btn btn-p" onclick="downloadFile(\''+p.id+'\',\''+(p.file_path||'')+'\')">⬇ 下载</button>'+(currentUser?'<button class="btn btn-outline btn-s" onclick="showReviewInput(\''+p.id+'\')">⭐ 评分</button>':'')+(isOwner?'<button class="btn btn-d btn-s" onclick="deletePaper(\''+p.id+'\')">🗑 删除</button>':'')+'</div></div><div class="st">💬 评价 ('+(reviews?reviews.length:0)+')</div><div id="reviewList">'+(!reviews||!reviews.length?'<p style="color:var(--text2);font-size:0.9rem">暂无评价</p>':'')+(reviews?reviews.map(r=>'<div class="rc"><div class="rh"><span>'+esc(r.user_email||'匿名')+'</span><span class="stars">'+'★'.repeat(r.rating||0)+'☆'.repeat(5-(r.rating||0))+'</span><span>'+timeAgo(r.created_at)+'</span></div>'+(r.comment?'<p style="font-size:0.88rem">'+esc(r.comment)+'</p>':'')+'</div>').join(''):'')+'</div><div id="reviewInputArea"></div>';
+    document.getElementById('mainContent').innerHTML='<a href="#" onclick="goHome()" class="bl">← 返回首页</a><div class="dc"><h1 class="dt">'+esc(p.title||'')+'</h1><div class="dm"><span class="tag">'+esc(p.subject||'')+'</span><span class="tag yr">'+p.year+'</span>'+(p.file_type?'<span class="tag fl">'+p.file_type.toUpperCase()+'</span>':'')+'<span style="font-size:0.85rem;color:var(--text2)">⬇ '+(p.downloads||0)+' 下载</span><span style="font-size:0.85rem;color:var(--text2)">⭐ '+(p.rating_count?p.avg_rating.toFixed(1)+' ('+p.rating_count+')':'暂无评分')+'</span></div>'+(p.tags?'<div style="margin:6px 0;font-size:0.84rem;color:var(--text2)">🏷️ '+esc(p.tags)+'</div>':'')+'<div class="da">'+(currentUser?'<button class="btn btn-p" onclick="downloadFile(\''+p.id+'\',\''+(p.file_path||'')+'\')">⬇ 下载</button><button class="btn btn-outline btn-s" onclick="showReviewInput(\''+p.id+'\')">⭐ 评分</button>':'<p style="color:var(--orange);font-size:0.9rem">🔒 请登录后下载</p>')+(isOwner?'<button class="btn btn-d btn-s" onclick="deletePaper(\''+p.id+'\')">🗑 删除</button>':'')+'</div></div><div class="st">💬 评价 ('+(reviews?reviews.length:0)+')</div><div id="reviewList">'+(!reviews||!reviews.length?'<p style="color:var(--text2);font-size:0.9rem">暂无评价</p>':'')+(reviews?reviews.map(r=>'<div class="rc"><div class="rh"><span>'+esc(r.user_email||'匿名')+'</span><span class="stars">'+'★'.repeat(r.rating||0)+'☆'.repeat(5-(r.rating||0))+'</span><span>'+timeAgo(r.created_at)+'</span></div>'+(r.comment?'<p style="font-size:0.88rem">'+esc(r.comment)+'</p>':'')+'</div>').join(''):'')+'</div><div id="reviewInputArea"></div>';
   }catch(e){toast('加载失败');renderHome()}
 }
 
@@ -340,7 +340,12 @@ async function submitReview(pid){
   toast('评价已提交');showDetail(pid)
 }
 
-function downloadFile(pid,url){if(!url){toast('文件路径无效');return}supabase.rpc('increment_downloads',{paper_id:pid}).catch(()=>{});window.open(url,'_blank');toast('开始下载')}
+async function downloadFile(pid,url){
+  if(!currentUser){toast('请先登录后再下载');return}
+  if(!url){toast('文件路径无效');return}
+  supabase.rpc('increment_downloads',{paper_id:pid}).catch(()=>{});
+  window.open(url,'_blank');toast('开始下载')
+}
 
 async function deletePaper(pid){
   if(!confirm('确定删除？'))return;
@@ -357,7 +362,7 @@ async function doUpload(){
   const title=document.getElementById('upTitle').value.trim(),subject=document.getElementById('upSubject').value;
   const year=document.getElementById('upYear').value,tags=document.getElementById('upTags').value.trim();
   const file=document.getElementById('upFile').files[0];
-  if(!title){toast('请输入标题');return}if(!file){toast('请选择文件');return}if(file.size>50*1024*1024){toast('文件不能超过50MB');return}
+  if(!title){toast('请输入标题');return}if(!file){toast('请选择文件');return}if(file.size>100*1024*1024){toast('文件不能超过100MB');return}
   const ext=file.name.split('.').pop().toLowerCase();
   const fileName=Date.now()+'.'+ext;
   const safePath=currentUser.id+'/'+fileName;
