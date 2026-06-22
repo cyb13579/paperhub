@@ -251,7 +251,7 @@ async function doAuth(){
   const e=document.getElementById('authEmail').value.trim(),p=document.getElementById('authPassword').value;
   if(!e||!p){toast('请填写邮箱和密码');return}
   const m=document.getElementById('authModal');let r;
-  if(m._mode==='signup'){r=await supabase.auth.signUp({email:e,password:p});if(r.error){toast('注册失败: '+r.error.message);return};toast('注册成功！请登录')}
+  if(m._mode==='signup'){r=await supabase.auth.signUp({email:e,password:p});if(r.error){toast('注册失败: '+r.error.message);return};if(r.data?.session){toast('注册成功！')}else{toast('注册成功！正在登录...');r=await supabase.auth.signInWithPassword({email:e,password:p});if(r.error){toast('请检查邮箱确认后登录');return}}}
   else{r=await supabase.auth.signInWithPassword({email:e,password:p});if(r.error){toast('登录失败: '+r.error.message);return};toast('登录成功！')}
   document.getElementById('authModal').classList.remove('active');renderHome();
 }
