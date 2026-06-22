@@ -331,17 +331,37 @@ async function showDetail(id){
     if(!p){toast('资料不存在');renderHome();return}
     const{data:reviews}=await supabase.from('reviews').select('*').eq('paper_id',id).order('created_at',{ascending:false});
     const isOwner=currentUser&&currentUser.id===p.user_id;
-    document.getElementById('mainContent').innerHTML=`<a href="#" onclick="goHome()" class="bl">← 返回首页</a>
-<div class="dc"><h1 class="dt">${esc(p.title||'')}</h1>
-<div class="dm"><span class="tag">${esc(p.subject||'')}</span><span class="tag yr">${p.year}</span>${p.file_type?'<span class="tag fl">'+p.file_type.toUpperCase()+' '+(p.file_size?(p.file_size/1024/1024).toFixed(1)+'MB':'')+'</span>':''}<span style="font-size:0.85rem;color:var(--t2)">⬇ ${p.downloads||0} 下载</span><span style="font-size:0.85rem;color:var(--t2)">⭐ ${p.rating_count?p.avg_rating.toFixed(1)+' ('+p.rating_count+')':'暂无评分'}</span></div>
-${p.tags?'<div style="margin:6px 0;font-size:0.84rem;color:var(--t2)">🏷️ '+esc(p.tags)+'</div>':''}
-<div class="da">
-${currentUser?`<button class="btn btn-p" onclick="downloadFile('${p.id}','${p.file_path||''}')">⬇ 下载</button>${p.file_type==='pdf'?'<button class="btn btn-o btn-s" onclick="previewFile(\''+p.file_path+'\')">👁 预览</button><button class="btn btn-g btn-s" onclick="copyLink('+p.file_path+')">🔗 复制链接</button>':''}<button class="btn btn-g btn-s" onclick="showReviewInput('${p.id}')">⭐ 评分</button>`:'<p style="color:var(--o)">🔒 请登录后下载</p>'}
-${isOwner?'<button class="btn btn-d btn-s" onclick="deletePaper(\''+p.id+'\')">🗑 删除</button>':''}
-</div></div>
-<div class="st">💬 评价 (${reviews?reviews.length:0})</div>
-<div id="reviewList">${!reviews||!reviews.length?'<p style="color:var(--t2);font-size:0.9rem">暂无评价</p>':''}${reviews?reviews.map(r=>'<div class="rc"><div class="rh"><span>'+esc(r.user_email||'匿名')+'</span><span class="stars">'+'★'.repeat(r.rating||0)+'☆'.repeat(5-(r.rating||0))+'</span><span>'+timeAgo(r.created_at)+'</span></div>'+(r.comment?'<p style="font-size:0.88rem">'+esc(r.comment)+'</p>':'')+'</div>').join(''):''}</div>
-<div id="reviewInputArea"></div>`;
+    const title=esc(p.title||''),subject=esc(p.subject||''),tags=p.tags?esc(p.tags):'';
+    const fileUrl=p.file_path||'',fileType=p.file_type||'';
+    const downloads=p.downloads||0,rating=p.rating_count?p.avg_rating.toFixed(1)+' ('+p.rating_count+')':'暂无评分';
+    const fileSize=p.file_size?(p.file_size/1024/1024).toFixed(1)+'MB':'';
+    const uploader=esc(p.user_email||'');
+
+    let html='<a href="#" onclick="goHome()" class="bl">← 返回首页</a>';
+    html+='<div class="dc"><h1 class="dt">'+title+'</h1>';
+    html+='<div class="dm"><span class="tag">'+subject+'</span><span class="tag yr">'+p.year+'</span>';
+    if(fileType)html+='<span class="tag fl">'+fileType.toUpperCase()+' '+fileSize+'</span>';
+    html+='<span style="font-size:0.85rem;color:var(--t2)">⬇ '+downloads+' 下载</span>';
+    html+='<span style="font-size:0.85rem;color:var(--t2)">⭐ '+rating+'</span></div>';
+    if(tags)html+='<div style="margin:6px 0;font-size:0.84rem;color:var(--t2)">🏷️ '+tags+'</div>';
+    if(p.description)html+='<div class="detail-desc">'+esc(p.description)+'</div>';
+    html+='<div class="da">';
+    if(currentUser){
+      html+='<button class="btn btn-p" onclick="downloadFile(''+p.id+'',''+fileUrl+'')">⬇ 下载</button>';
+      if(fileType==='pdf')html+='<button class="btn btn-o btn-s" onclick="previewFile(''+fileUrl+'')">👁 预览</button>';
+      html+='<button class="btn btn-g btn-s" onclick="copyLink(''+fileUrl+'')">🔗 复制链接</button>';
+      html+='<button class="btn btn-g btn-s" onclick="showReviewInput(''+p.id+'')">⭐ 评分</button>';
+    }else{
+      html+='<p style="color:var(--o)">🔒 请登录后下载</p>';
+    }
+    if(isOwner)html+='<button class="btn btn-d btn-s" onclick="deletePaper(''+p.id+'')">🗑 删除</button>';
+    html+='</div></div>';
+    html+='<div class="st">💬 评价 ('+(reviews?reviews.length:0)+')</div>';
+    html+='<div id="reviewList">';
+    if(!reviews||!reviews.length)html+='<p style="color:var(--t2);font-size:0.9rem">暂无评价</p>';
+    else reviews.forEach(r=>{html+='<div class="rc"><div class="rh"><span>'+esc(r.user_email||'匿名')+'</span><span class="stars">'+'★'.repeat(r.rating||0)+'☆'.repeat(5-(r.rating||0))+'</span><span>'+timeAgo(r.created_at)+'</span></div>'+(r.comment?'<p style="font-size:0.88rem">'+esc(r.comment)+'</p>':'')+'</div>';});
+    html+='</div><div id="reviewInputArea"></div>';
+    document.getElementById('mainContent').innerHTML=html;
   }catch(e){toast('加载失败');renderHome()}
 }
 
