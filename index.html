@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PaperHub · 试卷资料共享平台</title>
+<!-- 无需外部 CDN，纯 fetch 实现 -->
+<style>
+:root {
+  --bg: #f8f9fb; --surface: #fff; --border: #e5e7eb;
+  --text: #1a1a2e; --text2: #6b7280; --text3: #9ca3af;
+  --primary: #4f46e5; --primary2: #4338ca; --green: #10b981;
+  --red: #ef4444; --orange: #f59e0b; --blue: #3b82f6;
+  --radius: 10px; --radius-sm: 6px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  background: var(--bg); color: var(--text); line-height: 1.6;
+  min-height: 100vh;
+}
+a{color:var(--primary);text-decoration:none}
+a:hover{text-decoration:underline}
+
+/* Layout */
+.container{max-width:1100px;margin:0 auto;padding:0 20px}
+header{
+  background: var(--surface); border-bottom: 1px solid var(--border);
+  padding: 16px 0; position: sticky; top:0; z-index: 100;
+}
+.header-inner{display:flex;align-items:center;justify-content:space-between}
+.logo{font-size:1.4rem;font-weight:800;color:var(--primary);letter-spacing:-0.02em}
+.logo span{color:var(--text)}
+nav{display:flex;align-items:center;gap:12px}
+.btn{
+  padding: 8px 18px; border-radius: var(--radius-sm); font-size:0.9rem;
+  font-weight:500; cursor:pointer; border:none; transition:all .15s;
+  display:inline-flex;align-items:center;gap:6px;
+}
+.btn-primary{background:var(--primary);color:#fff}
+.btn-primary:hover{background:var(--primary2)}
+.btn-outline{background:transparent;border:1px solid var(--border);color:var(--text)}
+.btn-outline:hover{background:var(--bg)}
+.btn-sm{padding:5px 12px;font-size:0.8rem}
+.btn-danger{background:var(--red);color:#fff}
+.btn-danger:hover{opacity:.85}
+.btn-ghost{background:transparent;color:var(--text2);padding:4px 8px}
+.btn-ghost:hover{color:var(--text)}
+
+/* Search */
+.search-bar{
+  display:flex;gap:8px;margin:24px 0;
+  flex-wrap:wrap;
+}
+.search-bar input, .search-bar select{
+  padding:10px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);
+  font-size:0.9rem;outline:none;background:var(--surface);
+}
+.search-bar input:focus, .search-bar select:focus{
+  border-color:var(--primary);box-shadow:0 0 0 3px rgba(79,70,229,.1);
+}
+.search-bar input{flex:1;min-width:200px}
+.search-bar select{min-width:120px}
+
+/* Cards */
+.section-title{font-size:1.1rem;font-weight:700;margin:24px 0 12px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;margin-bottom:40px}
+.card{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+  padding:18px 20px;transition:all .15s;cursor:pointer;
+}
+.card:hover{border-color:var(--primary);box-shadow:0 4px 20px rgba(0,0,0,.06)}
+.card-title{font-size:1rem;font-weight:600;margin-bottom:4px;line-height:1.3}
+.card-meta{font-size:0.82rem;color:var(--text2)}
+.card-footer{display:flex;align-items:center;justify-content:space-between;margin-top:12px}
+.badge{
+  display:inline-block;padding:2px 10px;border-radius:20px;font-size:0.75rem;
+  font-weight:500;
+}
+.badge-subject{background:#eef2ff;color:var(--primary)}
+.badge-year{background:#fef3c7;color:#92400e}
+.badge-free{background:#d1fae5;color:#065f46}
+.badge-pdf{background:#fee2e2;color:#991b1b}
+
+/* Stats row */
+.stats{display:flex;gap:6px;font-size:0.8rem;color:var(--text2);align-items:center}
+
+/* Modal */
+.modal-overlay{
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);
+  z-index:200;align-items:center;justify-content:center;
+}
+.modal-overlay.active{display:flex}
+.modal{
+  background:var(--surface);border-radius:var(--radius);padding:28px 30px;
+  max-width:440px;width:90%;max-height:90vh;overflow-y:auto;
+}
+.modal h2{font-size:1.2rem;margin-bottom:18px}
+.form-group{margin-bottom:14px}
+.form-group label{display:block;font-size:0.85rem;font-weight:500;margin-bottom:4px;color:var(--text2)}
+.form-group input, .form-group select, .form-group textarea{
+  width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);
+  font-size:0.9rem;outline:none;background:var(--bg);
+}
+.form-group input:focus, .form-group textarea:focus, .form-group select:focus{
+  border-color:var(--primary);box-shadow:0 0 0 3px rgba(79,70,229,.08);
+}
+.form-group textarea{resize:vertical;min-height:80px}
+.form-row{display:flex;gap:10px}
+.form-row .form-group{flex:1}
+.modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:20px}
+.modal-actions button{min-width:80px}
+
+/* Detail page */
+.detail-header{margin:24px 0}
+.detail-header h1{font-size:1.6rem;font-weight:700}
+.detail-meta{display:flex;gap:12px;flex-wrap:wrap;margin:8px 0;font-size:0.85rem;color:var(--text2)}
+.detail-actions{display:flex;gap:8px;margin:16px 0}
+.review-card{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+  padding:14px 18px;margin-bottom:8px;
+}
+.review-header{display:flex;justify-content:space-between;font-size:0.82rem;color:var(--text2);margin-bottom:4px}
+.stars{color:var(--orange)}
+
+/* Toast */
+.toast{
+  position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
+  background:#1a1a2e;color:#fff;padding:10px 24px;border-radius:30px;
+  font-size:0.85rem;z-index:300;opacity:0;transition:opacity .25s;pointer-events:none;
+}
+.toast.show{opacity:1}
+
+/* Empty state */
+.empty-state{text-align:center;padding:60px 20px;color:var(--text2)}
+.empty-state .icon{font-size:3rem;margin-bottom:12px}
+.empty-state p{font-size:0.95rem}
+
+/* Responsive */
+@media(max-width:640px){
+  .grid{grid-template-columns:1fr}
+  .logo{font-size:1.1rem}
+  .search-bar{flex-direction:column}
+  .search-bar select{width:100%}
+  .form-row{flex-direction:column}
+}
+</style>
+</head>
+<body>
+
+<!-- ========== HEADER ========== -->
+<header>
+  <div class="container header-inner">
+    <a href="#" class="logo" onclick="goHome()">📚 Paper<span>Hub</span></a>
+    <nav>
+      <span id="userInfo" style="font-size:0.85rem;color:var(--text2)"></span>
+      <button class="btn btn-outline btn-sm" onclick="showUploadModal()" id="uploadNavBtn">+ 上传</button>
+      <button class="btn btn-primary btn-sm" onclick="showAuthModal()" id="loginBtn">登录</button>
+      <button class="btn btn-outline btn-sm" onclick="logout()" id="logoutBtn" style="display:none">退出</button>
+    </nav>
+  </div>
+</header>
+
+<!-- ========== MAIN ========== -->
+<div class="container" id="mainContent">
+  <!-- dynamically filled -->
+</div>
+
+<!-- ========== MODALS ========== -->
+<div class="modal-overlay" id="authModal">
+  <div class="modal">
+    <h2 id="authTitle">登录</h2>
+    <div class="form-group"><label>邮箱</label><input type="email" id="authEmail" placeholder="your@email.com"></div>
+    <div class="form-group"><label>密码</label><input type="password" id="authPassword" placeholder="至少6位"></div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" id="authToggle" onclick="toggleAuthMode()">去注册</button>
+      <button class="btn btn-primary" onclick="doAuth()">登录</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="uploadModal">
+  <div class="modal">
+    <h2>📤 上传资料</h2>
+    <div class="form-group"><label>标题</label><input type="text" id="upTitle" placeholder="例如：2024年高考数学真题" maxlength="100"></div>
+    <div class="form-row">
+      <div class="form-group"><label>学科</label><select id="upSubject">
+        <option value="数学">数学</option><option value="语文">语文</option><option value="英语">英语</option>
+        <option value="物理">物理</option><option value="化学">化学</option><option value="生物">生物</option>
+        <option value="历史">历史</option><option value="地理">地理</option><option value="政治">政治</option>
+        <option value="计算机">计算机</option><option value="其他">其他</option>
+      </select></div>
+      <div class="form-group"><label>年份</label><select id="upYear">
+        <script>
+          for(let y=new Date().getFullYear();y>=2000;y--)document.write(`<option value="${y}">${y}</option>`);
+        </script>
+      </select></div>
+    </div>
+    <div class="form-group"><label>标签（用逗号分隔）</label><input type="text" id="upTags" placeholder="高考,真题,全国卷"></div>
+    <div class="form-group"><label>描述</label><textarea id="upDesc" placeholder="简要描述这份资料..."></textarea></div>
+    <div class="form-group"><label>文件（PDF/图片/ZIP，最大20MB）</label><input type="file" id="upFile" accept=".pdf,.jpg,.jpeg,.png,.zip,.doc,.docx,.ppt,.pptx"></div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeUploadModal()">取消</button>
+      <button class="btn btn-primary" onclick="doUpload()">上传</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ======================================================================
+// 📚 PaperHub · 试卷资料共享平台
+// 纯 fetch 实现，不依赖任何外部 CDN
+// ======================================================================
+const SUPABASE_URL = 'https://ugkyvcevycpmcbrqucla.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_L-cWMAfLnZ1jw-S3yscfdQ_B5lmiElK';
+
+// ── 轻量 Supabase 客户端 (fetch-based) ──
+function createSupabaseClient(url, key) {
+  const jsonHeaders = () => ({
+    'apikey': key,
+    'Authorization': `Bearer ${key}`,
+    'Content-Type': 'application/json'
+  });
+
+  let session = null;
+  const listeners = [];
+
+  // ── Auth ──
+  const auth = {
+    async getSession() {
+      const stored = localStorage.getItem('sb_session');
+      if (stored) {
+        try { session = JSON.parse(stored); } catch { session = null; }
+      }
+      return { data: { session } };
+    },
+    async signUp({email, password}) {
+      const r = await fetch(`${url}/auth/v1/signup`, {
+        method: 'POST', headers: jsonHeaders(),
+        body: JSON.stringify({email, password})
+      });
+      const data = await r.json().catch(()=>({}));
+      if (!r.ok) return { error: { message: data.msg || r.statusText }};
+      // Supabase may require email confirmation
+      if (data.session) {
+        session = { access_token: data.session.access_token, user: data.user || data.session.user };
+        localStorage.setItem('sb_session', JSON.stringify(session));
+        notify();
+        return { data: { session, user: session.user }, error: null };
+      }
+      // Email confirmation needed
+      return { data, error: null };
+    },
+    async signInWithPassword({email, password}) {
+      const r = await fetch(`${url}/auth/v1/token?grant_type=password`, {
+        method: 'POST', headers: jsonHeaders(),
+        body: JSON.stringify({email, password})
+      });
+      const data = await r.json().catch(()=>({}));
+      if (!r.ok) {
+        return { error: { message: data.error_description || data.msg || '登录失败' }};
+      }
+      session = { access_token: data.access_token, user: data.user };
+      localStorage.setItem('sb_session', JSON.stringify(session));
+      notify();
+      return { data: { session, user: data.user }, error: null };
+    },
+    async signOut() {
+      if (session?.access_token) {
+        await fetch(`${url}/auth/v1/logout`, {
+          method: 'POST',
+          headers: { ...jsonHeaders(), Authorization: `Bearer ${session.access_token}` }
+        }).catch(()=>{});
+      }
+      session = null;
+      localStorage.removeItem('sb_session');
+      notify();
+      return { error: null };
+    },
+    onAuthStateChange(fn) { listeners.push(fn); },
+  };
+  function notify() {
+    const s = session ? { user: session.user } : null;
+    listeners.forEach(fn => fn('AUTH_CHANGE', s));
+  }
+
+  // ── Storage ──
+  const storage = {
+    from(bucket) {
+      return {
+        async upload(filePath, file) {
+          const form = new FormData();
+          form.append('file', file);
+          const h = { 'apikey': key, 'Authorization': `Bearer ${key}` };
+          const r = await fetch(`${url}/storage/v1/object/${bucket}/${filePath}`, {
+            method: 'POST', headers: h, body: form
+          });
+          if (!r.ok) {
+            const txt = await r.text().catch(()=>'');
+            return { error: { message: txt || 'Upload failed' }};
+          }
+          return { data: await r.json().catch(()=>null), error: null };
+        },
+        getPublicUrl(filePath) {
+          return { data: { publicUrl: `${url}/storage/v1/object/public/${bucket}/${filePath}` }};
+        },
+        async remove(paths) {
+          const qs = paths.map(p => `paths=${encodeURIComponent(p)}`).join('&');
+          const h = { 'apikey': key, 'Authorization': `Bearer ${key}` };
+          if (session?.access_token) h.Authorization = `Bearer ${session.access_token}`;
+          const r = await fetch(`${url}/storage/v1/object/${bucket}?${qs}`, {
+            method: 'DELETE', headers: h
+          });
+          return { data: await r.json().catch(()=>null), error: r.ok ? null : { message: await r.text().catch(()=>'') }};
+        }
+      };
+    }
+  };
+
+  // ── Query Builder ──
+  function from(table) {
+    let q = { table, method: 'GET', filters: [], params:{}, body:null, cols:'*', single:false, count:false };
+    const chain = {
+      select(cols='*', opts) { q.cols = cols; if (opts?.count) q.count = true; return this; },
+      insert(body) { q.method = 'POST'; q.body = body; return this; },
+      delete() { q.method = 'DELETE'; return this; },
+      eq(field, val) { q.filters.push([field, 'eq', val]); return this; },
+      ilike(field, val) { q.filters.push([field, 'ilike', val]); return this; },
+      order(field, opts) {
+        q.params.order = `${field}.${opts?.ascending === false ? 'desc' : 'asc'}`;
+        return this;
+      },
+      limit(n) { q.params.limit = n; return this; },
+      single() { q.single = true; return this; },
+      async then(resolve) {
+        try {
+          let path = `${url}/rest/v1/${q.table}`;
+          const params = new URLSearchParams();
+          for (const [k, v] of Object.entries(q.params)) params.set(k, v);
+          for (const [f, op, v] of q.filters) params.set(f, `${op}.${encodeURIComponent(v)}`);
+          if (q.cols && q.cols !== '*') params.set('select', q.cols);
+
+          const h = { 'apikey': key };
+          if (session?.access_token) h.Authorization = `Bearer ${session.access_token}`;
+          else h.Authorization = `Bearer ${key}`;
+
+          if (q.method !== 'GET' && q.method !== 'DELETE') {
+            h['Content-Type'] = 'application/json';
+            if (q.method === 'POST') h['Prefer'] = 'return=representation';
+          }
+          if (q.count) h['Prefer'] = h['Prefer'] ? h['Prefer'] + ',count=exact' : 'count=exact';
+
+          const fetchOpts = { method: q.method, headers: h };
+          if (q.body) fetchOpts.body = JSON.stringify(q.body);
+
+          const paramStr = params.toString();
+          const fullUrl = paramStr ? `${path}?${paramStr}` : path;
+
+          const r = await fetch(fullUrl, fetchOpts);
+          if (!r.ok) {
+            const txt = await r.text().catch(()=>r.statusText);
+            resolve({ data: null, error: { message: txt } });
+            return;
+          }
+          let data = r.status !== 204 ? await r.json() : [];
+          if (!Array.isArray(data)) data = [data];
+          if (q.single) data = data[0] || null;
+          const cntHdr = r.headers.get('content-range');
+          const count = cntHdr ? parseInt(cntHdr.split('/').pop()) : null;
+          resolve({ data, error: null, count: count !== null ? count : (Array.isArray(data) ? data.length : 0) });
+        } catch(e) {
+          resolve({ data: null, error: { message: e.message } });
+        }
+      }
+    };
+    return chain;
+  }
+
+  // ── RPC ──
+  async function rpc(fnName, params) {
+    const h = { 'apikey': key, 'Content-Type': 'application/json' };
+    if (session?.access_token) h.Authorization = `Bearer ${session.access_token}`;
+    else h.Authorization = `Bearer ${key}`;
+    const r = await fetch(`${url}/rest/v1/rpc/${fnName}`, {
+      method: 'POST', headers: h, body: JSON.stringify(params)
+    });
+    if (!r.ok) return { error: { message: await r.text().catch(()=>'RPC error') }};
+    return { data: null, error: null };
+  }
+
+  return { auth, from, storage, rpc };
+}
+
+const supabase = createSupabaseClient(SUPABASE_URL, SUPABASE_KEY);
+console.log('✅ PaperHub 就绪');
+
+// ====== State ======
+let currentView = 'home';
+let currentUser = null;
+let currentDetailId = null;
+
+// ====== Auth ======
+async function checkAuth() {
+  const {data:{session}} = await supabase.auth.getSession();
+  currentUser = session?.user || null;
+  updateAuthUI();
+  return currentUser;
+}
+supabase.auth.onAuthStateChange((_event, session) => {
+  currentUser = session?.user || null;
+  updateAuthUI();
+  if (currentView === 'home' || currentView === 'mine') renderHome();
+});
+
+function updateAuthUI() {
+  if (currentUser) {
+    document.getElementById('loginBtn').style.display = 'none';
+    document.getElementById('logoutBtn').style.display = '';
+    document.getElementById('userInfo').textContent = currentUser.email;
+  } else {
+    document.getElementById('loginBtn').style.display = '';
+    document.getElementById('logoutBtn').style.display = 'none';
+    document.getElementById('userInfo').textContent = '';
+  }
+}
+
+function showAuthModal() {
+  document.getElementById('authTitle').textContent = '登录';
+  document.getElementById('authToggle').textContent = '去注册';
+  document.getElementById('authEmail').value = '';
+  document.getElementById('authPassword').value = '';
+  document.getElementById('authModal').classList.add('active');
+  document.getElementById('authModal')._mode = 'login';
+}
+
+function toggleAuthMode() {
+  const modal = document.getElementById('authModal');
+  if (modal._mode === 'login') {
+    modal._mode = 'signup';
+    document.getElementById('authTitle').textContent = '注册';
+    document.getElementById('authToggle').textContent = '去登录';
+  } else {
+    modal._mode = 'login';
+    document.getElementById('authTitle').textContent = '登录';
+    document.getElementById('authToggle').textContent = '去注册';
+  }
+}
+
+async function doAuth() {
+  const email = document.getElementById('authEmail').value.trim();
+  const password = document.getElementById('authPassword').value;
+  if (!email || !password) { toast('请填写邮箱和密码'); return; }
+  const modal = document.getElementById('authModal');
+  let result;
+  if (modal._mode === 'signup') {
+    result = await supabase.auth.signUp({email, password});
+    if (result.error) { toast('注册失败: ' + result.error.message); return; }
+    toast('注册成功！请检查邮箱确认（或直接登录）');
+  } else {
+    result = await supabase.auth.signInWithPassword({email, password});
+    if (result.error) { toast('登录失败: ' + result.error.message); return; }
+    toast('登录成功！');
+  }
+  document.getElementById('authModal').classList.remove('active');
+  renderHome();
+}
+
+async function logout() {
+  await supabase.auth.signOut();
+  toast('已退出');
+  renderHome();
+}
+
+// ====== Toast ======
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ====== Views ======
+async function renderHome() {
+  currentView = 'home';
+  document.getElementById('uploadModal').classList.remove('active');
+  document.getElementById('authModal').classList.remove('active');
+
+  const main = document.getElementById('mainContent');
+  main.innerHTML = `
+    <!-- Search -->
+    <div class="search-bar">
+      <input type="text" id="searchInput" placeholder="🔍 搜索试卷标题、学科、标签..." onkeydown="if(event.key==='Enter')searchPapers()">
+      <select id="searchSubject"><option value="">全部学科</option>
+        ${['数学','语文','英语','物理','化学','生物','历史','地理','政治','计算机','其他'].map(s=>`<option value="${s}">${s}</option>`).join('')}
+      </select>
+      <select id="searchYear"><option value="">全部年份</option>
+        ${(()=>{let o='';for(let y=new Date().getFullYear();y>=2000;y--)o+=`<option value="${y}">${y}</option>`;return o;})()}
+      </select>
+      <button class="btn btn-primary" onclick="searchPapers()">搜索</button>
+      ${currentUser ? '<button class="btn btn-outline" onclick="showMyPapers()">📂 我的上传</button>' : ''}
+    </div>
+
+    <div class="section-title">📄 最新上传</div>
+    <div class="grid" id="paperGrid"></div>
+    <div id="pagination"></div>
+  `;
+
+  await loadPapers();
+}
+
+async function loadPapers(subject='', year='', search='', userId='') {
+  const grid = document.getElementById('paperGrid');
+  if (!grid) return;
+  grid.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text2)">加载中...</div>';
+
+  let query = supabase.from('papers').select('*', {count:'exact'}).order('created_at', {ascending:false}).limit(50);
+  if (subject) query = query.eq('subject', subject);
+  if (year) query = query.eq('year', parseInt(year));
+  if (search) query = query.ilike('title', `*${search}*`);
+  if (userId) query = query.eq('user_id', userId);
+  // If searching and no subject filter, also search tags
+  // (simplified: title search is primary)
+
+  const {data: papers, error, count} = await query;
+
+  if (error) { grid.innerHTML = `<div class="empty-state"><div class="icon">⚠️</div><p>加载失败: ${error.message}</p></div>`; return; }
+  if (!papers || papers.length === 0) {
+    grid.innerHTML = `<div class="empty-state"><div class="icon">📭</div><p>还没有资料，${currentUser?'上传第一份吧！':'登录后可以上传资料'}</p></div>`;
+    return;
+  }
+
+  // Also search by tags if searching
+  let filtered = papers;
+  if (search && !subject && !year && !userId) {
+    const q = search.toLowerCase();
+    filtered = papers.filter(p => {
+      if (p.title.toLowerCase().includes(q)) return true;
+      if (p.subject.toLowerCase().includes(q)) return true;
+      if (p.tags && p.tags.toLowerCase().includes(q)) return true;
+      return false;
+    });
+  }
+  if (filtered.length === 0) {
+    grid.innerHTML = `<div class="empty-state"><div class="icon">🔍</div><p>没有找到匹配的资料</p></div>`;
+    return;
+  }
+
+  grid.innerHTML = filtered.map(p => `
+    <div class="card" onclick="showDetail('${p.id}')">
+      <div class="card-title">${esc(p.title)}</div>
+      <div class="card-meta">
+        <span class="badge badge-subject">${esc(p.subject)}</span>
+        <span class="badge badge-year">${p.year}</span>
+        ${p.file_type ? `<span class="badge badge-pdf">${p.file_type.toUpperCase()}</span>` : ''}
+      </div>
+      ${p.tags ? `<div style="margin-top:6px;font-size:0.78rem;color:var(--text3)">🏷️ ${esc(p.tags)}</div>` : ''}
+      <div class="card-footer">
+        <span class="stats">⬇ ${p.downloads || 0} &nbsp;⭐ ${p.rating_count ? p.avg_rating.toFixed(1) : '-'}</span>
+        <span style="font-size:0.78rem;color:var(--text3)">${timeAgo(p.created_at)}</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+async function searchPapers() {
+  const search = document.getElementById('searchInput')?.value?.trim() || '';
+  const subject = document.getElementById('searchSubject')?.value || '';
+  const year = document.getElementById('searchYear')?.value || '';
+  await loadPapers(subject, year, search);
+}
+
+async function showMyPapers() {
+  if (!currentUser) { toast('请先登录'); return; }
+  currentView = 'mine';
+  const main = document.getElementById('mainContent');
+  main.innerHTML = `
+    <div style="margin:20px 0">
+      <a href="#" onclick="goHome()" style="font-size:0.9rem">← 返回首页</a>
+    </div>
+    <div class="section-title">📂 我上传的资料</div>
+    <div class="grid" id="paperGrid"></div>
+  `;
+  await loadPapers('', '', '', currentUser.id);
+}
+
+function goHome() { renderHome(); }
+
+async function showDetail(id) {
+  currentDetailId = id;
+  currentView = 'detail';
+  const {data: paper, error} = await supabase.from('papers').select('*').eq('id', id).single();
+  if (error || !paper) { toast('资料不存在'); renderHome(); return; }
+
+  // Increment view / get reviews
+  const {data: reviews} = await supabase.from('reviews').select('*').eq('paper_id', id).order('created_at', {ascending:false});
+
+  const main = document.getElementById('mainContent');
+  main.innerHTML = `
+    <div style="margin:20px 0"><a href="#" onclick="goHome()" style="font-size:0.9rem">← 返回首页</a></div>
+    <div class="detail-header">
+      <h1>${esc(paper.title)}</h1>
+      <div class="detail-meta">
+        <span class="badge badge-subject">${esc(paper.subject)}</span>
+        <span class="badge badge-year">${paper.year}</span>
+        ${paper.file_type ? `<span class="badge badge-pdf">${paper.file_type.toUpperCase()}</span>` : ''}
+        <span>⬇ ${paper.downloads || 0} 次下载</span>
+        <span>⭐ ${paper.avg_rating ? paper.avg_rating.toFixed(1)+' ('+paper.rating_count+')' : '暂无评分'}</span>
+        <span>上传于 ${timeAgo(paper.created_at)}</span>
+      </div>
+      ${paper.tags ? `<div style="margin:4px 0;font-size:0.85rem;color:var(--text2)">🏷️ ${esc(paper.tags)}</div>` : ''}
+      ${paper.description ? `<p style="margin:12px 0;font-size:0.95rem;color:var(--text2);white-space:pre-wrap">${esc(paper.description)}</p>` : ''}
+      <div class="detail-actions">
+        <button class="btn btn-primary download-btn" data-id="${paper.id}" data-path="${esc(paper.file_path||'')}">⬇ 下载文件</button>
+        ${currentUser ? `<button class="btn btn-outline" onclick="showReviewInput('${paper.id}')">⭐ 评分</button>` : ''}
+        ${currentUser && currentUser.id === paper.user_id ? `<button class="btn btn-danger btn-sm" onclick="deletePaper('${paper.id}')">🗑 删除</button>` : ''}
+      </div>
+    </div>
+
+    <div class="section-title">💬 评价 (${reviews?.length || 0})</div>
+    <div id="reviewList">
+      ${!reviews || reviews.length === 0 ? '<p style="color:var(--text2);font-size:0.9rem">暂无评价</p>' : ''}
+      ${reviews ? reviews.map(r => `
+        <div class="review-card">
+          <div class="review-header">
+            <span>${esc(r.user_email || '匿名')}</span>
+            <span class="stars">${'★'.repeat(r.rating)}${'☆'.repeat(5-r.rating)}</span>
+            <span>${timeAgo(r.created_at)}</span>
+          </div>
+          ${r.comment ? `<p style="font-size:0.9rem">${esc(r.comment)}</p>` : ''}
+        </div>
+      `).join('') : ''}
+    </div>
+    <div id="reviewInputArea" style="margin-top:12px"></div>
+  `;
+}
+
+function showReviewInput(paperId) {
+  const area = document.getElementById('reviewInputArea');
+  area.innerHTML = `
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 18px">
+      <div style="margin-bottom:8px;font-weight:500">留下你的评价</div>
+      <div style="margin-bottom:8px">
+        ${[1,2,3,4,5].map(n => `<button class="btn btn-ghost" onclick="setRating(${n})" id="star${n}" style="font-size:1.4rem;padding:2px 6px">☆</button>`).join('')}
+      </div>
+      <div class="form-group"><textarea id="reviewComment" placeholder="写点评论（可选）" rows="2"></textarea></div>
+      <button class="btn btn-primary btn-sm" onclick="submitReview('${paperId}')">提交评价</button>
+    </div>
+  `;
+  window._rating = 0;
+}
+
+function setRating(n) {
+  window._rating = n;
+  for (let i=1;i<=5;i++) {
+    document.getElementById('star'+i).textContent = i <= n ? '★' : '☆';
+  }
+}
+
+async function submitReview(paperId) {
+  if (!currentUser) { toast('请先登录'); return; }
+  const rating = window._rating;
+  if (!rating) { toast('请选择评分'); return; }
+  const comment = document.getElementById('reviewComment')?.value?.trim() || '';
+  const {error} = await supabase.from('reviews').insert({
+    paper_id: paperId,
+    user_id: currentUser.id,
+    user_email: currentUser.email,
+    rating: rating,
+    comment: comment
+  });
+  if (error) { toast('提交失败: ' + error.message); return; }
+  // Update paper avg
+  await updatePaperRating(paperId);
+  toast('评价已提交！');
+  showDetail(paperId);
+}
+
+async function updatePaperRating(paperId) {
+  const {data: reviews} = await supabase.from('reviews').select('rating').eq('paper_id', paperId);
+  if (!reviews || reviews.length === 0) return;
+  const avg = reviews.reduce((s,r) => s + r.rating, 0) / reviews.length;
+  await supabase.from('papers').update({
+    avg_rating: Math.round(avg * 10) / 10,
+    rating_count: reviews.length
+  }).eq('id', paperId);
+}
+
+async function downloadPaper(paperId, filePath) {
+  if (!filePath) { toast('文件路径无效'); return; }
+  // Increment download count
+  await supabase.rpc('increment_downloads', {paper_id: paperId});
+  // Get public URL
+  const {data} = supabase.storage.from('papers').getPublicUrl(filePath);
+  if (data?.publicUrl) {
+    window.open(data.publicUrl, '_blank');
+    toast('开始下载！');
+    // Refresh detail to update count
+    setTimeout(() => showDetail(paperId), 500);
+  } else {
+    toast('获取下载链接失败');
+  }
+}
+
+async function deletePaper(paperId) {
+  if (!confirm('确定要删除这份资料吗？此操作不可撤销。')) return;
+  const {data: paper} = await supabase.from('papers').select('file_path').eq('id', paperId).single();
+  if (paper?.file_path) {
+    await supabase.storage.from('papers').remove([paper.file_path]);
+  }
+  await supabase.from('reviews').delete().eq('paper_id', paperId);
+  await supabase.from('papers').delete().eq('id', paperId);
+  toast('已删除');
+  renderHome();
+}
+
+// ====== Upload ======
+function showUploadModal() {
+  if (!currentUser) { toast('请先登录'); return; }
+  document.getElementById('uploadModal').classList.add('active');
+  document.getElementById('upTitle').value = '';
+  document.getElementById('upTags').value = '';
+  document.getElementById('upDesc').value = '';
+  document.getElementById('upFile').value = '';
+}
+
+function closeUploadModal() {
+  document.getElementById('uploadModal').classList.remove('active');
+}
+
+async function doUpload() {
+  if (!currentUser) { toast('请先登录'); return; }
+  const title = document.getElementById('upTitle').value.trim();
+  const subject = document.getElementById('upSubject').value;
+  const year = document.getElementById('upYear').value;
+  const tags = document.getElementById('upTags').value.trim();
+  const desc = document.getElementById('upDesc').value.trim();
+  const fileInput = document.getElementById('upFile');
+  const file = fileInput.files[0];
+
+  if (!title) { toast('请输入标题'); return; }
+  if (!file) { toast('请选择文件'); return; }
+  if (file.size > 20 * 1024 * 1024) { toast('文件不能超过20MB'); return; }
+
+  const ext = file.name.split('.').pop().toLowerCase();
+  const filePath = `${currentUser.id}/${Date.now()}.${ext}`;
+
+  // Upload file
+  const {error: uploadError} = await supabase.storage.from('papers').upload(filePath, file);
+  if (uploadError) { toast('上传失败: ' + uploadError.message); return; }
+
+  // Insert record
+  const {error: insertError} = await supabase.from('papers').insert({
+    title, subject, year: parseInt(year), tags, description: desc,
+    file_path: filePath, file_type: ext, file_size: file.size,
+    user_id: currentUser.id, user_email: currentUser.email
+  });
+  if (insertError) {
+    toast('保存记录失败: ' + insertError.message);
+    await supabase.storage.from('papers').remove([filePath]);
+    return;
+  }
+
+  toast('上传成功！🎉');
+  closeUploadModal();
+  renderHome();
+}
+
+// ====== Helpers ======
+function esc(s) {
+  if (!s) return '';
+  const div = document.createElement('div');
+  div.textContent = String(s);
+  return div.innerHTML;
+}
+
+function timeAgo(dateStr) {
+  if (!dateStr) return '';
+  const now = new Date();
+  const d = new Date(dateStr);
+  const diff = now - d;
+  const min = Math.floor(diff / 60000);
+  if (min < 1) return '刚刚';
+  if (min < 60) return min + '分钟前';
+  const h = Math.floor(min / 60);
+  if (h < 24) return h + '小时前';
+  const days = Math.floor(h / 24);
+  if (days < 30) return days + '天前';
+  if (days < 365) return Math.floor(days / 30) + '个月前';
+  return Math.floor(days / 365) + '年前';
+}
+
+// ====== Close modals on overlay click ======
+document.getElementById('authModal').addEventListener('click', function(e) {
+  if (e.target === this) this.classList.remove('active');
+});
+document.getElementById('uploadModal').addEventListener('click', function(e) {
+  if (e.target === this) this.classList.remove('active');
+});
+
+// ====== Event Delegation ======
+document.getElementById('mainContent').addEventListener('click', function(e) {
+  const btn = e.target.closest('.download-btn');
+  if (btn) {
+    const id = btn.getAttribute('data-id');
+    const path = btn.getAttribute('data-path');
+    if (id && path) downloadPaper(id, path);
+  }
+});
+
+// ====== Init ======
+(async function init() {
+  await checkAuth();
+  renderHome();
+  console.log('📚 PaperHub 已就绪', currentUser ? `(已登录: ${currentUser.email})` : '(未登录)');
+})();
+</script>
+</body>
+</html>
