@@ -116,7 +116,7 @@ a{color:var(--p);text-decoration:none}
 
 <div class="mo" id="upMo"><div class="modal">
 <h2>📤 上传资料</h2>
-<div class="fg"><label>标题</label><input type="text" id="upTitle" placeholder="例如：2024年高考数学真题" maxlength="100"></div>
+<div class="fg"><label>你的昵称（显示在资料上）</label><input type="text" id="upNick" placeholder="可选，不填显示邮箱"></div><div class="fg"><label>标题</label><input type="text" id="upTitle" placeholder="例如：2024年高考数学真题" maxlength="100"></div>
 <div class="fr"><div class="fg"><label>学科</label><select id="upSubj"><option value="数学">数学</option><option value="语文">语文</option><option value="英语">英语</option><option value="物理">物理</option><option value="化学">化学</option><option value="生物">生物</option><option value="历史">历史</option><option value="地理">地理</option><option value="政治">政治</option><option value="计算机">计算机</option><option value="其他">其他</option></select></div>
 <div class="fg"><label>年份</label><select id="upYear"><script>for(let y=new Date().getFullYear();y>=2000;y--)document.write('<option value="'+y+'">'+y+'</option>');</script></select></div></div>
 <div class="fg"><label>标签（逗号分隔）</label><input type="text" id="upTags" placeholder="高考,真题,全国卷"></div>
@@ -317,17 +317,30 @@ function showUpload(){if(!U){toast('请先登录');return}document.getElementByI
 function closeUp(){document.getElementById('upMo').classList.remove('active')}
 async function doUpload(){
   if(!U){toast('请先登录');return}
+  const nick=document.getElementById('upNick')?.value?.trim()||'';
   const title=document.getElementById('upTitle').value.trim(),subject=document.getElementById('upSubj').value;
   const year=document.getElementById('upYear').value,tags=document.getElementById('upTags').value.trim(),desc=document.getElementById('upDesc').value.trim();
   const file=document.getElementById('upFile').files[0];
   if(!title){toast('请输入标题');return}if(!file){toast('请选择文件');return}
   if(file.size>104857600){toast('文件不能超过100MB');return}
-  const btn=document.getElementById('upBtn2');btn.textContent='上传中...';btn.disabled=true;
+  const btn=document.getElementById('upBtn2');btn.textContent='0%';btn.disabled=true;
   try{
     const ext=file.name.split('.').pop().toLowerCase(),path=U.id+'/'+Date.now()+'.'+ext;
-    await supa.storage.upload(path,file);const url=supa.storage.url(path);
-    await supa.db.create('papers',{title,subject,year:parseInt(year),tags,description:desc,file_path:url,file_type:ext,file_size:file.size,user_id:U.id,user_email:U.email,downloads:0,avg_rating:0,rating_count:0});
-    toast('上传成功！🎉');closeUp();renderHome();
+    // Upload with progress via XHR
+    await new Promise((resolve,reject)=>{
+      const fd=new FormData();fd.append('file',file);
+      const xhr=new XMLHttpRequest();
+      xhr.upload.onprogress=e=>{if(e.lengthComputable){btn.textContent=Math.round(e.loaded/e.total*100)+'%'}};
+      xhr.onload=()=>xhr.status===200?resolve():reject(new Error('Upload failed'));
+      xhr.onerror=()=>reject(new Error('Network error'));
+      xhr.open('POST',SUPA+'/storage/v1/object/papers/'+path);
+      xhr.setRequestHeader('apikey',SUPA_KEY);
+      xhr.setRequestHeader('Authorization','Bearer '+(S?S.access_token:SUPA_KEY));
+      xhr.send(fd);
+    });
+    const url=supa.storage.url(path);
+    await supa.db.create('papers',{title,subject,year:parseInt(year),tags,description:desc,file_path:url,file_type:ext,file_size:file.size,user_id:U.id,user_email:nick||U.email,downloads:0,avg_rating:0,rating_count:0});
+    toast('上传成功！');closeUp();renderHome();
   }catch(e){toast('上传失败: '+e.message)}
   btn.textContent='上传';btn.disabled=false;
 }
