@@ -310,6 +310,10 @@ async function submitReview(pid){
 }
 function dl(pid,url){if(!url)return;supa.db.get('papers',pid).then(p=>{if(p)supa.db.upd('papers',pid,{downloads:(p.downloads||0)+1})}).catch(()=>{});window.open(url,'_blank');toast('开始下载')}
 function preview(url){if(url)window.open(url,'_blank')}
+function getFavs(){try{return JSON.parse(localStorage.getItem('favs')||'[]')}catch{return[]}}
+function isFav(id){return getFavs().some(function(f){return f.id===id})}
+function toggleFav(id,title){var f=getFavs();if(isFav(id)){f=f.filter(function(x){return x.id!==id});toast('已取消')}else{f.push({id:id,title:title});toast('已收藏')}localStorage.setItem('favs',JSON.stringify(f));showDetail(id)}
+function showFavs(){var f=getFavs();view='favs';document.getElementById('hero').style.display='none';document.getElementById('main').innerHTML='<a href=\"#\" onclick=\"goHome()\" class=\"bl\">← 返回首页</a><div class=\"st\">❤️ 我的收藏</div><div class=\"grid\" id=\"grid\"></div>';var g=document.getElementById('grid');if(!f.length){g.innerHTML='<div class=\"empty\"><div class=\"ic\">💔</div><p>还没有收藏</p></div>';return}Promise.all(f.map(function(x){return supa.db.get('papers',x.id)})).then(function(r){var p=r.filter(Boolean);g.innerHTML=p.map(function(p){return'<div class=\"card\" onclick=\"showDetail(\\''+p.id+'\\')\"><div class=\"cb\"><div class=\"cti\">'+esc(p.title||'')+'</div><div class=\"ctg\"><span class=\"tag\">'+esc(p.subject||'')+'</span><span class=\"tag yr\">'+p.year+'</span></div></div></div>'}).join('')}).catch(function(){g.innerHTML='<div class=\"empty\"><p>加载失败</p></div>'})}
 function copyUrl(url){navigator.clipboard.writeText(url).then(()=>toast('链接已复制！')).catch(()=>toast('复制失败'))}
 async function delPaper(pid){if(!confirm('确定删除？'))return;try{await supa.db.del('papers',pid);const revs=await supa.db.q('reviews',{where:{paper_id:pid}});for(const r of revs)await supa.db.del('reviews',r.id);toast('已删除');renderHome()}catch(e){toast('删除失败')}}
 
@@ -340,7 +344,7 @@ async function doUpload(){
     });
     const url=supa.storage.url(path);
     await supa.db.create('papers',{title,subject,year:parseInt(year),tags,description:desc,file_path:url,file_type:ext,file_size:file.size,user_id:U.id,user_email:nick||U.email,downloads:0,avg_rating:0,rating_count:0});
-    toast('上传成功！');closeUp();renderHome();
+    toast('上传成功！');closeUp();renderHome();setTimeout(()=>{document.querySelector('.card')?.click()},500);
   }catch(e){toast('上传失败: '+e.message)}
   btn.textContent='上传';btn.disabled=false;
 }
