@@ -532,8 +532,8 @@ async function renderHome() {
       ${currentUser?'<button class="btn btn-outline btn-sm" onclick="showMyPapers()">📂 我的上传</button>':''}
     </div>
     <div class="subject-pills" id="subjectPills">
-      <span class="pill active" onclick="filterSubject('')">全部</span>
-      ${['数学','语文','英语','物理','化学','生物','计算机'].map(s=>`<span class="pill" onclick="filterSubject('${s}')">${s}</span>`).join('')}
+      <span class="pill active" onclick="filterSubject('',this)">全部</span>
+      ${['数学','语文','英语','物理','化学','生物','计算机'].map(s=>`<span class="pill" onclick="filterSubject('${s}',this)">${s}</span>`).join('')}
     </div>
     <div class="section-title"><span>📄 资料列表</span><span class="count" id="resultCount"></span></div>
     <div class="grid" id="paperGrid"></div>
@@ -545,18 +545,20 @@ async function renderHome() {
 }
 
 async function loadStats() {
-  const {count:total} = await supabase.from('papers').select('*',{count:'exact'}).limit(1);
-  const {count:subjects} = await supabase.from('papers').select('subject',{count:'exact'}).limit(1);
-  // Get distinct subject count and total downloads
-  const {data:all} = await supabase.from('papers').select('downloads,user_id');
-  const totalDownloads = all ? all.reduce((s,p)=>s+(p.downloads||0),0) : 0;
-  const uniqueUsers = all ? new Set(all.map(p=>p.user_id)).size : 0;
-  const uniqueSubjects = all ? new Set().size : 0; // simplified
+  try {
+    const {count:total} = await supabase.from('papers').select('id',{count:'exact'}).limit(1);
+    document.getElementById('hTotal').textContent = total ?? '0';
+  } catch { document.getElementById('hTotal').textContent = '-'; }
 
-  document.getElementById('hTotal').textContent = total ?? '-';
-  document.getElementById('hDownloads').textContent = totalDownloads.toLocaleString();
-  document.getElementById('hUsers').textContent = uniqueUsers || '-';
-  document.getElementById('hSubjects').textContent = 11;
+  try {
+    const {data:all} = await supabase.from('papers').select('downloads,user_id').limit(500);
+    const dl = all ? all.reduce((s,p)=>s+(p.downloads||0),0) : 0;
+    const users = all ? new Set(all.map(p=>p.user_id).filter(Boolean)).size : 0;
+    document.getElementById('hDownloads').textContent = dl.toLocaleString();
+    document.getElementById('hUsers').textContent = users || '0';
+  } catch { document.getElementById('hDownloads').textContent = '-'; document.getElementById('hUsers').textContent = '-'; }
+
+  document.getElementById('hSubjects').textContent = '11';
 }
 
 async function loadPapers(reset=true) {
@@ -621,10 +623,10 @@ async function loadPapers(reset=true) {
     </div>` : '';
 }
 
-function filterSubject(s) {
+function filterSubject(s, el) {
   currentSubject = s;
-  document.querySelectorAll('.pill').forEach(el=>el.classList.remove('active'));
-  event?.target?.classList?.add('active');
+  document.querySelectorAll('.pill').forEach(p=>p.classList.remove('active'));
+  if (el) el.classList.add('active');
   const sel = document.getElementById('searchSubject');
   if (sel) sel.value = s;
   loadPapers(true);
@@ -714,15 +716,7 @@ async function updatePaperRating(paperId) {
 function downloadFile(paperId, filePath) {
   if (!filePath) { toast('文件路径无效'); return; }
   supabase.rpc('increment_downloads',{paper_id:paperId}).catch(()=>{});
-  // Use a hidden link to trigger download
-  const a = document.createElement('a');
-  a.href = filePath;
-  a.download = '';
-  a.target = '_blank';
-  a.rel = 'noopener';
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
+  window.open(filePath, '_blank');
   toast('开始下载！');
   setTimeout(()=>{ if(currentView==='detail') showDetail(paperId); },800);
 }
