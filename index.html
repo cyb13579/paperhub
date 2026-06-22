@@ -385,7 +385,6 @@ ${p.tags?`<div style="margin:6px 0;font-size:0.84rem;color:var(--text2)"> ${esc(
 ${p.description?`<div class="detail-desc">${esc(p.description)}</div>`:''}
 <div class="detail-actions">
 <button class="btn btn-primary" onclick="downloadFile('${p.id}','${p.file_path||''}')"> 下载</button>
-${p.file_type==='pdf'?`<button class="btn btn-outline" onclick="previewFile('${p.file_path||''}')"> 在线预览</button>`:''}
 ${currentUser?`<button class="btn btn-ghost btn-sm" onclick="showReviewInput('${p.id}')"> 评分</button>`:''}
 ${currentUser&&currentUser.id===p.user_id?`<button class="btn btn-danger btn-sm" onclick="deletePaper('${p.id}')"> 删除</button>`:''}
 </div></div>
@@ -409,7 +408,7 @@ async function submitReview(pid){
 }
 
 function downloadFile(pid,url){if(!url){toast('文件路径无效');return}supabase.rpc('increment_downloads',{paper_id:pid}).catch(()=>{});const a=document.createElement('a');a.href=url;a.download='';a.click();toast('开始下载')}
-function previewFile(url){if(!url)return;window.open(url,'_blank')}
+
 async function deletePaper(pid){if(!confirm('确定删除？'))return;await supabase.from('reviews').delete().eq('paper_id',pid);await supabase.from('papers').delete().eq('id',pid);toast('已删除');renderHome()}
 
 // Upload
