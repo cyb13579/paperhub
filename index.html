@@ -125,7 +125,7 @@ a{color:var(--p);text-decoration:none}
 <div class="fg"><label>标题</label><input type="text" id="upTitle" placeholder="例如：2024年高考数学真题" maxlength="100"></div>
 <div class="fr"><div class="fg"><label>学科</label><select id="upSubject"><option value="数学">数学</option><option value="语文">语文</option><option value="英语">英语</option><option value="物理">物理</option><option value="化学">化学</option><option value="生物">生物</option><option value="历史">历史</option><option value="地理">地理</option><option value="政治">政治</option><option value="计算机">计算机</option><option value="其他">其他</option></select></div>
 <div class="fg"><label>年份</label><select id="upYear"><script>for(let y=new Date().getFullYear();y>=2000;y--)document.write(`<option value="${y}">${y}</option>`);</script></select></div></div>
-<div class="fg"><label>标签（逗号分隔）</label><input type="text" id="upTags" placeholder="高考,真题,全国卷"></div>
+<div class="fg"><label>描述（可选）</label><textarea id="upDesc" placeholder="简要描述..." rows="2"></textarea></div><div class="fg"><label>标签（逗号分隔）</label><input type="text" id="upTags" placeholder="高考,真题,全国卷"></div>
 <div class="fg"><label>文件（最大100MB）</label><div class="uz" id="dropZone" onclick="document.getElementById('upFile').click()"><div class="ic">📁</div><div class="hi">拖拽文件到此处，或<strong>点击选择</strong></div><div style="font-size:0.75rem;color:var(--t3);margin-top:4px" id="fileInfo"></div></div><input type="file" id="upFile" accept=".pdf,.jpg,.jpeg,.png,.zip,.doc,.docx,.ppt,.pptx" style="display:none"></div>
 <div class="ma"><button class="btn btn-g" onclick="document.getElementById('uploadModal').classList.remove('active')">取消</button><button class="btn btn-p" onclick="doUpload()" id="uploadBtn">上传</button></div>
 </div></div>
@@ -265,7 +265,10 @@ async function renderHome(){
 <div class="sb"><span style="color:var(--t3);margin-right:6px">🔍</span><input type="text" id="searchInput" placeholder="搜索试卷..." onkeydown="if(event.key==='Enter')doSearch()"></div>
 <select class="fs" id="searchSubject" onchange="doSearch()"><option value="">全部学科</option>${['数学','语文','英语','物理','化学','生物','历史','地理','政治','计算机','其他'].map(s=>'<option value="'+s+'">'+s+'</option>').join('')}</select>
 <select class="fs" id="searchYear" onchange="doSearch()"><option value="">全部年份</option>${Array.from({length:26},(_,i)=>'<option value="'+(new Date().getFullYear()-i)+'">'+(new Date().getFullYear()-i)+'</option>').join('')}</select>
-<button class="btn btn-p btn-s" onclick="doSearch()">搜索</button></div>
+<select class="fs" id="searchSort" onchange="doSearch()"><option value="created_at.desc">🕐 最新</option><option value="downloads.desc">⬇ 下载最多</option><option value="avg_rating.desc">⭐ 评分最高</option></select>
+<button class="btn btn-p btn-s" onclick="doSearch()">搜索</button>
+${currentUser?'<button class="btn btn-o btn-s" onclick="showMyPapers()">📂 我的上传</button>':''}
+</div>
 <div class="sp" id="subjectPills"><span class="pill active" onclick="filterSubject('',this)">全部</span>${['数学','语文','英语','物理','化学','生物','计算机'].map(s=>'<span class="pill" onclick="filterSubject(\''+s+'\',this)">'+s+'</span>').join('')}</div>
 <div class="st"><span>📄 资料列表</span><span class="c" id="resultCount"></span></div>
 <div class="grid" id="paperGrid"></div>`;
@@ -287,14 +290,14 @@ async function loadPapers(reset=true){
   const year=document.getElementById('searchYear')?.value||'';
 
   // Cache hit: skip API call, re-render from cache
-  const cacheKey=subject+'|'+year;
+  const sort=(document.getElementById('searchSort')?.value||'created_at.desc').split('.');const cacheKey=subject+'|'+year+'|'+sort[0];
   if(reset&&!search&&paperCache&&cacheKey===paperCache.key&&Date.now()-cacheTime<30000){
     renderPapersFromCache(paperCache.data,search);return;
   }
 
   if(reset)grid.innerHTML=Array(6).fill(0).map(()=>'<div class="card"><div class="cb"><div style="height:16px;background:#f1f5f9;border-radius:4px;margin-bottom:8px"></div><div style="height:16px;width:60%;background:#f1f5f9;border-radius:4px"></div></div></div>').join('');
   try{
-    let q=supabase.from('papers').select('*').order('created_at',{ascending:false}).limit(100);
+    let q=supabase.from('papers').select('*').order(sort[0],{ascending:sort[1]==='asc'}).limit(100);
     if(subject)q=q.eq('subject',subject);if(year)q=q.eq('year',parseInt(year));
     const{data:papers,error}=await q;
 
@@ -313,7 +316,7 @@ function renderPapersFromCache(papers,search){
   if(!filtered.length){grid.innerHTML='<div class="empty"><div class="ic">📭</div><p>'+(currentUser?'快来上传第一份！':'还没有资料')+'</p></div>';return}
   const sm={数学:'m',语文:'cn',英语:'en',物理:'ph',化学:'ch',生物:'bi',历史:'hi',地理:'ge',政治:'po',计算机:'cs'};
   const em={数学:'📐',语文:'📖',英语:'🌍',物理:'⚡',化学:'🧪',生物:'🧬',历史:'📜',地理:'🗺️',政治:'⚖️',计算机:'💻'};
-  grid.innerHTML=filtered.map(p=>'<div class="card" onclick="showDetail(\''+p.id+'\')"><div class="ct '+(sm[p.subject]||'ot')+'">'+(em[p.subject]||'📄')+'</div><div class="cb"><div class="cti">'+esc(p.title||'')+'</div><div class="ctg"><span class="tag">'+esc(p.subject||'')+'</span><span class="tag yr">'+p.year+'</span>'+(p.file_type?'<span class="tag fl">'+p.file_type.toUpperCase()+'</span>':'')+'</div><div class="cf"><span>⬇ '+(p.downloads||0)+'</span><span>⭐ '+(p.rating_count?p.avg_rating.toFixed(1):'-')+'</span><span>'+timeAgo(p.created_at)+'</span></div></div></div>').join('');
+  grid.innerHTML=filtered.map(p=>'<div class="card" onclick="showDetail(\''+p.id+'\')"><div class="ct '+(sm[p.subject]||'ot')+'">'+(em[p.subject]||'📄')+'</div><div class="cb"><div class="cti">'+esc(p.title||'')+'</div><div class="ctg"><span class="tag">'+esc(p.subject||'')+'</span><span class="tag yr">'+p.year+'</span>'+(p.file_type?'<span class="tag fl">'+p.file_type.toUpperCase()+' '+(p.file_size?(p.file_size/1024/1024).toFixed(1)+'MB':'')+'</span>':'')+'</div><div class="cf"><span>⬇ '+(p.downloads||0)+'</span><span>⭐ '+(p.rating_count?p.avg_rating.toFixed(1):'-')+'</span><span>'+timeAgo(p.created_at)+'</span></div></div></div>').join('');
 }
 
 // Legacy wrapper for old code paths
@@ -330,10 +333,10 @@ async function showDetail(id){
     const isOwner=currentUser&&currentUser.id===p.user_id;
     document.getElementById('mainContent').innerHTML=`<a href="#" onclick="goHome()" class="bl">← 返回首页</a>
 <div class="dc"><h1 class="dt">${esc(p.title||'')}</h1>
-<div class="dm"><span class="tag">${esc(p.subject||'')}</span><span class="tag yr">${p.year}</span>${p.file_type?'<span class="tag fl">'+p.file_type.toUpperCase()+'</span>':''}<span style="font-size:0.85rem;color:var(--t2)">⬇ ${p.downloads||0} 下载</span><span style="font-size:0.85rem;color:var(--t2)">⭐ ${p.rating_count?p.avg_rating.toFixed(1)+' ('+p.rating_count+')':'暂无评分'}</span></div>
+<div class="dm"><span class="tag">${esc(p.subject||'')}</span><span class="tag yr">${p.year}</span>${p.file_type?'<span class="tag fl">'+p.file_type.toUpperCase()+' '+(p.file_size?(p.file_size/1024/1024).toFixed(1)+'MB':'')+'</span>':''}<span style="font-size:0.85rem;color:var(--t2)">⬇ ${p.downloads||0} 下载</span><span style="font-size:0.85rem;color:var(--t2)">⭐ ${p.rating_count?p.avg_rating.toFixed(1)+' ('+p.rating_count+')':'暂无评分'}</span></div>
 ${p.tags?'<div style="margin:6px 0;font-size:0.84rem;color:var(--t2)">🏷️ '+esc(p.tags)+'</div>':''}
 <div class="da">
-${currentUser?`<button class="btn btn-p" onclick="downloadFile('${p.id}','${p.file_path||''}')">⬇ 下载</button>${p.file_type==='pdf'?'<button class="btn btn-o btn-s" onclick="previewFile(\''+p.file_path+'\')">👁 预览</button>':''}<button class="btn btn-g btn-s" onclick="showReviewInput('${p.id}')">⭐ 评分</button>`:'<p style="color:var(--o)">🔒 请登录后下载</p>'}
+${currentUser?`<button class="btn btn-p" onclick="downloadFile('${p.id}','${p.file_path||''}')">⬇ 下载</button>${p.file_type==='pdf'?'<button class="btn btn-o btn-s" onclick="previewFile(\''+p.file_path+'\')">👁 预览</button><button class="btn btn-g btn-s" onclick="copyLink('+p.file_path+')">🔗 复制链接</button>':''}<button class="btn btn-g btn-s" onclick="showReviewInput('${p.id}')">⭐ 评分</button>`:'<p style="color:var(--o)">🔒 请登录后下载</p>'}
 ${isOwner?'<button class="btn btn-d btn-s" onclick="deletePaper(\''+p.id+'\')">🗑 删除</button>':''}
 </div></div>
 <div class="st">💬 评价 (${reviews?reviews.length:0})</div>
@@ -357,6 +360,7 @@ async function submitReview(pid){
   toast('评价已提交');showDetail(pid)
 }
 
+function copyLink(url){if(!url)return;navigator.clipboard.writeText(url).then(()=>toast('链接已复制！')).catch(()=>toast('复制失败'))}
 function previewFile(url){if(url)window.open(url,'_blank')}
 async function downloadFile(pid,url){
   if(!currentUser){toast('请先登录');return}
@@ -370,7 +374,22 @@ async function deletePaper(pid){
   await supabase.from('papers').delete().eq('id',pid);
   toast('已删除');renderHome()
 }
+
+async function showMyPapers(){
+  if(!currentUser){toast('请先登录');return}
+  currentView='mine';document.getElementById('heroSection').style.display='none';
+  document.getElementById('mainContent').innerHTML='<a href="#" onclick="goHome()" class="bl">← 返回首页</a><div class="st">📂 我上传的资料</div><div class="grid" id="paperGrid"></div>';
+  const grid=document.getElementById('paperGrid');
+  try{
+    const{data:papers}=await supabase.from('papers').select('*').eq('user_id',currentUser.id).order('created_at',{ascending:false});
+    if(!papers||!papers.length){grid.innerHTML='<div class="empty"><div class="ic">📭</div><p>还没有上传资料</p></div>';return}
+    const sm={数学:'m',语文:'cn',英语:'en',物理:'ph',化学:'ch',生物:'bi',历史:'hi',地理:'ge',政治:'po',计算机:'cs'};
+    const em={数学:'📐',语文:'📖',英语:'🌍',物理:'⚡',化学:'🧪',生物:'🧬',历史:'📜',地理:'🗺️',政治:'⚖️',计算机:'💻'};
+    grid.innerHTML=papers.map(p=>'<div class="card" onclick="showDetail(''+p.id+'')"><div class="cb"><div class="cti">'+esc(p.title||'')+'</div><div class="ctg"><span class="tag">'+esc(p.subject||'')+'</span><span class="tag yr">'+p.year+'</span></div><div class="cf"><span>⬇ '+(p.downloads||0)+'</span><span>⭐ '+(p.rating_count?p.avg_rating.toFixed(1):'-')+'</span><span>'+timeAgo(p.created_at)+'</span></div></div></div>').join('');
+  }catch(e){grid.innerHTML='<div class="empty"><p>加载失败</p></div>'}
+}
 function goHome(){document.getElementById('heroSection').style.display='';renderHome()}
+
 
 // ===== Upload =====
 function showUploadModal(){
@@ -381,7 +400,7 @@ function showUploadModal(){
 async function doUpload(){
   if(!currentUser){toast('请先登录');return}
   const title=document.getElementById('upTitle').value.trim(),subject=document.getElementById('upSubject').value;
-  const year=document.getElementById('upYear').value,tags=document.getElementById('upTags').value.trim();
+  const year=document.getElementById('upYear').value,tags=document.getElementById('upTags').value.trim(),desc=document.getElementById('upDesc')?.value?.trim()||'';
   const file=document.getElementById('upFile').files[0];
   if(!title){toast('请输入标题');return}if(!file){toast('请选择文件');return}
   if(file.size>100*1024*1024){toast('文件不能超过100MB');return}
@@ -393,7 +412,7 @@ async function doUpload(){
     if(upErr)throw new Error(upErr.message||'上传失败');
     const{data:urlData}=supabase.storage.from('papers').getPublicUrl(safePath);
     const downloadUrl=urlData?.publicUrl||'';
-    const{error:dbErr}=await supabase.from('papers').insert({title,subject,year:parseInt(year),tags,description:'',file_path:downloadUrl,file_type:ext,file_size:file.size,user_id:currentUser.id,user_email:currentUser.email});
+    const{error:dbErr}=await supabase.from('papers').insert({title,subject,year:parseInt(year),tags,description:desc,file_path:downloadUrl,file_type:ext,file_size:file.size,user_id:currentUser.id,user_email:currentUser.email});
     if(dbErr)throw new Error(dbErr.message);
     toast('上传成功！🎉');document.getElementById('uploadModal').classList.remove('active');renderHome();
   }catch(e){toast('上传失败: '+(e.message||''))}
