@@ -408,8 +408,8 @@ async function submitReview(pid){
   toast('评价已提交');showDetail(pid)
 }
 
-function downloadFile(pid,url){if(!url){toast('文件路径无效');return}supabase.rpc('increment_downloads',{paper_id:pid}).catch(()=>{});window.open(url,'_blank');toast('开始下载')}
-function previewFile(url){if(!url)return;window.open('https://docs.google.com/viewer?embedded=true&url='+encodeURIComponent(url),'_blank')}
+function downloadFile(pid,url){if(!url){toast('文件路径无效');return}supabase.rpc('increment_downloads',{paper_id:pid}).catch(()=>{});const a=document.createElement('a');a.href=url;a.download='';a.click();toast('开始下载')}
+function previewFile(url){if(!url)return;window.open(url,'_blank')}
 async function deletePaper(pid){if(!confirm('确定删除？'))return;await supabase.from('reviews').delete().eq('paper_id',pid);await supabase.from('papers').delete().eq('id',pid);toast('已删除');renderHome()}
 
 // Upload
