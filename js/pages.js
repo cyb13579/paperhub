@@ -264,21 +264,10 @@ export function downloadFile(paperId, url) {
   supabase.get('papers', paperId).then(function (p) {
     if (p) supabase.update('papers', paperId, { downloads: (p.downloads || 0) + 1 });
   }).catch(function () { });
-
-  toast('下载中...');
-  fetch(url).then(function (res) { return res.blob(); }).then(function (blob) {
-    var a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = url.split('/').pop() || 'file';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    setTimeout(function () { URL.revokeObjectURL(a.href); }, 1000);
-    toast('下载完成');
-  }).catch(function () {
-    window.open(url, '_blank');
-    toast('开始下载');
-  });
+  // Supabase Storage supports ?download to force Content-Disposition: attachment
+  var downloadUrl = url + (url.indexOf('?') > -1 ? '&' : '?') + 'download=';
+  window.open(downloadUrl, '_blank');
+  toast('开始下载');
 }
 
 export function previewFile(url, ext) {
