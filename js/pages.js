@@ -704,5 +704,7 @@ export function updateNav() {
   document.getElementById('upBtn').style.display = user ? '' : 'none';
   document.getElementById('favBtn').style.display = user ? '' : 'none';
   document.getElementById('mineBtn').style.display = user ? '' : 'none';
+  document.getElementById('friendsBtn').style.display = user ? '' : 'none';
+  document.getElementById('notifBell').style.display = user ? '' : 'none';
   document.getElementById('userInfo').textContent = user ? (user.email || '') : '';
 }
