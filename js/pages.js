@@ -579,7 +579,7 @@ export async function doAuth() {
     } else {
       await supabase.signIn(email, password);
     }
-    var ALLOWED=['cyb@qq.com'];var userEmail=supabase.getUser()?.email||'';if(ALLOWED.indexOf(userEmail)===-1){await supabase.signOut();updateNav();toast('你没有权限登录');return}
+    var ALLOWED=['cyb@qq.com','cyb13579_2023@qq.com'];var userEmail=supabase.getUser()?.email||'';if(ALLOWED.indexOf(userEmail)===-1){await supabase.signOut();updateNav();toast('你没有权限登录');return}
     toast('登录成功');
     updateNav();
     location.hash = '#/';
