@@ -101,6 +101,7 @@ a{color:var(--p);text-decoration:none}
 <button class="btn btn-w btn-s" onclick="navigate('#/favs')" id="favBtn" style="display:none">❤️</button>
 <button class="btn btn-w btn-s" onclick="navigate('#/mine')" id="mineBtn" style="display:none">📂</button>
 <button class="btn btn-w btn-s" onclick="navigate('#/login')" id="loginBtn">登录</button>
+<a href="#/status" class="btn btn-w btn-s" style="font-size:0.7rem">📊</a>
 <button class="btn btn-w btn-s" onclick="doLogout()" id="logoutBtn" style="display:none">退出</button>
 </div>
 </div></header>
@@ -189,6 +190,7 @@ function router(){
     case 'mine': renderMine(); break;
     case 'favs': renderFavs(); break;
     case 'login': renderLogin(); break;
+    case 'status': renderStatus(); break;
     default: renderHome();
   }
   document.getElementById('backTop').style.display=page?'none':'none';
@@ -207,6 +209,39 @@ function updateNav(){
 function renderLogin(){
   document.getElementById('hero').style.display='none';
   document.getElementById('main').innerHTML='<div class="mo active" id="authMo" style="position:relative;background:transparent"><div class="modal" style="margin:0 auto"><h2 id="authTitle">登录</h2><div class="fg"><label>邮箱</label><input type="email" id="authEmail" placeholder="your@email.com"></div><div class="fg"><label>密码（至少6位）</label><input type="password" id="authPW" placeholder="···"></div><div class="ma"><button class="btn btn-g" id="authSwitch" onclick="switchAuth()">去注册</button><button class="btn btn-p" onclick="doAuth()">登录</button></div></div></div>';document.getElementById('authMo')._m='login';
+
+// ===== Error Logger =====
+window._errors=[];
+window.addEventListener('error',function(e){window._errors.push({time:new Date().toISOString(),msg:e.message,src:e.filename,line:e.lineno,col:e.colno});if(window._errors.length>50)window._errors.shift()});
+
+async function renderStatus(){
+  document.getElementById('hero').style.display='none';
+  var st=Date.now(),checks=[];
+  // Check Supabase
+  try{var r=await fetch(SUPA+'/rest/v1/papers?limit=1',{headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}});var ok=r.ok;var dbTime=Date.now()-st;checks.push({name:'Supabase 数据库',status:ok?'✅ 正常':'❌ 异常',time:dbTime+'ms'})}catch(e){checks.push({name:'Supabase 数据库',status:'❌ 无法连接',time:'-',error:e.message})}
+  // Check Storage
+  st=Date.now();
+  try{var r2=await fetch(SUPA+'/storage/v1/object/public/papers/_exists',{method:'HEAD',headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}});var sTime=Date.now()-st;checks.push({name:'Supabase 存储',status:'✅ 正常',time:sTime+'ms'})}catch(e){checks.push({name:'Supabase 存储',status:'⚠️ '+(e.message||''),time:'-',error:e.message})}
+  // Check Auth
+  st=Date.now();
+  try{var r3=await fetch(SUPA+'/auth/v1/user',{headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}});var aTime=Date.now()-st;checks.push({name:'Supabase 认证',status:'✅ 正常',time:aTime+'ms'})}catch(e){checks.push({name:'Supabase 认证',status:'⚠️ '+(e.message||''),time:'-'})}
+
+  var h='<a href="#/" class="bl">← 返回首页</a><div class="dc"><h1 class="dt">📊 系统状态</h1><p style="color:var(--t2);margin-bottom:16px">实时监控 · '+new Date().toLocaleString()+'</p>';
+  h+='<div class="sc" style="grid-template-columns:repeat(1,1fr);margin-bottom:20px">';
+  checks.forEach(function(c){
+    var color=c.status.indexOf('✅')>-1?'var(--g)':c.status.indexOf('⚠')>-1?'var(--o)':'var(--r)';
+    h+='<div class="scd" style="background:var(--card);color:var(--tx);border:1px solid var(--bo)"><div style="display:flex;justify-content:space-between;align-items:center"><span style="font-weight:600">'+c.name+'</span><span style="font-size:0.8rem;color:var(--t3)">'+c.time+'</span></div><div style="color:'+color+';margin-top:4px">'+c.status+'</div>'+(c.error?'<div style="font-size:0.75rem;color:var(--r);margin-top:2px">'+c.error+'</div>':'')+'</div>';
+  });
+  h+='</div></div>';
+
+  // Error log
+  h+='<div class="dc"><h1 class="dt" style="font-size:1.1rem">📋 错误日志 (最近50条)</h1>';
+  if(!window._errors.length)h+='<p style="color:var(--t2)">暂无错误 ✅</p>';
+  else{window._errors.slice().reverse().forEach(function(e){h+='<div style="background:'+(e.error?'#fef2f2':'#f0fdf4')+';border-radius:var(--rs);padding:8px 12px;margin-bottom:4px;font-size:0.8rem"><span style="color:var(--t3)">'+e.time+'</span> — <strong>'+esc(e.msg)+'</strong><br><span style="color:var(--t3)">'+esc(e.src||'')+' :'+e.line+':'+e.col+'</span></div>'})}
+  h+='<div style="margin-top:8px"><button class="btn btn-o btn-s" onclick="window._errors=[];navigate(\'#/status\')">清空日志</button></div></div>';
+
+  document.getElementById('main').innerHTML=h;
+}
 }
 
 function switchAuth(){
