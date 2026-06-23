@@ -265,13 +265,20 @@ export function downloadFile(paperId, url) {
     if (p) supabase.update('papers', paperId, { downloads: (p.downloads || 0) + 1 });
   }).catch(function () { });
   toast('下载中...');
-  fetch(url, {mode:'cors'}).then(function(r){if(!r.ok)throw new Error('fail');return r.blob()}).then(function(b){
-    var u=URL.createObjectURL(b),a=document.createElement('a');
-    a.href=u;a.download='file';a.click();
-    setTimeout(function(){URL.revokeObjectURL(u)},2000);
+  fetch(url).then(function(r){return r.blob()}).then(function(b){
+    var u=URL.createObjectURL(b);
+    var a=document.createElement('a');
+    a.href=u;
+    a.download=url.split('/').pop()||'download';
+    a.style.display='none';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function(){URL.revokeObjectURL(u)},3000);
     toast('下载完成');
-  }).catch(function(){
-    window.open(url,'_blank');toast('已在新标签打开');
+  }).catch(function(e){
+    console.log('Download fallback:',e);
+    window.open(url,'_blank');
   });
 }
 
