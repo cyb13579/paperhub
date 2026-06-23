@@ -11,7 +11,8 @@
 <header class="header">
   <div class="header-inner">
     <a href="#/" class="logo">Paper<span>Hub</span></a>
-    <nav class="nav-right">
+    <button class="btn btn-ghost btn-small" onclick="document.getElementById('sidebar').style.left='0';document.getElementById('overlay').style.display='block'" style="font-size:1.2rem">☰</button>
+    <nav class="nav-right" style="display:none">
       <span class="user-email" id="userInfo"></span>
       <button class="btn btn-outline btn-small" onclick="location.hash='#/upload'" id="upBtn" style="display:none">上传</button>
       <button class="btn btn-outline btn-small" onclick="location.hash='#/favs'" id="favBtn" style="display:none">收藏</button>
@@ -53,6 +54,26 @@
 
 <button id="back-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
 <div class="toast" id="toast"></div>
+
+<!-- Sidebar Menu -->
+<div id="sidebar" style="position:fixed;left:-260px;top:0;width:260px;height:100%;background:var(--card);border-right:1px solid var(--border);z-index:300;transition:left 0.25s;overflow-y:auto;padding:20px;box-shadow:2px 0 20px rgba(0,0,0,.1)">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px">
+    <span style="font-weight:700;font-size:1.1rem;color:var(--text)">PaperHub</span>
+    <button class="btn btn-ghost btn-small" onclick="document.getElementById('sidebar').style.left='-260px';document.getElementById('overlay').style.display='none'">✕</button>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:2px">
+    <a href="#/" class="btn btn-ghost" style="justify-content:flex-start;text-align:left;padding:10px 12px" onclick="document.getElementById('sidebar').style.left='-260px';document.getElementById('overlay').style.display='none'">🏠 首页</a>
+    <a href="#/upload" class="btn btn-ghost" id="sideUpload" style="justify-content:flex-start;text-align:left;padding:10px 12px;display:none" onclick="document.getElementById('sidebar').style.left='-260px';document.getElementById('overlay').style.display='none'">📤 上传资料</a>
+    <a href="#/favs" class="btn btn-ghost" id="sideFavs" style="justify-content:flex-start;text-align:left;padding:10px 12px;display:none" onclick="document.getElementById('sidebar').style.left='-260px';document.getElementById('overlay').style.display='none'">⭐ 我的收藏</a>
+    <a href="#/mine" class="btn btn-ghost" id="sideMine" style="justify-content:flex-start;text-align:left;padding:10px 12px;display:none" onclick="document.getElementById('sidebar').style.left='-260px';document.getElementById('overlay').style.display='none'">📂 我的上传</a>
+    <a href="#/friends" class="btn btn-ghost" id="sideFriends" style="justify-content:flex-start;text-align:left;padding:10px 12px;display:none" onclick="document.getElementById('sidebar').style.left='-260px';document.getElementById('overlay').style.display='none'">👥 好友</a>
+    <div style="margin:8px 0;border-top:1px solid var(--border)"></div>
+    <span id="sideUser" style="font-size:0.78rem;color:var(--text-muted);padding:8px 12px"></span>
+    <a href="#/login" class="btn btn-ghost" id="sideLogin" style="justify-content:flex-start;text-align:left;padding:10px 12px">🔐 登录</a>
+    <a href="#" class="btn btn-ghost" id="sideLogout" style="justify-content:flex-start;text-align:left;padding:10px 12px;display:none" onclick="window._doLogout();document.getElementById('sidebar').style.left='-260px';document.getElementById('overlay').style.display='none'">退出</a>
+  </div>
+</div>
+<div id="overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.3);z-index:299" onclick="document.getElementById('sidebar').style.left='-260px';this.style.display='none'"></div>
 
 <script type="module">
 /**

@@ -707,4 +707,10 @@ export function updateNav() {
   document.getElementById('friendsBtn').style.display = user ? '' : 'none';
   document.getElementById('notifBell').style.display = user ? '' : 'none';
   document.getElementById('userInfo').textContent = user ? (user.email || '') : '';
+  // Sidebar
+  var sideItems = ['sideUpload','sideFavs','sideMine','sideFriends'];
+  sideItems.forEach(function(id){ var el=document.getElementById(id); if(el)el.style.display=user?'':'none'; });
+  var sl=document.getElementById('sideLogin'); if(sl)sl.style.display=user?'none':'';
+  var so=document.getElementById('sideLogout'); if(so)so.style.display=user?'':'none';
+  var su=document.getElementById('sideUser'); if(su)su.textContent=user?user.email||'':'';
 }
