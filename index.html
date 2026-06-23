@@ -298,7 +298,7 @@ async function renderDetail(id){
     h+='<div class="da">';
     if(U){h+='<button class="btn btn-p" onclick="dl(\''+p.id+'\',\''+fu+'\')">⬇ 下载</button>';
     var previewable=['pdf','jpg','jpeg','png','gif','bmp','webp','txt','md'];if(previewable.indexOf(ft)>-1)h+='<button class="btn btn-o btn-s" onclick="preview(\''+fu+'\')">👁 预览</button>';
-    h+='<button class="btn btn-g btn-s" onclick="copyUrl(\''+fu+'\')">🔗 复制链接</button><button class="btn btn-g btn-s" onclick="ratePaper(\''+p.id+'\')">⭐ 评分</button>';}
+    h+='<button class="btn btn-g btn-s" onclick="copyUrl(\''+fu+'\')">🔗 复制链接</button><button class="btn btn-g btn-s" onclick="ratePaper(\''+p.id+'\')">⭐ 评分</button>';h+='<button class="btn btn-o btn-s" onclick="toggleFav(\''+p.id+'\',\''+esc(p.title||'')+'\')">'+(isFav(p.id)?'❤️':'🤍')+'</button>';}
     else{h+='<p style="color:var(--o)">🔒 请<a href=\"#/login\">登录</a>后下载</p>'}
     if(isOwner)h+='<button class="btn btn-d btn-s" onclick="delPaper(\''+p.id+'\')">🗑 删除</button>';
     h+='</div></div><div class="st">💬 评价 ('+reviews.length+')</div><div id="reviewList">';
