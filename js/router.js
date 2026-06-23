@@ -34,9 +34,8 @@ function handleRoute() {
     hero.style.display = (page === '' || page === 'home') ? '' : 'none';
   }
 
-  // Auth guard: redirect to login for protected pages
-  var protectedPages = ['upload', 'mine', 'favs'];
-  if (protectedPages.indexOf(page) > -1 && !supabase.getUser()) {
+  // Auth guard: all pages except login require authentication
+  if (page !== 'login' && !supabase.getUser()) {
     location.hash = '#/login';
     return;
   }
