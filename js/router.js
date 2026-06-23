@@ -35,7 +35,7 @@ function handleRoute() {
   }
 
   // Auth guard: redirect to login for protected pages
-  var protectedPages = ['upload', 'mine', 'favs', 'video-upload'];
+  var protectedPages = ['upload', 'mine', 'favs'];
   if (protectedPages.indexOf(page) > -1 && !supabase.getUser()) {
     location.hash = '#/login';
     return;
@@ -61,15 +61,6 @@ function handleRoute() {
       break;
     case 'login':
       pages.renderLogin();
-      break;
-    case 'videos':
-      pages.renderVideos();
-      break;
-    case 'video-detail':
-      pages.renderVideoDetail(param);
-      break;
-    case 'video-upload':
-      pages.renderVideoUpload();
       break;
     case 'friends':
       pages.renderFriends();
