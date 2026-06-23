@@ -607,15 +607,39 @@ export async function renderFriends() {
     '<div id="friendList"></div>';
 
   try {
-    var friends = await supabase.query('friendships', { limit: 100 });
+    var friends = await supabase.query('friendships', { limit: 200 });
     var accepted = friends.filter(function(f) { return f.status === 'accepted' && (f.user_id === user.id || f.friend_id === user.id); });
     var pending = friends.filter(function(f) { return f.status === 'pending' && f.friend_id === user.id; });
+
+    // Build UUID→email map from papers+friendships data
+    var emailMap = {};
+    // Try using stored email columns first, fall back to papers lookup
+    friends.forEach(function(f) {
+      if (f.user_email) emailMap[f.user_id] = f.user_email;
+      if (f.friend_email) emailMap[f.friend_id] = f.friend_email;
+    });
+    // For any UUIDs missing emails, query papers table
+    var missingIds = [];
+    friends.forEach(function(f) {
+      if (!emailMap[f.user_id] && missingIds.indexOf(f.user_id) === -1) missingIds.push(f.user_id);
+      if (!emailMap[f.friend_id] && missingIds.indexOf(f.friend_id) === -1) missingIds.push(f.friend_id);
+    });
+    if (missingIds.length) {
+      try {
+        // Query papers for each missing UUID (batch not supported, do sequential)
+        for (var i = 0; i < missingIds.length; i++) {
+          var p = await supabase.query('papers', { where: { user_id: missingIds[i] }, limit: 1 });
+          if (p && p.length && p[0].user_email) emailMap[missingIds[i]] = p[0].user_email;
+        }
+      } catch (e) { /* ignore lookup failures */ }
+    }
 
     var html = '';
     if (pending.length) {
       html += '<div class="section-title">待处理请求 (' + pending.length + ')</div>';
       pending.forEach(function(f) {
-        html += '<div class="review-card"><span style="font-weight:500">' + esc(f.user_id) + '</span> 想加你为好友 ' +
+        var senderEmail = emailMap[f.user_id] || f.user_id;
+        html += '<div class="review-card"><span style="font-weight:500">' + esc(senderEmail) + '</span> 想加你为好友 ' +
           '<button class="btn btn-primary btn-small" onclick="window._acceptFriend(\'' + f.id + '\')" style="margin-left:8px">接受</button></div>';
       });
     }
@@ -624,7 +648,8 @@ export async function renderFriends() {
       html += '<div class="paper-grid">';
       accepted.forEach(function(f) {
         var fid = f.user_id === user.id ? f.friend_id : f.user_id;
-        html += '<div class="paper-card"><div class="paper-title">' + esc(fid) + '</div></div>';
+        var friendEmail = emailMap[fid] || fid;
+        html += '<div class="paper-card"><div class="paper-title">' + esc(friendEmail) + '</div></div>';
       });
       html += '</div>';
     }
@@ -641,7 +666,16 @@ export async function addFriend() {
   if (!friendEmail) { toast('请输入好友邮箱'); return; }
   if (friendEmail === user.email) { toast('不能添加自己'); return; }
   try {
-    await supabase.create('friendships', { user_id: user.id, friend_id: friendEmail, status: 'pending' });
+    // 通过邮箱查找好友UUID（从papers表）
+    var papers = await supabase.query('papers', { where: { user_email: friendEmail }, limit: 1 });
+    if (!papers || !papers.length) { toast('未找到该用户（需已上传过资料）'); return; }
+    var friendId = papers[0].user_id;
+    if (friendId === user.id) { toast('不能添加自己'); return; }
+    // 检查是否已经是好友
+    var existing = await supabase.query('friendships', { where: { user_id: user.id, friend_id: friendId }, limit: 1 });
+    if (existing && existing.length && existing[0].status === 'pending') { toast('已发送过请求'); return; }
+    if (existing && existing.length && existing[0].status === 'accepted') { toast('已经是好友'); return; }
+    await supabase.create('friendships', { user_id: user.id, friend_id: friendId, status: 'pending' });
     toast('好友请求已发送');
     renderFriends();
   } catch (e) { toast('添加失败: ' + e.message); }
@@ -657,7 +691,7 @@ export async function acceptFriend(friendshipId) {
 export async function checkNotifications() {
   var user = supabase.getUser(); if (!user) return;
   try {
-    var notifs = await supabase.query('notifications', { where: { user_id: user.email, read: 'false' }, order: 'created_at.desc', limit: 20 });
+    var notifs = await supabase.query('notifications', { where: { user_id: user.id, read: 'false' }, order: 'created_at.desc', limit: 20 });
     var badge = document.getElementById('notifBadge');
     if (notifs && notifs.length) {
       badge.textContent = notifs.length > 9 ? '9+' : notifs.length;
@@ -671,7 +705,7 @@ export async function showNotifications() {
   document.getElementById('hero').style.display = 'none';
   document.getElementById('main').innerHTML = '<a href="#/" class="back-link">← 返回</a><div class="section-title">通知</div><div id="notifList"></div>';
   try {
-    var notifs = await supabase.query('notifications', { where: { user_id: user.email }, order: 'created_at.desc', limit: 50 });
+    var notifs = await supabase.query('notifications', { where: { user_id: user.id }, order: 'created_at.desc', limit: 50 });
     var list = document.getElementById('notifList');
     if (!notifs || !notifs.length) { list.innerHTML = '<div class="empty-state"><p>暂无通知</p></div>'; return; }
     list.innerHTML = notifs.map(function(n) {

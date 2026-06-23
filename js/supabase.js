@@ -202,15 +202,18 @@ export const supabase = {
    * Used for operations that need elevated privileges
    */
   async rpc(functionName, params) {
-    const headers = {
-      'apikey': SUPA_KEY,
-      'Authorization': 'Bearer ' + (session ? session.access_token : SUPA_KEY),
-      'Content-Type': 'application/json'
-    };
-    await fetch(SUPA_URL + '/rest/v1/rpc/' + functionName, {
+    const headers = authHeaders();
+    const res = await fetch(SUPA_URL + '/rest/v1/rpc/' + functionName, {
       method: 'POST',
       headers: headers,
-      body: JSON.stringify(params)
+      body: JSON.stringify(params || {})
     });
+    if (!res.ok) {
+      const err = await res.json().catch(function() { return { message: 'RPC 请求失败' }; });
+      throw new Error(err.message || 'RPC 请求失败');
+    }
+    // Return parsed JSON, or null for empty responses
+    const text = await res.text();
+    return text ? JSON.parse(text) : null;
   }
 };
