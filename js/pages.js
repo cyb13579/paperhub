@@ -368,7 +368,7 @@ export function renderUpload() {
     '<div class="detail-card"><h1 class="detail-title">上传资料</h1>' +
     '<div class="form-group"><label>标题</label><input type="text" id="upTitle" placeholder="例：2024年高考数学真题" maxlength="100"></div>' +
     '<div class="form-row">' +
-    '<div class="form-group"><label>学科</label><input type='text' id='upSubject' placeholder='例如：数据结构、高等数学' maxlength='50'></div>' +
+    '<div class="form-group"><label>学科</label><input type="text" id="upSubject" placeholder="例如：数据结构、高等数学" maxlength="50"></div>' +
     '<div class="form-group"><label>年份</label><select id="upYear">';
   for (var y = new Date().getFullYear(); y >= 2000; y--) {
     html += '<option value="' + y + '">' + y + '</option>';
