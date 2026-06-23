@@ -286,7 +286,7 @@ async function renderDetail(id){
   try{
     const p=await supa.db.get('papers',id);if(!p){toast('资料不存在');navigate('#/');return}
     let reviews=[];try{reviews=await supa.db.q('reviews',{where:{paper_id:id},order:'created_at.desc'});}catch(e){}
-    const isOwner=U&&U.id===p.user_id,fu=p.file_url||'',ft=p.file_type||'',fs=p.file_size?(p.file_size/1048576).toFixed(1)+'MB':'';
+    const isOwner=U&&U.id===p.user_id,fu=p.file_path||'',ft=p.file_type||'',fs=p.file_size?(p.file_size/1048576).toFixed(1)+'MB':'';
     const rating=p.rating_count?p.avg_rating.toFixed(1)+' ('+p.rating_count+')':'暂无评分';
     let h='<a href="#/" class="bl">← 返回首页</a><div class="dc"><h1 class="dt">'+esc(p.title||'')+'</h1>';
     h+='<div class="dm"><span class="tag">'+esc(p.subject||'')+'</span><span class="tag yr">'+p.year+'</span>';
@@ -297,7 +297,7 @@ async function renderDetail(id){
     if(p.description)h+='<div class="detail-desc">'+esc(p.description)+'</div>';
     h+='<div class="da">';
     if(U){h+='<button class="btn btn-p" onclick="dl(\''+p.id+'\',\''+fu+'\')">⬇ 下载</button>';
-    if(ft==='pdf')h+='<button class="btn btn-o btn-s" onclick="preview(\''+fu+'\')">👁 预览</button>';
+    var previewable=['pdf','jpg','jpeg','png','gif','bmp','webp','txt','md'];if(previewable.indexOf(ft)>-1)h+='<button class="btn btn-o btn-s" onclick="preview(\''+fu+'\')">👁 预览</button>';
     h+='<button class="btn btn-g btn-s" onclick="copyUrl(\''+fu+'\')">🔗 复制链接</button><button class="btn btn-g btn-s" onclick="ratePaper(\''+p.id+'\')">⭐ 评分</button>';}
     else{h+='<p style="color:var(--o)">🔒 请<a href=\"#/login\">登录</a>后下载</p>'}
     if(isOwner)h+='<button class="btn btn-d btn-s" onclick="delPaper(\''+p.id+'\')">🗑 删除</button>';
