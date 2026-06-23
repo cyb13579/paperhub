@@ -209,6 +209,7 @@ function updateNav(){
 function renderLogin(){
   document.getElementById('hero').style.display='none';
   document.getElementById('main').innerHTML='<div class="mo active" id="authMo" style="position:relative;background:transparent"><div class="modal" style="margin:0 auto"><h2 id="authTitle">登录</h2><div class="fg"><label>邮箱</label><input type="email" id="authEmail" placeholder="your@email.com"></div><div class="fg"><label>密码（至少6位）</label><input type="password" id="authPW" placeholder="···"></div><div class="ma"><button class="btn btn-g" id="authSwitch" onclick="switchAuth()">去注册</button><button class="btn btn-p" onclick="doAuth()">登录</button></div></div></div>';document.getElementById('authMo')._m='login';
+}
 
 // ===== Error Logger =====
 window._errors=[];
@@ -241,7 +242,6 @@ async function renderStatus(){
   h+='<div style="margin-top:8px"><button class="btn btn-o btn-s" onclick="window._errors=[];navigate(\'#/status\')">清空日志</button></div></div>';
 
   document.getElementById('main').innerHTML=h;
-}
 }
 
 function switchAuth(){
