@@ -459,6 +459,7 @@ export async function doUpload() {
     });
 
     toast('上传成功');
+    notifyFriends(result[0].id, user.email + ' 上传了资料：' + title);
     location.hash = '#/detail/' + result[0].id;
   } catch (e) {
     toast('上传失败: ' + e.message);
@@ -691,6 +692,107 @@ function getVideoEmbed(url) {
   var yt = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]+)/i);
   if (yt) return '<iframe src="https://www.youtube.com/embed/'+yt[1]+'" style="position:absolute;top:0;left:0;width:100%;height:100%" frameborder="0" allowfullscreen></iframe>';
   return '';
+}
+
+// ── Friends & Notifications ──
+
+export async function renderFriends() {
+  var user = supabase.getUser(); if (!user) { location.hash = '#/login'; return; }
+  document.getElementById('hero').style.display = 'none';
+  document.getElementById('main').innerHTML = '<a href="#/" class="back-link">← 返回</a>' +
+    '<div class="detail-card"><h1 class="detail-title">好友</h1>' +
+    '<div class="form-row" style="margin-bottom:16px"><div class="form-group" style="flex:1"><input type="email" id="friendEmail" placeholder="输入好友邮箱"></div>' +
+    '<button class="btn btn-primary" onclick="window._addFriend()">添加</button></div></div>' +
+    '<div id="friendList"></div>';
+
+  try {
+    var friends = await supabase.query('friendships', { limit: 100 });
+    var accepted = friends.filter(function(f) { return f.status === 'accepted' && (f.user_id === user.id || f.friend_id === user.id); });
+    var pending = friends.filter(function(f) { return f.status === 'pending' && f.friend_id === user.id; });
+
+    var html = '';
+    if (pending.length) {
+      html += '<div class="section-title">待处理请求 (' + pending.length + ')</div>';
+      pending.forEach(function(f) {
+        html += '<div class="review-card"><span style="font-weight:500">' + esc(f.user_id) + '</span> 想加你为好友 ' +
+          '<button class="btn btn-primary btn-small" onclick="window._acceptFriend(\'' + f.id + '\')" style="margin-left:8px">接受</button></div>';
+      });
+    }
+    if (accepted.length) {
+      html += '<div class="section-title">好友列表 (' + accepted.length + ')</div>';
+      html += '<div class="paper-grid">';
+      accepted.forEach(function(f) {
+        var fid = f.user_id === user.id ? f.friend_id : f.user_id;
+        html += '<div class="paper-card"><div class="paper-title">' + esc(fid) + '</div></div>';
+      });
+      html += '</div>';
+    }
+    if (!pending.length && !accepted.length) {
+      html += '<div class="empty-state"><p>还没有好友，输入邮箱添加</p></div>';
+    }
+    document.getElementById('friendList').innerHTML = html;
+  } catch (e) { document.getElementById('friendList').innerHTML = '<div class="empty-state"><p>加载失败</p></div>'; }
+}
+
+export async function addFriend() {
+  var user = supabase.getUser(); if (!user) return;
+  var friendEmail = document.getElementById('friendEmail')?.value?.trim();
+  if (!friendEmail) { toast('请输入好友邮箱'); return; }
+  if (friendEmail === user.email) { toast('不能添加自己'); return; }
+  try {
+    await supabase.create('friendships', { user_id: user.id, friend_id: friendEmail, status: 'pending' });
+    toast('好友请求已发送');
+    renderFriends();
+  } catch (e) { toast('添加失败: ' + e.message); }
+}
+
+export async function acceptFriend(friendshipId) {
+  try {
+    await supabase.update('friendships', friendshipId, { status: 'accepted' });
+    toast('已接受'); renderFriends();
+  } catch (e) { toast('操作失败'); }
+}
+
+export async function checkNotifications() {
+  var user = supabase.getUser(); if (!user) return;
+  try {
+    var notifs = await supabase.query('notifications', { where: { user_id: user.email, read: 'false' }, order: 'created_at.desc', limit: 20 });
+    var badge = document.getElementById('notifBadge');
+    if (notifs && notifs.length) {
+      badge.textContent = notifs.length > 9 ? '9+' : notifs.length;
+      badge.style.display = 'flex';
+    } else { badge.style.display = 'none'; }
+  } catch (e) { /* ignore */ }
+}
+
+export async function showNotifications() {
+  var user = supabase.getUser(); if (!user) return;
+  document.getElementById('hero').style.display = 'none';
+  document.getElementById('main').innerHTML = '<a href="#/" class="back-link">← 返回</a><div class="section-title">通知</div><div id="notifList"></div>';
+  try {
+    var notifs = await supabase.query('notifications', { where: { user_id: user.email }, order: 'created_at.desc', limit: 50 });
+    var list = document.getElementById('notifList');
+    if (!notifs || !notifs.length) { list.innerHTML = '<div class="empty-state"><p>暂无通知</p></div>'; return; }
+    list.innerHTML = notifs.map(function(n) {
+      return '<div class="review-card" style="opacity:' + (n.read ? '0.5' : '1') + '"><span>' + esc(n.message) + '</span><span style="font-size:0.78rem;color:var(--text-muted);margin-left:12px">' + timeAgo(n.created_at) + '</span>' +
+        (n.paper_id ? '<a href="#/detail/' + n.paper_id + '" style="margin-left:8px;font-size:0.8rem">查看</a>' : '') + '</div>';
+    }).join('');
+    // Mark all as read
+    notifs.forEach(function(n) { if (!n.read) supabase.update('notifications', n.id, { read: true }).catch(function(){}); });
+    checkNotifications();
+  } catch (e) { document.getElementById('notifList').innerHTML = '<div class="empty-state"><p>加载失败</p></div>'; }
+}
+
+export async function notifyFriends(paperId, message) {
+  var user = supabase.getUser(); if (!user) return;
+  try {
+    var friends = await supabase.query('friendships', { limit: 200 });
+    var accepted = friends.filter(function(f) { return f.status === 'accepted' && (f.user_id === user.id || f.friend_id === user.id); });
+    accepted.forEach(function(f) {
+      var fid = f.user_id === user.id ? f.friend_id : f.user_id;
+      supabase.create('notifications', { user_id: fid, message: message, paper_id: paperId, read: false }).catch(function(){});
+    });
+  } catch (e) { /* ignore */ }
 }
 
 // ── Nav Update ──

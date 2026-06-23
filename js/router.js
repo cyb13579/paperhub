@@ -71,10 +71,15 @@ function handleRoute() {
     case 'video-upload':
       pages.renderVideoUpload();
       break;
+    case 'friends':
+      pages.renderFriends();
+      break;
     default:
       pages.renderHome();
   }
 
   // Scroll to top on navigation
   window.scrollTo({ top: 0, behavior: 'instant' });
+  // Poll notifications
+  if (supabase.getUser()) { pages.checkNotifications(); }
 }
