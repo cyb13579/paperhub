@@ -56,11 +56,6 @@ export function toggleFavorite(id, title) {
   localStorage.setItem('favs', JSON.stringify(favs));
 }
 
-/** Subjects list and mappings */
-export var SUBJECTS = [
-  '数学', '语文', '英语', '物理', '化学',
-  '生物', '历史', '地理', '政治', '计算机'
-];
 
 /** Previewable file types */
 var PREVIEWABLE = [

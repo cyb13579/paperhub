@@ -4,7 +4,7 @@
  */
 
 import { supabase } from './supabase.js';
-import { esc, timeAgo, getFavorites, isFavorite, toggleFavorite, SUBJECTS, isPreviewable, getPreviewUrl, toast } from './utils.js';
+import { esc, timeAgo, getFavorites, isFavorite, toggleFavorite, isPreviewable, getPreviewUrl, toast } from './utils.js';
 
 // ── Shared helpers ──
 
@@ -51,18 +51,7 @@ export async function renderHome() {
   for (var y = new Date().getFullYear(); y >= 2000; y--) {
     html += '<option value="' + y + '">' + y + '</option>';
   }
-  html += '</select>' +
-    '<select class="filter-select" id="searchSort" onchange="window._doSearch()">' +
-    '<option value="created_at.desc">最新</option>' +
-    '<option value="downloads.desc">最多下载</option>' +
-    '<option value="avg_rating.desc">最高评分</option>' +
-    '</select></div>' +
-    '<div class="subject-pills" id="subjectPills">' +
-    '<span class="pill active" onclick="window._pickSubject(\'\',this)">全部</span>';
-  SUBJECTS.forEach(function (s) {
-    html += '<span class="pill" onclick="window._pickSubject(\'' + s + '\',this)">' + s + '</span>';
-  });
-  html += '</div>' +
+  html += '</select></div>' +
     '<div class="section-title"><span>资料列表</span><span class="count" id="resultCount"></span></div>' +
     '<div class="paper-grid" id="paperGrid"></div>';
 
@@ -72,12 +61,6 @@ export async function renderHome() {
   loadPapers();
 }
 
-export function pickSubject(subj, el) {
-  currentSubject = subj;
-  document.querySelectorAll('.pill').forEach(function (p) { p.classList.remove('active'); });
-  if (el) el.classList.add('active');
-  loadPapers();
-}
 
 export function debounceSearch() {
   clearTimeout(searchTimer);
@@ -374,9 +357,7 @@ export function renderUpload() {
     '<div class="detail-card"><h1 class="detail-title">上传资料</h1>' +
     '<div class="form-group"><label>标题</label><input type="text" id="upTitle" placeholder="例：2024年高考数学真题" maxlength="100"></div>' +
     '<div class="form-row">' +
-    '<div class="form-group"><label>学科</label><select id="upSubject">';
-  SUBJECTS.forEach(function (s) { html += '<option value="' + s + '">' + s + '</option>'; });
-  html += '<option value="其他">其他</option></select></div>' +
+    '<div class="form-group"><label>学科</label><input type='text' id='upSubject' placeholder='例如：数据结构、高等数学' maxlength='50'></div>' +
     '<div class="form-group"><label>年份</label><select id="upYear">';
   for (var y = new Date().getFullYear(); y >= 2000; y--) {
     html += '<option value="' + y + '">' + y + '</option>';
