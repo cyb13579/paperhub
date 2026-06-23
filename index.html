@@ -196,7 +196,7 @@ function router(){
 window.addEventListener('hashchange',router);
 
 // ===== Auth =====
-function initAuth(){U=supa.auth.getSession()?.user||null;updateNav();}
+async function initAuth(){await supa.auth.getSession();U=S?.user||null;updateNav();}
 
 function updateNav(){
   document.getElementById('loginBtn').style.display=U?'none':'';document.getElementById('logoutBtn').style.display=U?'':'none';
@@ -409,7 +409,7 @@ function timeAgo(d){if(!d)return'';var m=Math.floor((Date.now()-new Date(d).getT
 window.addEventListener('scroll',function(){document.getElementById('backTop').style.display=scrollY>500?'block':'none'});
 
 // Init
-initAuth();router();
+(async function(){await initAuth();router();})();
 </script>
 </body>
 </html>
