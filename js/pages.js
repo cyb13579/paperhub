@@ -640,7 +640,12 @@ export async function doUpload() {
     });
 
     toast('上传成功 🎉');
-    notifyFriends(result[0].id, user.email + ' 上传了资料：' + title);
+    // Await notification to ensure requests complete before navigation
+    try {
+      await notifyFriends(result[0].id, user.email + ' 上传了资料：' + title);
+    } catch (e) {
+      console.warn('通知好友失败:', e.message);
+    }
     location.hash = '#/detail/' + result[0].id;
   } catch (e) {
     toast('上传失败: ' + e.message);
@@ -982,18 +987,19 @@ export async function showNotifications() {
 
 export async function notifyFriends(paperId, message) {
   const user = supabase.getUser();
-  if (!user) return;
+  if (!user) { console.warn('notifyFriends: 未登录'); return; }
   try {
-    // Query only current user's friendships
-    const friends = await supabase.query('friendships', {
-      where: { user_id: user.id, status: 'accepted' },
-      limit: 200
-    });
-    // Also check reverse direction (where friend added current user)
-    const reverse = await supabase.query('friendships', {
-      where: { friend_id: user.id, status: 'accepted' },
-      limit: 200
-    });
+    // Query friendships in both directions
+    const [friends, reverse] = await Promise.all([
+      supabase.query('friendships', {
+        where: { user_id: user.id, status: 'accepted' },
+        limit: 200
+      }),
+      supabase.query('friendships', {
+        where: { friend_id: user.id, status: 'accepted' },
+        limit: 200
+      })
+    ]);
     const all = friends.concat(reverse);
     // Deduplicate
     const seen = {};
@@ -1005,17 +1011,23 @@ export async function notifyFriends(paperId, message) {
         targets.push(fid);
       }
     });
+    console.log('notifyFriends: 找到 ' + targets.length + ' 个好友');
+    if (!targets.length) return;
     // Create notifications for all friends in parallel
-    await Promise.all(targets.map(function (fid) {
+    const results = await Promise.all(targets.map(function (fid) {
       return supabase.create('notifications', {
         user_id: fid,
         message: message,
         paper_id: paperId,
         read: false
-      }).catch(function (e) {
-        console.warn('通知发送失败:', fid, e.message);
-      });
+      }).then(function () { return true; })
+        .catch(function (e) {
+          console.warn('通知发送失败:', fid, e.message);
+          return false;
+        });
     }));
+    const success = results.filter(Boolean).length;
+    console.log('notifyFriends: 成功发送 ' + success + '/' + targets.length + ' 条通知');
   } catch (e) {
     console.warn('notifyFriends 失败:', e.message);
   }
