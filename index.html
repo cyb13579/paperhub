@@ -77,7 +77,7 @@
     <a href="#/favs" class="btn btn-ghost sidebar-link" id="sideFavs" style="display:none">⭐ 我的收藏</a>
     <a href="#/mine" class="btn btn-ghost sidebar-link" id="sideMine" style="display:none">📂 我的上传</a>
     <a href="#/friends" class="btn btn-ghost sidebar-link" id="sideFriends" style="display:none">👥 好友</a>
-    <a href="#/notifications" class="btn btn-ghost sidebar-link" id="sideNotifs" style="display:none">🔔 通知</a>
+    <a href="#/notifications" class="btn btn-ghost sidebar-link" id="sideNotifs" style="display:none">🔔 通知<span id="sideNotifBadge" class="notif-badge" style="position:relative;top:0;right:0;margin-left:6px">0</span></a>
     <div class="sidebar-divider"></div>
     <span id="sideUser" class="sidebar-user"></span>
     <a href="#/login" class="btn btn-ghost sidebar-link" id="sideLogin">🔐 登录</a>
@@ -124,6 +124,13 @@ overlay.addEventListener('click', closeSidebarFn);
 // Close sidebar on link click
 document.querySelectorAll('.sidebar-link').forEach(function (link) {
   link.addEventListener('click', closeSidebarFn);
+});
+
+// Sidebar logout
+document.getElementById('sideLogout').addEventListener('click', function (e) {
+  e.preventDefault();
+  closeSidebarFn();
+  pages.doLogout();
 });
 
 // ── Expose logout to global (needed for inline onclick in header) ──

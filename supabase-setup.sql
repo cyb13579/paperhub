@@ -131,6 +131,16 @@ CREATE TRIGGER on_review_change
   AFTER INSERT OR DELETE OR UPDATE ON reviews
   FOR EACH ROW EXECUTE FUNCTION recalc_paper_rating();
 
+-- ── Create Notification (bypasses RLS) ──
+DROP FUNCTION IF EXISTS create_notification(UUID, TEXT, UUID);
+CREATE OR REPLACE FUNCTION create_notification(p_user_id UUID, p_message TEXT, p_paper_id UUID)
+RETURNS VOID AS $$
+BEGIN
+  INSERT INTO notifications (user_id, message, paper_id, read)
+  VALUES (p_user_id, p_message, p_paper_id, false);
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
 -- ============================================
 -- Row Level Security (RLS) Policies
 -- ============================================

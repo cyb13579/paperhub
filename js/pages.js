@@ -944,13 +944,20 @@ export async function checkNotifications() {
       order: 'created_at.desc',
       limit: 20
     });
+    const count = (notifs && notifs.length) ? notifs.length : 0;
+    const text = count > 9 ? '9+' : String(count);
+
+    // Update header badge
     const badge = document.getElementById('notifBadge');
-    if (!badge) return;
-    if (notifs && notifs.length) {
-      badge.textContent = notifs.length > 9 ? '9+' : notifs.length;
-      badge.style.display = 'flex';
-    } else {
-      badge.style.display = 'none';
+    if (badge) {
+      badge.textContent = text;
+      badge.style.display = count > 0 ? 'flex' : 'none';
+    }
+    // Update sidebar badge
+    const sideBadge = document.getElementById('sideNotifBadge');
+    if (sideBadge) {
+      sideBadge.textContent = text;
+      sideBadge.style.display = count > 0 ? 'inline-flex' : 'none';
     }
   } catch (e) { /* ignore */ }
 }
@@ -1017,13 +1024,12 @@ export async function notifyFriends(paperId, message) {
     });
     console.log('notifyFriends: 找到 ' + targets.length + ' 个好友');
     if (!targets.length) return;
-    // Create notifications for all friends in parallel
+    // Create notifications via RPC (bypasses RLS)
     const results = await Promise.all(targets.map(function (fid) {
-      return supabase.create('notifications', {
-        user_id: fid,
-        message: message,
-        paper_id: paperId,
-        read: false
+      return supabase.rpc('create_notification', {
+        p_user_id: fid,
+        p_message: message,
+        p_paper_id: paperId
       }).then(function () { return true; })
         .catch(function (e) {
           console.warn('通知发送失败:', fid, e.message);
