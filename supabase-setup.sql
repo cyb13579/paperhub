@@ -113,6 +113,24 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
+-- ── Auto Recalculate Rating on Review Change ──
+DROP FUNCTION IF EXISTS recalc_paper_rating() CASCADE;
+CREATE OR REPLACE FUNCTION recalc_paper_rating()
+RETURNS TRIGGER AS $$
+BEGIN
+  UPDATE papers SET
+    avg_rating = COALESCE((SELECT ROUND(AVG(rating)::numeric, 1) FROM reviews WHERE paper_id = COALESCE(NEW.paper_id, OLD.paper_id)), 0),
+    rating_count = (SELECT COUNT(*) FROM reviews WHERE paper_id = COALESCE(NEW.paper_id, OLD.paper_id))
+  WHERE id = COALESCE(NEW.paper_id, OLD.paper_id);
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+DROP TRIGGER IF EXISTS on_review_change ON reviews;
+CREATE TRIGGER on_review_change
+  AFTER INSERT OR DELETE OR UPDATE ON reviews
+  FOR EACH ROW EXECUTE FUNCTION recalc_paper_rating();
+
 -- ============================================
 -- Row Level Security (RLS) Policies
 -- ============================================

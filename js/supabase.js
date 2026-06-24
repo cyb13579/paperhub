@@ -144,6 +144,7 @@ export const supabase = {
   async query(table, options) {
     options = options || {};
     const params = new URLSearchParams();
+    if (options.select) params.set('select', options.select);
     if (options.where) {
       Object.keys(options.where).forEach(function (k) {
         const val = options.where[k];
@@ -212,9 +213,11 @@ export const supabase = {
 
   /** Delete a record */
   async remove(table, id) {
+    const headers = authHeaders();
+    delete headers['Content-Type']; // DELETE has no body
     const res = await checkAuth(await fetch(SUPA_URL + '/rest/v1/' + table + '?id=eq.' + id, {
       method: 'DELETE',
-      headers: authHeaders()
+      headers: headers
     }));
     if (!res.ok) throw new Error(await res.text());
   },
@@ -223,6 +226,8 @@ export const supabase = {
 
   /** Upload a file to storage */
   async uploadFile(bucket, path, file, onProgress) {
+    // Check session validity before upload
+    const token = (session && isSessionValid(session)) ? session.access_token : SUPA_KEY;
     return new Promise(function (resolve, reject) {
       const formData = new FormData();
       formData.append('file', file);
@@ -235,16 +240,17 @@ export const supabase = {
       }
       xhr.onload = function () {
         if (xhr.status === 200) resolve();
-        else reject(new Error('上传失败'));
+        else if (xhr.status === 401 || xhr.status === 403) {
+          handleExpiredJwt();
+          reject(new Error('登录已过期，请重新登录'));
+        }
+        else reject(new Error('上传失败 (HTTP ' + xhr.status + ')'));
       };
       xhr.onerror = function () { reject(new Error('网络错误')); };
 
       xhr.open('POST', SUPA_URL + '/storage/v1/object/' + bucket + '/' + path);
       xhr.setRequestHeader('apikey', SUPA_KEY);
-      xhr.setRequestHeader(
-        'Authorization',
-        'Bearer ' + (session ? session.access_token : SUPA_KEY)
-      );
+      xhr.setRequestHeader('Authorization', 'Bearer ' + token);
       xhr.send(formData);
     });
   },

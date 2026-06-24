@@ -9,6 +9,8 @@ import { esc, timeAgo, getFavorites, isFavorite, toggleFavorite, isPreviewable, 
 
 // ── Shared helpers ──
 
+let starRating = 0;
+
 function renderCards(papers) {
   return papers.map(function (p) {
     const size = p.file_size ? (p.file_size / 1048576).toFixed(2) + 'MB' : '';
@@ -17,7 +19,7 @@ function renderCards(papers) {
       '<div class="paper-title">' + esc(p.title || '') + '</div>' +
       '<div class="paper-tags">' +
       '<span class="tag tag-subject">' + esc(p.subject || '') + '</span>' +
-      '<span class="tag tag-year">' + p.year + '</span>' +
+      '<span class="tag tag-year">' + (p.year || '—') + '</span>' +
       (p.file_type ? '<span class="tag tag-file">' + icon + ' ' + p.file_type.toUpperCase() + ' ' + size + '</span>' : '') +
       '</div>' +
       '<div class="paper-footer">' +
@@ -219,10 +221,24 @@ async function loadStats() {
   } catch (e) { /* ignore */ }
 
   try {
-    const papers = await supabase.query('papers', { limit: 200 });
+    // Fetch all papers for stats (paginated if needed)
+    let allPapers = [];
+    let offset = 0;
+    const batchSize = 1000;
+    while (true) {
+      const batch = await supabase.query('papers', {
+        select: 'downloads,user_id',
+        limit: batchSize,
+        skip: offset
+      });
+      if (!batch || !batch.length) break;
+      allPapers = allPapers.concat(batch);
+      if (batch.length < batchSize) break;
+      offset += batchSize;
+    }
     let dl = 0;
     const users = new Set();
-    papers.forEach(function (p) {
+    allPapers.forEach(function (p) {
       dl += p.downloads || 0;
       if (p.user_id) users.add(p.user_id);
     });
@@ -410,21 +426,17 @@ export function downloadFile(paperId, url) {
       if (p) supabase.update('papers', paperId, { downloads: (p.downloads || 0) + 1 });
     }).catch(function () { });
   });
+  // Use hidden link for download — avoids loading entire file into memory
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = url.split('/').pop() || 'download';
+  a.target = '_blank';
+  a.rel = 'noopener';
+  a.style.display = 'none';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
   toast('下载中...');
-  fetch(url).then(function (r) { return r.blob(); }).then(function (b) {
-    const u = URL.createObjectURL(b);
-    const a = document.createElement('a');
-    a.href = u;
-    a.download = url.split('/').pop() || 'download';
-    a.style.display = 'none';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    setTimeout(function () { URL.revokeObjectURL(u); }, 3000);
-    toast('下载完成');
-  }).catch(function () {
-    window.open(url, '_blank');
-  });
 }
 
 export function previewFile(url, ext) {
@@ -444,11 +456,11 @@ export function showRateForm(paperId) {
     '<button class="btn btn-primary btn-small" data-action="submitReview" data-id="' + paperId + '">提交</button>' +
     '</div>';
   document.getElementById('reviewForm').innerHTML = html;
-  window._starRating = 0;
+  starRating = 0;
 }
 
 export function setStar(n) {
-  window._starRating = n;
+  starRating = n;
   for (let i = 1; i <= 5; i++) {
     const el = document.getElementById('star' + i);
     if (el) el.textContent = i <= n ? '★' : '☆';
@@ -458,7 +470,7 @@ export function setStar(n) {
 export async function submitReview(paperId) {
   const user = supabase.getUser();
   if (!user) { toast('请先登录'); return; }
-  if (!window._starRating) { toast('请选择评分'); return; }
+  if (!starRating) { toast('请选择评分'); return; }
 
   const comment = document.getElementById('rateComment')?.value?.trim() || '';
 
@@ -473,28 +485,11 @@ export async function submitReview(paperId) {
       paper_id: paperId,
       user_id: user.id,
       user_email: user.email,
-      rating: window._starRating,
+      rating: starRating,
       comment: comment
     });
 
-    // Recalculate average using RPC for atomicity
-    const revs = await supabase.query('reviews', { where: { paper_id: paperId } });
-    const avg = revs.reduce(function (s, r) { return s + (r.rating || 0); }, 0) / revs.length;
-
-    try {
-      await supabase.rpc('update_paper_rating', {
-        p_id: paperId,
-        avg_r: Math.round(avg * 10) / 10,
-        r_count: revs.length
-      });
-    } catch (rpcErr) {
-      // Fallback: direct update
-      await supabase.update('papers', paperId, {
-        avg_rating: Math.round(avg * 10) / 10,
-        rating_count: revs.length
-      });
-    }
-
+    // DB trigger auto-recalculates avg_rating and rating_count
     toast('评价已提交');
     location.hash = '#/detail/' + paperId;
   } catch (e) {
@@ -514,11 +509,7 @@ export async function deletePaper(paperId) {
       } catch (e) { /* ignore file delete errors */ }
     }
 
-    // Delete reviews first, then the paper
-    const reviews = await supabase.query('reviews', { where: { paper_id: paperId } });
-    for (let i = 0; i < reviews.length; i++) {
-      await supabase.remove('reviews', reviews[i].id);
-    }
+    // Delete paper — reviews are CASCADE deleted by the database
     await supabase.remove('papers', paperId);
     toast('已删除');
     location.hash = '#/';
@@ -565,6 +556,7 @@ export function renderUpload() {
   // Wire drop zone
   const dz = document.getElementById('dropZone');
   const fileInput = document.getElementById('upFile');
+  const ALLOWED_EXT = ['pdf','jpg','jpeg','png','gif','bmp','webp','zip','rar','7z','doc','docx','ppt','pptx','xls','xlsx','txt','md','csv'];
   if (dz) {
     dz.addEventListener('click', function () { fileInput.click(); });
     dz.addEventListener('dragover', function (e) { e.preventDefault(); dz.classList.add('drag'); });
@@ -574,6 +566,11 @@ export function renderUpload() {
       dz.classList.remove('drag');
       const f = e.dataTransfer.files[0];
       if (f) {
+        const ext = f.name.split('.').pop().toLowerCase();
+        if (ALLOWED_EXT.indexOf(ext) === -1) {
+          toast('不支持的文件格式: .' + ext);
+          return;
+        }
         fileInput.files = e.dataTransfer.files;
         document.getElementById('fileInfo').textContent = '已选择: ' + f.name + ' (' + (f.size / 1048576).toFixed(1) + 'MB)';
       }
@@ -1000,19 +997,17 @@ export async function notifyFriends(paperId, message) {
         targets.push(fid);
       }
     });
-    // Create notifications for each friend
-    for (let i = 0; i < targets.length; i++) {
-      try {
-        await supabase.create('notifications', {
-          user_id: targets[i],
-          message: message,
-          paper_id: paperId,
-          read: false
-        });
-      } catch (e) {
-        console.warn('通知发送失败:', targets[i], e.message);
-      }
-    }
+    // Create notifications for all friends in parallel
+    await Promise.all(targets.map(function (fid) {
+      return supabase.create('notifications', {
+        user_id: fid,
+        message: message,
+        paper_id: paperId,
+        read: false
+      }).catch(function (e) {
+        console.warn('通知发送失败:', fid, e.message);
+      });
+    }));
   } catch (e) {
     console.warn('notifyFriends 失败:', e.message);
   }
@@ -1055,7 +1050,7 @@ export function updateNav() {
   if (userInfo) userInfo.textContent = user ? (user.email || '') : '';
 
   // Sidebar
-  const sideItems = ['sideUpload', 'sideFavs', 'sideMine', 'sideFriends'];
+  const sideItems = ['sideUpload', 'sideFavs', 'sideMine', 'sideFriends', 'sideNotifs'];
   sideItems.forEach(function (id) {
     const el = document.getElementById(id);
     if (el) el.style.display = user ? '' : 'none';
