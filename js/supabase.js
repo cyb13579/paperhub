@@ -276,7 +276,7 @@ export const supabase = {
    * Used for operations that need elevated privileges
    */
   async rpc(functionName, params) {
-    const headers = authHeaders();
+    const headers = { ...authHeaders(), 'Prefer': 'return=minimal' };
     const res = await checkAuth(await fetch(SUPA_URL + '/rest/v1/rpc/' + functionName, {
       method: 'POST',
       headers: headers,
