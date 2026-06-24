@@ -979,20 +979,65 @@ export async function notifyFriends(paperId, message) {
   const user = supabase.getUser();
   if (!user) return;
   try {
-    const friends = await supabase.query('friendships', { limit: 200 });
-    const accepted = friends.filter(function (f) {
-      return f.status === 'accepted' && (f.user_id === user.id || f.friend_id === user.id);
+    // Query only current user's friendships
+    const friends = await supabase.query('friendships', {
+      where: { user_id: user.id, status: 'accepted' },
+      limit: 200
     });
-    accepted.forEach(function (f) {
+    // Also check reverse direction (where friend added current user)
+    const reverse = await supabase.query('friendships', {
+      where: { friend_id: user.id, status: 'accepted' },
+      limit: 200
+    });
+    const all = friends.concat(reverse);
+    // Deduplicate
+    const seen = {};
+    const targets = [];
+    all.forEach(function (f) {
       const fid = f.user_id === user.id ? f.friend_id : f.user_id;
-      supabase.create('notifications', {
-        user_id: fid,
-        message: message,
-        paper_id: paperId,
-        read: false
-      }).catch(function () { });
+      if (!seen[fid]) {
+        seen[fid] = true;
+        targets.push(fid);
+      }
     });
-  } catch (e) { /* ignore */ }
+    // Create notifications for each friend
+    for (let i = 0; i < targets.length; i++) {
+      try {
+        await supabase.create('notifications', {
+          user_id: targets[i],
+          message: message,
+          paper_id: paperId,
+          read: false
+        });
+      } catch (e) {
+        console.warn('通知发送失败:', targets[i], e.message);
+      }
+    }
+  } catch (e) {
+    console.warn('notifyFriends 失败:', e.message);
+  }
+}
+
+// ── Notification Polling ──
+let notifTimer = null;
+
+export function startNotifPolling() {
+  if (notifTimer) return;
+  checkNotifications();
+  notifTimer = setInterval(function () {
+    if (supabase.getUser()) {
+      checkNotifications();
+    } else {
+      stopNotifPolling();
+    }
+  }, 30000); // every 30 seconds
+}
+
+export function stopNotifPolling() {
+  if (notifTimer) {
+    clearInterval(notifTimer);
+    notifTimer = null;
+  }
 }
 
 // ── Nav Update ──

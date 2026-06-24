@@ -73,6 +73,6 @@ function handleRoute() {
 
   // Scroll to top on navigation
   window.scrollTo({ top: 0, behavior: 'instant' });
-  // Poll notifications
-  if (supabase.getUser()) { pages.checkNotifications(); }
+  // Start notification polling
+  if (supabase.getUser()) { pages.startNotifPolling(); }
 }
