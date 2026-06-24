@@ -506,7 +506,11 @@ export async function deletePaper(paperId) {
 
     // Notify friends before deletion
     if (user) {
-      notifyFriends(paperId, user.email + ' 删除了资料：' + title);
+      try {
+        await notifyFriends(paperId, user.email + ' 删除了资料：' + title);
+      } catch (e) {
+        console.warn('通知好友失败:', e.message);
+      }
     }
 
     // Delete associated file from storage
