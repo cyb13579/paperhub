@@ -16,17 +16,72 @@ function authHeaders() {
     'Content-Type': 'application/json'
   };
   if (session && session.access_token) {
-    headers['Authorization'] = 'Bearer ' + session.access_token;
+    // Check token expiry before using it
+    if (isSessionValid(session)) {
+      headers['Authorization'] = 'Bearer ' + session.access_token;
+    } else {
+      // Token expired, clean up
+      session = null;
+      localStorage.removeItem('sb_session');
+    }
   }
   return headers;
 }
 
+/** Handle expired JWT — auto logout and reload */
+function handleExpiredJwt() {
+  session = null;
+  localStorage.removeItem('sb_session');
+  if (typeof window !== 'undefined') {
+    window.location.hash = '#/login';
+    window.location.reload();
+  }
+}
+
+/** Check response for JWT errors */
+async function checkAuth(res) {
+  if (res.status === 401 || res.status === 403) {
+    try {
+      const body = await res.clone().json();
+      if (body.message && body.message.includes('JWT')) {
+        handleExpiredJwt();
+        throw new Error('登录已过期，请重新登录');
+      }
+    } catch (e) {
+      if (e.message.includes('登录已过期')) throw e;
+      // JSON parse error, ignore
+    }
+  }
+  return res;
+}
+
+/** Check if stored session is still valid (not expired) */
+function isSessionValid(s) {
+  if (!s || !s.access_token) return false;
+  try {
+    // JWT expiry is in the 'exp' claim (seconds since epoch)
+    const payload = JSON.parse(atob(s.access_token.split('.')[1]));
+    return payload.exp * 1000 > Date.now();
+  } catch (e) {
+    return false;
+  }
+}
+
 export const supabase = {
-  /** Get/restore session from localStorage */
+  /** Get/restore session from localStorage with expiry check */
   async getSession() {
     try {
       const stored = localStorage.getItem('sb_session');
-      if (stored) session = JSON.parse(stored);
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (isSessionValid(parsed)) {
+          session = parsed;
+        } else {
+          // Session expired, clean up
+          session = null;
+          localStorage.removeItem('sb_session');
+        }
+      }
     } catch (e) { /* ignore */ }
     return session;
   },
@@ -92,18 +147,25 @@ export const supabase = {
 
   // ── Database ──
 
-  /** Query records */
+  /** Query records with advanced filtering */
   async query(table, options) {
     options = options || {};
     const params = new URLSearchParams();
     if (options.where) {
       Object.keys(options.where).forEach(function (k) {
-        params.set(k, 'eq.' + options.where[k]);
+        const val = options.where[k];
+        if (val === null || val === undefined) return;
+        // Support operators: { field: { op: 'ilike', value: '%text%' } }
+        if (typeof val === 'object' && val.op) {
+          params.set(k, val.op + '.' + val.value);
+        } else {
+          params.set(k, 'eq.' + val);
+        }
       });
     }
     if (options.order) params.set('order', options.order);
     if (options.limit) params.set('limit', options.limit);
-    if (options.skip) params.set('skip', options.skip);
+    if (options.skip) params.set('offset', options.skip);
 
     const isCount = options.count;
     if (isCount) {
@@ -115,7 +177,7 @@ export const supabase = {
     const headers = authHeaders();
     if (isCount) headers['Prefer'] = 'count=exact';
 
-    const res = await fetch(url, { headers: headers });
+    const res = await checkAuth(await fetch(url, { headers: headers }));
     if (!res.ok) throw new Error(await res.text());
 
     if (isCount) {
@@ -127,39 +189,41 @@ export const supabase = {
 
   /** Get a single record by ID */
   async get(table, id) {
-    const res = await fetch(SUPA_URL + '/rest/v1/' + table + '?id=eq.' + id, {
+    const res = await checkAuth(await fetch(SUPA_URL + '/rest/v1/' + table + '?id=eq.' + id, {
       headers: authHeaders()
-    });
+    }));
     const data = await res.json();
     return (data && data[0]) ? data[0] : null;
   },
 
   /** Create a record */
   async create(table, data) {
-    const res = await fetch(SUPA_URL + '/rest/v1/' + table, {
+    const res = await checkAuth(await fetch(SUPA_URL + '/rest/v1/' + table, {
       method: 'POST',
       headers: { ...authHeaders(), 'Prefer': 'return=representation' },
       body: JSON.stringify(data)
-    });
+    }));
     if (!res.ok) throw new Error(await res.text());
     return await res.json();
   },
 
   /** Update a record */
   async update(table, id, data) {
-    await fetch(SUPA_URL + '/rest/v1/' + table + '?id=eq.' + id, {
+    const res = await checkAuth(await fetch(SUPA_URL + '/rest/v1/' + table + '?id=eq.' + id, {
       method: 'PATCH',
       headers: { ...authHeaders(), 'Content-Type': 'application/json' },
       body: JSON.stringify(data)
-    });
+    }));
+    if (!res.ok) throw new Error(await res.text());
   },
 
   /** Delete a record */
   async remove(table, id) {
-    await fetch(SUPA_URL + '/rest/v1/' + table + '?id=eq.' + id, {
+    const res = await checkAuth(await fetch(SUPA_URL + '/rest/v1/' + table + '?id=eq.' + id, {
       method: 'DELETE',
       headers: authHeaders()
-    });
+    }));
+    if (!res.ok) throw new Error(await res.text());
   },
 
   // ── Storage ──
@@ -197,22 +261,30 @@ export const supabase = {
     return SUPA_URL + '/storage/v1/object/public/' + bucket + '/' + path;
   },
 
+  /** Delete a file from storage */
+  async deleteFile(bucket, path) {
+    const res = await fetch(SUPA_URL + '/storage/v1/object/' + bucket + '/' + path, {
+      method: 'DELETE',
+      headers: authHeaders()
+    });
+    if (!res.ok) throw new Error('文件删除失败');
+  },
+
   /**
    * Call an RPC function (SECURITY DEFINER)
    * Used for operations that need elevated privileges
    */
   async rpc(functionName, params) {
     const headers = authHeaders();
-    const res = await fetch(SUPA_URL + '/rest/v1/rpc/' + functionName, {
+    const res = await checkAuth(await fetch(SUPA_URL + '/rest/v1/rpc/' + functionName, {
       method: 'POST',
       headers: headers,
       body: JSON.stringify(params || {})
-    });
+    }));
     if (!res.ok) {
-      const err = await res.json().catch(function() { return { message: 'RPC 请求失败' }; });
+      const err = await res.json().catch(function () { return { message: 'RPC 请求失败' }; });
       throw new Error(err.message || 'RPC 请求失败');
     }
-    // Return parsed JSON, or null for empty responses
     const text = await res.text();
     return text ? JSON.parse(text) : null;
   }

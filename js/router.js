@@ -23,13 +23,13 @@ export async function init() {
 }
 
 function handleRoute() {
-  var hash = location.hash || '#/';
-  var parts = hash.replace('#/', '').split('/');
-  var page = parts[0] || '';
-  var param = parts[1] || '';
+  const hash = location.hash || '#/';
+  const parts = hash.replace('#/', '').split('/');
+  const page = parts[0] || '';
+  const param = parts[1] || '';
 
   // Show/hide hero (only on home page)
-  var hero = document.getElementById('hero');
+  const hero = document.getElementById('hero');
   if (hero) {
     hero.style.display = (page === '' || page === 'home') ? '' : 'none';
   }
@@ -63,6 +63,9 @@ function handleRoute() {
       break;
     case 'friends':
       pages.renderFriends();
+      break;
+    case 'notifications':
+      pages.showNotifications();
       break;
     default:
       pages.renderHome();

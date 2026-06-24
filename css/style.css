@@ -108,13 +108,18 @@ a {
   background: var(--bg);
 }
 
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .btn-primary {
   background: var(--primary);
   color: #fff;
   border-color: var(--primary);
 }
 
-.btn-primary:hover {
+.btn-primary:hover:not(:disabled) {
   background: var(--primary-hover);
 }
 
@@ -146,6 +151,10 @@ a {
   background: var(--red);
   color: #fff;
   border-color: var(--red);
+}
+
+.btn-danger:hover {
+  background: #b91c1c;
 }
 
 /* ── Layout ── */
@@ -610,16 +619,124 @@ a {
   padding: 16px;
 }
 
+/* ── Pagination ── */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 16px 0;
+}
+
+.page-info {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+}
+
+/* ── Notification Badge ── */
+.notif-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  background: var(--red);
+  color: #fff;
+  font-size: 0.6rem;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+/* ── Sidebar ── */
+.sidebar {
+  position: fixed;
+  left: -280px;
+  top: 0;
+  width: 280px;
+  height: 100%;
+  background: var(--card);
+  border-right: 1px solid var(--border);
+  z-index: 300;
+  transition: left 0.25s ease;
+  overflow-y: auto;
+  padding: 20px;
+  box-shadow: 2px 0 20px rgba(0, 0, 0, 0.1);
+}
+
+.sidebar.open {
+  left: 0;
+}
+
+.sidebar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.sidebar-title {
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--text);
+}
+
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.sidebar-link {
+  justify-content: flex-start;
+  text-align: left;
+  padding: 10px 12px;
+}
+
+.sidebar-divider {
+  margin: 8px 0;
+  border-top: 1px solid var(--border);
+}
+
+.sidebar-user {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  padding: 8px 12px;
+  word-break: break-all;
+}
+
+/* ── Overlay ── */
+.overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.3);
+  z-index: 299;
+  transition: opacity 0.2s;
+}
+
+.overlay.active {
+  display: block;
+}
+
 /* ── Skeleton ── */
 .skeleton {
   height: 16px;
-  background: #f1f5f9;
+  background: #e2e8f0;
   border-radius: 4px;
   margin-bottom: 8px;
+  animation: skeleton-pulse 1.5s ease-in-out infinite;
 }
 
 .skeleton-short {
   width: 60%;
+}
+
+@keyframes skeleton-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
 }
 
 /* ── Responsive ── */
@@ -642,5 +759,27 @@ a {
 
   .form-row {
     flex-direction: column;
+  }
+
+  /* Hide desktop nav on mobile, show hamburger */
+  .nav-right .btn-outline,
+  .nav-right .user-email {
+    display: none !important;
+  }
+
+  #loginBtn, #logoutBtn, #notifBell {
+    display: flex !important;
+  }
+
+  .sidebar {
+    width: 260px;
+    left: -260px;
+  }
+}
+
+@media (min-width: 769px) {
+  /* Hide hamburger on desktop */
+  #menuBtn {
+    display: none;
   }
 }

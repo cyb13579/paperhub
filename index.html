@@ -4,21 +4,31 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PaperHub · 试卷共享平台</title>
+<meta name="description" content="PaperHub 试卷资料共享平台 — 上传试卷、搜索资料、交流学习。支持 PDF、图片、Office 文档等多种格式。">
+<meta name="keywords" content="试卷,资料,共享,学习,高考,真题,大学">
+<meta property="og:title" content="PaperHub · 试卷共享平台">
+<meta property="og:description" content="上传试卷、搜索资料、交流学习">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://cybpaperhub.icu">
+<meta name="theme-color" content="#2563eb">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📚</text></svg>">
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
 <header class="header">
   <div class="header-inner">
-    <a href="#/" class="logo">Paper<span>Hub</span></a>
-    <button class="btn btn-ghost btn-small" onclick="document.getElementById('sidebar').style.left='0';document.getElementById('overlay').style.display='block'" style="font-size:1.2rem">☰</button>
-    <nav class="nav-right" style="display:none">
+    <div style="display:flex;align-items:center;gap:8px">
+      <button class="btn btn-ghost btn-small" id="menuBtn" style="font-size:1.2rem" aria-label="菜单">☰</button>
+      <a href="#/" class="logo">Paper<span>Hub</span></a>
+    </div>
+    <nav class="nav-right">
       <span class="user-email" id="userInfo"></span>
-      <button class="btn btn-outline btn-small" onclick="location.hash='#/upload'" id="upBtn" style="display:none">上传</button>
-      <button class="btn btn-outline btn-small" onclick="location.hash='#/favs'" id="favBtn" style="display:none">收藏</button>
-      <button class="btn btn-outline btn-small" onclick="location.hash='#/mine'" id="mineBtn" style="display:none">我的</button>
-<button class="btn btn-outline btn-small" onclick="location.hash='#/friends'" id="friendsBtn" style="display:none">好友</button>
-<button class="btn btn-outline btn-small" id="notifBell" style="display:none;position:relative" onclick="window._showNotifs()">🔔<span id="notifBadge" style="position:absolute;top:-4px;right:-4px;background:var(--red);color:#fff;font-size:0.6rem;width:16px;height:16px;border-radius:50%;display:none;align-items:center;justify-content:center;line-height:1">0</span></button>
+      <button class="btn btn-outline btn-small" onclick="location.hash='#/upload'" id="upBtn" style="display:none">📤 上传</button>
+      <button class="btn btn-outline btn-small" onclick="location.hash='#/favs'" id="favBtn" style="display:none">⭐ 收藏</button>
+      <button class="btn btn-outline btn-small" onclick="location.hash='#/mine'" id="mineBtn" style="display:none">📂 我的</button>
+      <button class="btn btn-outline btn-small" onclick="location.hash='#/friends'" id="friendsBtn" style="display:none">👥 好友</button>
+      <button class="btn btn-outline btn-small" id="notifBell" style="display:none;position:relative" onclick="location.hash='#/notifications'">🔔<span id="notifBadge" class="notif-badge">0</span></button>
       <button class="btn btn-primary btn-small" onclick="location.hash='#/login'" id="loginBtn">登录</button>
       <button class="btn btn-outline btn-small" onclick="window._doLogout()" id="logoutBtn" style="display:none">退出</button>
     </nav>
@@ -56,24 +66,25 @@
 <div class="toast" id="toast"></div>
 
 <!-- Sidebar Menu -->
-<div id="sidebar" style="position:fixed;left:-260px;top:0;width:260px;height:100%;background:var(--card);border-right:1px solid var(--border);z-index:300;transition:left 0.25s;overflow-y:auto;padding:20px;box-shadow:2px 0 20px rgba(0,0,0,.1)">
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px">
-    <span style="font-weight:700;font-size:1.1rem;color:var(--text)">PaperHub</span>
-    <button class="btn btn-ghost btn-small" onclick="document.getElementById('sidebar').style.left='-260px';document.getElementById('overlay').style.display='none'">✕</button>
+<div id="sidebar" class="sidebar">
+  <div class="sidebar-header">
+    <span class="sidebar-title">PaperHub</span>
+    <button class="btn btn-ghost btn-small" id="closeSidebar" aria-label="关闭">✕</button>
   </div>
-  <div style="display:flex;flex-direction:column;gap:2px">
-    <a href="#/" class="btn btn-ghost" style="justify-content:flex-start;text-align:left;padding:10px 12px" onclick="document.getElementById('sidebar').style.left='-260px';document.getElementById('overlay').style.display='none'">🏠 首页</a>
-    <a href="#/upload" class="btn btn-ghost" id="sideUpload" style="justify-content:flex-start;text-align:left;padding:10px 12px;display:none" onclick="document.getElementById('sidebar').style.left='-260px';document.getElementById('overlay').style.display='none'">📤 上传资料</a>
-    <a href="#/favs" class="btn btn-ghost" id="sideFavs" style="justify-content:flex-start;text-align:left;padding:10px 12px;display:none" onclick="document.getElementById('sidebar').style.left='-260px';document.getElementById('overlay').style.display='none'">⭐ 我的收藏</a>
-    <a href="#/mine" class="btn btn-ghost" id="sideMine" style="justify-content:flex-start;text-align:left;padding:10px 12px;display:none" onclick="document.getElementById('sidebar').style.left='-260px';document.getElementById('overlay').style.display='none'">📂 我的上传</a>
-    <a href="#/friends" class="btn btn-ghost" id="sideFriends" style="justify-content:flex-start;text-align:left;padding:10px 12px;display:none" onclick="document.getElementById('sidebar').style.left='-260px';document.getElementById('overlay').style.display='none'">👥 好友</a>
-    <div style="margin:8px 0;border-top:1px solid var(--border)"></div>
-    <span id="sideUser" style="font-size:0.78rem;color:var(--text-muted);padding:8px 12px"></span>
-    <a href="#/login" class="btn btn-ghost" id="sideLogin" style="justify-content:flex-start;text-align:left;padding:10px 12px">🔐 登录</a>
-    <a href="#" class="btn btn-ghost" id="sideLogout" style="justify-content:flex-start;text-align:left;padding:10px 12px;display:none" onclick="window._doLogout();document.getElementById('sidebar').style.left='-260px';document.getElementById('overlay').style.display='none'">退出</a>
+  <div class="sidebar-nav">
+    <a href="#/" class="btn btn-ghost sidebar-link" id="sideHome">🏠 首页</a>
+    <a href="#/upload" class="btn btn-ghost sidebar-link" id="sideUpload" style="display:none">📤 上传资料</a>
+    <a href="#/favs" class="btn btn-ghost sidebar-link" id="sideFavs" style="display:none">⭐ 我的收藏</a>
+    <a href="#/mine" class="btn btn-ghost sidebar-link" id="sideMine" style="display:none">📂 我的上传</a>
+    <a href="#/friends" class="btn btn-ghost sidebar-link" id="sideFriends" style="display:none">👥 好友</a>
+    <a href="#/notifications" class="btn btn-ghost sidebar-link" id="sideNotifs" style="display:none">🔔 通知</a>
+    <div class="sidebar-divider"></div>
+    <span id="sideUser" class="sidebar-user"></span>
+    <a href="#/login" class="btn btn-ghost sidebar-link" id="sideLogin">🔐 登录</a>
+    <a href="#" class="btn btn-ghost sidebar-link" id="sideLogout" style="display:none">退出登录</a>
   </div>
 </div>
-<div id="overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.3);z-index:299" onclick="document.getElementById('sidebar').style.left='-260px';this.style.display='none'"></div>
+<div id="overlay" class="overlay"></div>
 
 <script type="module">
 /**
@@ -82,44 +93,40 @@
  * Architecture:
  *   css/style.css    — All styles
  *   js/supabase.js   — Supabase client (auth + db + storage)
- *   js/utils.js      — Helpers (esc, timeAgo, toast, favs)
- *   js/pages.js      — Page renderers + actions
+ *   js/utils.js      — Helpers (esc, timeAgo, toast, favs, delegate)
+ *   js/pages.js      — Page renderers + actions (event delegation)
  *   js/router.js     — Hash router + auth guard
  */
 
 import { init } from './js/router.js';
 import * as pages from './js/pages.js';
-import { toggleFavorite } from './js/utils.js';
 
-// ── Expose functions to global scope (needed for inline onclick handlers) ──
-// These are called from onclick attributes in dynamically rendered HTML
+// ── Sidebar toggle (only global handler needed) ──
+const sidebar = document.getElementById('sidebar');
+const overlay = document.getElementById('overlay');
+const menuBtn = document.getElementById('menuBtn');
+const closeSidebar = document.getElementById('closeSidebar');
 
-// Home
-window._debounceSearch = pages.debounceSearch;
-window._doSearch = pages.doSearch;
-window._showAll = pages.showAll;
+function openSidebar() {
+  sidebar.classList.add('open');
+  overlay.classList.add('active');
+}
 
-// Detail
-window._download = pages.downloadFile;
-window._preview = pages.previewFile;
-window._showRateForm = pages.showRateForm;
-window._setStar = pages.setStar;
-window._submitReview = pages.submitReview;
-window._deletePaper = pages.deletePaper;
-window._toggleFav = toggleFavorite;
+function closeSidebarFn() {
+  sidebar.classList.remove('open');
+  overlay.classList.remove('active');
+}
 
-// Upload
-window._doUpload = pages.doUpload;
+menuBtn.addEventListener('click', openSidebar);
+closeSidebar.addEventListener('click', closeSidebarFn);
+overlay.addEventListener('click', closeSidebarFn);
 
-// Friends
-window._addFriend = pages.addFriend;
-window._acceptFriend = pages.acceptFriend;
-window._showNotifs = pages.showNotifications;
-window._checkNotifs = pages.checkNotifications;
+// Close sidebar on link click
+document.querySelectorAll('.sidebar-link').forEach(function (link) {
+  link.addEventListener('click', closeSidebarFn);
+});
 
-// Auth
-window._switchAuth = pages.switchAuthMode;
-window._doAuth = pages.doAuth;
+// ── Expose logout to global (needed for inline onclick in header) ──
 window._doLogout = pages.doLogout;
 
 // ── Back to top button ──
