@@ -16,14 +16,7 @@ function authHeaders() {
     'Content-Type': 'application/json'
   };
   if (session && session.access_token) {
-    // Check token expiry before using it
-    if (isSessionValid(session)) {
-      headers['Authorization'] = 'Bearer ' + session.access_token;
-    } else {
-      // Token expired, clean up
-      session = null;
-      localStorage.removeItem('sb_session');
-    }
+    headers['Authorization'] = 'Bearer ' + session.access_token;
   }
   return headers;
 }
