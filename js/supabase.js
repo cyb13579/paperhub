@@ -256,9 +256,11 @@ export const supabase = {
 
   /** Delete a file from storage */
   async deleteFile(bucket, path) {
+    const headers = authHeaders();
+    delete headers['Content-Type']; // DELETE has no body, Fastify rejects empty JSON
     const res = await fetch(SUPA_URL + '/storage/v1/object/' + bucket + '/' + path, {
       method: 'DELETE',
-      headers: authHeaders()
+      headers: headers
     });
     if (!res.ok) throw new Error('文件删除失败');
   },
