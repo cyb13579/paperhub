@@ -500,8 +500,16 @@ export async function submitReview(paperId) {
 export async function deletePaper(paperId) {
   if (!confirm('确定删除此资料？删除后无法恢复。')) return;
   try {
-    // Delete associated file from storage
     const paper = await supabase.get('papers', paperId);
+    const user = supabase.getUser();
+    const title = paper ? (paper.title || '未知资料') : '未知资料';
+
+    // Notify friends before deletion
+    if (user) {
+      notifyFriends(paperId, user.email + ' 删除了资料：' + title);
+    }
+
+    // Delete associated file from storage
     if (paper && paper.file_path) {
       try {
         const path = paper.file_path.split('/public/papers/')[1];
