@@ -764,16 +764,7 @@ export async function doAuth() {
       await supabase.signIn(email, password);
     }
 
-    // Backend whitelist validation
-    const ALLOWED = ['cyb@qq.com', 'cyb13579_2023@qq.com', '1870403731@qq.com'];
-    const userEmail = supabase.getUser()?.email || '';
-    if (ALLOWED.indexOf(userEmail) === -1) {
-      await supabase.signOut();
-      updateNav();
-      toast('你没有权限登录，请联系管理员');
-      return;
-    }
-
+    // 所有账户均可登录（白名单已移除）
     toast('登录成功 🎉');
     updateNav();
     location.hash = '#/';
