@@ -5,7 +5,7 @@
  */
 
 import { supabase } from './supabase.js';
-import { esc, timeAgo, getFavorites, isFavorite, toggleFavorite, syncLocalFavorites, isPreviewable, isEmbeddedPreview, isPdfPreview, isVideoPreview, getVideoMime, getPreviewUrl, getFileIcon, getFileExt, getFileValidationError, displayNameFor, displayNameWithEmail, toast, delegate, SUBJECTS } from './utils.js';
+import { esc, timeAgo, getFavorites, isFavorite, toggleFavorite, syncLocalFavorites, isPreviewable, isEmbeddedPreview, isPdfPreview, isVideoPreview, getVideoMime, getPreviewUrl, getFileIcon, getFileExt, getFileValidationError, displayNameFor, displayNameWithEmail, shouldWaitForEmailConfirmation, toast, delegate, SUBJECTS } from './utils.js';
 
 // ── Shared helpers ──
 
@@ -1000,8 +1000,11 @@ export async function doAuth() {
   try {
     if (authMode === 'signup') {
       await supabase.signUp(email, password);
-      if (!supabase.getUser()) {
-        await supabase.signIn(email, password);
+      if (shouldWaitForEmailConfirmation(supabase.getUser())) {
+        toast('注册成功，请查看邮箱完成验证后再登录');
+        authMode = 'login';
+        renderLogin();
+        return;
       }
     } else {
       await supabase.signIn(email, password);

@@ -53,6 +53,10 @@ export function displayNameWithEmail(profile, fallback) {
   return email && name !== email ? name + ' · ' + email : name;
 }
 
+export function shouldWaitForEmailConfirmation(user) {
+  return !user;
+}
+
 /** Favorite helpers (Supabase account storage with local fallback) */
 export function getLocalFavorites() {
   try { return JSON.parse(localStorage.getItem('favs') || '[]'); }
