@@ -38,32 +38,101 @@ export function toast(message) {
   el._timer = setTimeout(function () { el.classList.remove('show'); }, 2500);
 }
 
-/** Favorite helpers (localStorage based, synced to DB when logged in) */
-export function getFavorites() {
+/** Favorite helpers (Supabase account storage with local fallback) */
+export function getLocalFavorites() {
   try { return JSON.parse(localStorage.getItem('favs') || '[]'); }
   catch (e) { return []; }
 }
 
-export function isFavorite(id) {
-  return getFavorites().some(function (f) { return f.id === id; });
+function setLocalFavorites(favs) {
+  localStorage.setItem('favs', JSON.stringify(favs));
 }
 
-export function toggleFavorite(id, title) {
-  const favs = getFavorites();
-  if (isFavorite(id)) {
-    const newFavs = favs.filter(function (x) { return x.id !== id; });
-    localStorage.setItem('favs', JSON.stringify(newFavs));
-    toast('已取消收藏');
-  } else {
-    favs.push({ id: id, title: title });
-    localStorage.setItem('favs', JSON.stringify(favs));
-    toast('已收藏');
+export async function getFavorites(supabase, user) {
+  if (!user) return getLocalFavorites();
+  try {
+    const rows = await supabase.query('favorites', {
+      where: { user_id: user.id },
+      order: 'created_at.desc',
+      limit: 300
+    });
+    return rows.map(function (f) {
+      return { id: f.paper_id, title: f.title || '' };
+    });
+  } catch (e) {
+    return getLocalFavorites();
   }
-  // Update UI if on detail page
+}
+
+export async function isFavorite(id, supabase, user) {
+  const favs = await getFavorites(supabase, user);
+  return favs.some(function (f) { return f.id === id; });
+}
+
+export async function syncLocalFavorites(supabase, user) {
+  if (!user) return;
+  const favs = getLocalFavorites();
+  if (!favs.length) return;
+  try {
+    const existing = await supabase.query('favorites', {
+      where: { user_id: user.id },
+      limit: 300
+    });
+    const existingIds = new Set(existing.map(function (f) { return f.paper_id; }));
+    await Promise.all(favs.filter(function (f) {
+      return !existingIds.has(f.id);
+    }).map(function (f) {
+      return supabase.create('favorites', {
+        user_id: user.id,
+        paper_id: f.id,
+        title: f.title || ''
+      }).catch(function () { return null; });
+    }));
+    localStorage.removeItem('favs');
+  } catch (e) { /* keep local favorites as fallback */ }
+}
+
+export async function toggleFavorite(id, title, supabase, user) {
+  const favs = await getFavorites(supabase, user);
+  const exists = favs.some(function (f) { return f.id === id; });
+
+  if (user) {
+    try {
+      if (exists) {
+        await supabase.removeWhere('favorites', { user_id: user.id, paper_id: id });
+        toast('已取消收藏');
+      } else {
+        await supabase.create('favorites', {
+          user_id: user.id,
+          paper_id: id,
+          title: title || ''
+        });
+        toast('已收藏');
+      }
+    } catch (e) {
+      toggleLocalFavorite(id, title, exists);
+    }
+  } else {
+    toggleLocalFavorite(id, title, exists);
+  }
+
   const btn = document.querySelector('[data-fav-id="' + id + '"]');
   if (btn) {
-    btn.textContent = isFavorite(id) ? '取消收藏' : '收藏';
+    const nowFav = await isFavorite(id, supabase, user);
+    btn.textContent = nowFav ? '取消收藏' : '收藏';
   }
+}
+
+function toggleLocalFavorite(id, title, exists) {
+  const favs = getLocalFavorites();
+  if (exists) {
+    setLocalFavorites(favs.filter(function (x) { return x.id !== id; }));
+    toast('已取消收藏');
+    return;
+  }
+  favs.push({ id: id, title: title });
+  setLocalFavorites(favs);
+  toast('已收藏');
 }
 
 /** Previewable file types */

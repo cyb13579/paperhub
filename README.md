@@ -5,10 +5,11 @@
 ## 功能
 
 - 🔐 邮箱注册/登录（Supabase Auth）
-- 📤 上传试卷（PDF/图片/ZIP，最大 20MB）
+- 📤 上传试卷（PDF/图片/ZIP/Office 等，最大 100MB）
 - 🔍 按标题、学科、年份、标签搜索
 - ⬇ 下载计数
 - ⭐ 五星评分 + 评论
+- ⭐ 账号云端收藏（未迁移数据库时自动降级为本地收藏）
 - 📱 响应式设计，手机可用
 
 ## 部署步骤（约 10 分钟）
@@ -27,6 +28,7 @@
 2. 点击 **New query**
 3. 复制 [`supabase-setup.sql`](supabase-setup.sql) 的全部内容 → 粘贴
 4. 点击右下角 **Run** → 看到 "Success"
+5. 如果你是从旧版本升级，也需要重新运行这份 SQL，以创建收藏表、搜索索引和 RLS 策略。
 
 ### 第三步：创建存储桶
 
@@ -43,11 +45,11 @@
 
 ### 第五步：配置代码
 
-1. 打开 `index.html`
-2. 修改第 268-269 行：
+1. 打开 `js/supabase.js`
+2. 修改文件顶部的 Supabase 配置：
 ```js
-const SUPABASE_URL = 'https://xxxxx.supabase.co';   // 填你的 Project URL
-const SUPABASE_KEY = 'eyJhbGci...';                  // 填你的 anon key
+const SUPA_URL = 'https://xxxxx.supabase.co';   // 填你的 Project URL
+const SUPA_KEY = 'sb_publishable_xxx';          // 填你的 publishable/anon key
 ```
 
 ### 第六步：部署到 Vercel（永久在线，免费）

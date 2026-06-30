@@ -5,7 +5,7 @@
  */
 
 import { supabase } from './supabase.js';
-import { esc, timeAgo, getFavorites, isFavorite, toggleFavorite, isPreviewable, getPreviewUrl, getFileIcon, toast, delegate, SUBJECTS } from './utils.js';
+import { esc, timeAgo, getFavorites, isFavorite, toggleFavorite, syncLocalFavorites, isPreviewable, getPreviewUrl, getFileIcon, toast, delegate, SUBJECTS } from './utils.js';
 
 // ── Shared helpers ──
 
@@ -81,7 +81,7 @@ function ensureMainDelegate() {
         break;
       case 'toggleFav':
         e.stopPropagation();
-        toggleFavorite(id, extra);
+        toggleFavorite(id, extra, supabase, supabase.getUser());
         break;
       case 'deletePaper':
         e.stopPropagation();
@@ -265,18 +265,30 @@ async function loadPapers() {
     const where = {};
     if (currentSubject) where.subject = currentSubject;
     if (year) where.year = parseInt(year);
+    const start = (currentPage - 1) * PER_PAGE;
+    const end = start + PER_PAGE - 1;
 
-    // Server-side search using ilike
-    let papers;
-    if (search) {
-      // Supabase doesn't support OR in a single query easily with REST,
-      // so we fetch with subject/year filter and then client-filter for multi-field search
+    let result;
+    try {
       const opts = {
+        where: Object.keys(where).length ? where : undefined,
+        order: sortCol + '.' + sortDir,
+        range: { from: start, to: end },
+        returnCount: true
+      };
+      if (search) {
+        const term = '*' + search.replace(/[(),]/g, ' ').trim() + '*';
+        opts.or = '(title.ilike.' + term + ',tags.ilike.' + term + ',description.ilike.' + term + ',subject.ilike.' + term + ')';
+      }
+      result = await supabase.query('papers', opts);
+    } catch (e) {
+      const fallbackOpts = {
         where: Object.keys(where).length ? where : undefined,
         order: sortCol + '.' + sortDir,
         limit: 500
       };
-      papers = await supabase.query('papers', opts);
+      let papers = await supabase.query('papers', fallbackOpts);
+      if (search) {
       const lower = search.toLowerCase();
       papers = papers.filter(function (p) {
         return (p.title || '').toLowerCase().includes(lower) ||
@@ -284,17 +296,17 @@ async function loadPapers() {
           (p.description || '').toLowerCase().includes(lower) ||
           (p.subject || '').toLowerCase().includes(lower);
       });
-    } else {
-      const opts = {
-        where: Object.keys(where).length ? where : undefined,
-        order: sortCol + '.' + sortDir,
-        limit: 500
+      }
+      result = {
+        data: papers.slice(start, start + PER_PAGE),
+        count: papers.length
       };
-      papers = await supabase.query('papers', opts);
     }
 
+    const papers = result.data || [];
+    const total = result.count || 0;
     const countEl = document.getElementById('resultCount');
-    if (countEl) countEl.textContent = papers.length + ' 份资料';
+    if (countEl) countEl.textContent = total + ' 份资料';
 
     if (!papers.length) {
       grid.innerHTML = '<div class="empty-state"><div class="icon">📭</div><p>' +
@@ -304,10 +316,8 @@ async function loadPapers() {
     }
 
     allPapers = papers;
-    const start = (currentPage - 1) * PER_PAGE;
-    const shown = papers.slice(start, start + PER_PAGE);
-    grid.innerHTML = renderCards(shown);
-    document.getElementById('paginationWrap').innerHTML = renderPagination(currentPage, papers.length, PER_PAGE);
+    grid.innerHTML = renderCards(papers);
+    document.getElementById('paginationWrap').innerHTML = renderPagination(currentPage, total, PER_PAGE);
   } catch (e) {
     grid.innerHTML = '<div class="empty-state"><p>加载失败，请稍后重试</p></div>';
   }
@@ -333,6 +343,7 @@ export async function renderDetail(id) {
 
     const user = supabase.getUser();
     const isOwner = user && user.id === paper.user_id;
+    const fav = user ? await isFavorite(paper.id, supabase, user) : false;
     const fileUrl = paper.file_path || '';
     const fileType = paper.file_type || '';
     const fileSize = paper.file_size ? (paper.file_size / 1048576).toFixed(2) + 'MB' : '';
@@ -379,7 +390,7 @@ export async function renderDetail(id) {
 
       html += '<button class="btn btn-ghost btn-small" data-action="showRateForm" data-id="' + paper.id + '">评分</button>';
       html += '<button class="btn btn-outline btn-small" data-action="toggleFav" data-id="' + paper.id + '" data-extra="' + esc(paper.title || '') + '" data-fav-id="' + paper.id + '">' +
-        (isFavorite(paper.id) ? '取消收藏' : '收藏') + '</button>';
+        (fav ? '取消收藏' : '收藏') + '</button>';
     } else {
       html += '<p style="color:var(--orange)">请<a href="#/login">登录</a>后下载</p>';
     }
@@ -441,7 +452,7 @@ export function downloadFile(paperId, url) {
 
 export function previewFile(url, ext) {
   if (!url) return;
-  window.open(getPreviewUrl(url, ext), '_blank');
+  window.open(getPreviewUrl(url, ext), '_blank', 'noopener,noreferrer');
 }
 
 export function showRateForm(paperId) {
@@ -473,6 +484,8 @@ export async function submitReview(paperId) {
   if (!starRating) { toast('请选择评分'); return; }
 
   const comment = document.getElementById('rateComment')?.value?.trim() || '';
+  const btn = document.querySelector('[data-action="submitReview"]');
+  if (btn) { btn.disabled = true; btn.textContent = '提交中...'; }
 
   try {
     // Prevent duplicate
@@ -494,6 +507,8 @@ export async function submitReview(paperId) {
     location.hash = '#/detail/' + paperId;
   } catch (e) {
     toast('提交失败: ' + e.message);
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = '提交'; }
   }
 }
 
@@ -694,13 +709,15 @@ export async function renderFavs() {
   const user = supabase.getUser();
   if (!user) { location.hash = '#/login'; return; }
 
-  const favs = getFavorites();
   document.getElementById('main').innerHTML =
     '<a href="#/" class="back-link">← 返回</a>' +
-    '<div class="section-title">⭐ 我的收藏 (' + favs.length + ')</div>' +
-    '<div class="paper-grid" id="paperGrid"></div>';
+    '<div class="section-title">⭐ 我的收藏 <span class="count" id="favCount"></span></div>' +
+    '<div class="paper-grid" id="paperGrid">' + skeletonGrid(3) + '</div>';
 
   const grid = document.getElementById('paperGrid');
+  const favs = await getFavorites(supabase, user);
+  const favCount = document.getElementById('favCount');
+  if (favCount) favCount.textContent = '(' + favs.length + ')';
   if (!favs.length) {
     grid.innerHTML = '<div class="empty-state"><div class="icon">⭐</div><p>还没有收藏，浏览资料时点击"收藏"即可添加</p></div>';
     return;
@@ -765,6 +782,7 @@ export async function doAuth() {
     }
 
     // 所有账户均可登录（白名单已移除）
+    await syncLocalFavorites(supabase, supabase.getUser());
     toast('登录成功 🎉');
     updateNav();
     location.hash = '#/';

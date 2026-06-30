@@ -53,6 +53,10 @@ CREATE INDEX IF NOT EXISTS idx_papers_subject ON papers(subject);
 CREATE INDEX IF NOT EXISTS idx_papers_created_at ON papers(created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_papers_downloads ON papers(downloads DESC);
 CREATE INDEX IF NOT EXISTS idx_papers_avg_rating ON papers(avg_rating DESC);
+CREATE INDEX IF NOT EXISTS idx_papers_year ON papers(year);
+CREATE INDEX IF NOT EXISTS idx_papers_title_lower ON papers(LOWER(title));
+CREATE INDEX IF NOT EXISTS idx_papers_tags_lower ON papers(LOWER(tags));
+CREATE INDEX IF NOT EXISTS idx_papers_description_lower ON papers(LOWER(description));
 
 -- ── Reviews Table ──
 CREATE TABLE IF NOT EXISTS reviews (
@@ -67,6 +71,19 @@ CREATE TABLE IF NOT EXISTS reviews (
 );
 
 CREATE INDEX IF NOT EXISTS idx_reviews_paper_id ON reviews(paper_id);
+
+-- ── Favorites Table ──
+CREATE TABLE IF NOT EXISTS favorites (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
+  paper_id UUID REFERENCES papers(id) ON DELETE CASCADE NOT NULL,
+  title TEXT DEFAULT '',
+  created_at TIMESTAMPTZ DEFAULT now(),
+  UNIQUE(user_id, paper_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_favorites_user_created ON favorites(user_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_favorites_paper_id ON favorites(paper_id);
 
 -- ── Friendships Table ──
 CREATE TABLE IF NOT EXISTS friendships (
@@ -148,6 +165,9 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 -- ── Profiles ──
 ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Profiles: public read" ON profiles;
+DROP POLICY IF EXISTS "Profiles: owner update" ON profiles;
+
 -- Anyone can read profiles (for friend email lookup)
 CREATE POLICY "Profiles: public read" ON profiles
   FOR SELECT USING (true);
@@ -158,6 +178,11 @@ CREATE POLICY "Profiles: owner update" ON profiles
 
 -- ── Papers ──
 ALTER TABLE papers ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Papers: public read" ON papers;
+DROP POLICY IF EXISTS "Papers: auth insert" ON papers;
+DROP POLICY IF EXISTS "Papers: owner update" ON papers;
+DROP POLICY IF EXISTS "Papers: owner delete" ON papers;
 
 -- Anyone (even anon) can read papers
 CREATE POLICY "Papers: public read" ON papers
@@ -178,6 +203,11 @@ CREATE POLICY "Papers: owner delete" ON papers
 -- ── Reviews ──
 ALTER TABLE reviews ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Reviews: public read" ON reviews;
+DROP POLICY IF EXISTS "Reviews: auth insert" ON reviews;
+DROP POLICY IF EXISTS "Reviews: owner update" ON reviews;
+DROP POLICY IF EXISTS "Reviews: owner delete" ON reviews;
+
 -- Anyone can read reviews
 CREATE POLICY "Reviews: public read" ON reviews
   FOR SELECT USING (true);
@@ -194,8 +224,32 @@ CREATE POLICY "Reviews: owner update" ON reviews
 CREATE POLICY "Reviews: owner delete" ON reviews
   FOR DELETE USING (auth.uid() = user_id);
 
+-- ── Favorites ──
+ALTER TABLE favorites ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Favorites: owner read" ON favorites;
+DROP POLICY IF EXISTS "Favorites: owner insert" ON favorites;
+DROP POLICY IF EXISTS "Favorites: owner delete" ON favorites;
+
+-- Users can only read their own favorites
+CREATE POLICY "Favorites: owner read" ON favorites
+  FOR SELECT USING (auth.uid() = user_id);
+
+-- Users can only create favorites for themselves
+CREATE POLICY "Favorites: owner insert" ON favorites
+  FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+-- Users can only delete their own favorites
+CREATE POLICY "Favorites: owner delete" ON favorites
+  FOR DELETE USING (auth.uid() = user_id);
+
 -- ── Friendships ──
 ALTER TABLE friendships ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Friendships: involved read" ON friendships;
+DROP POLICY IF EXISTS "Friendships: auth insert" ON friendships;
+DROP POLICY IF EXISTS "Friendships: involved update" ON friendships;
+DROP POLICY IF EXISTS "Friendships: involved delete" ON friendships;
 
 -- Users can see friendships where they are involved
 CREATE POLICY "Friendships: involved read" ON friendships
@@ -216,6 +270,11 @@ CREATE POLICY "Friendships: involved delete" ON friendships
 
 -- ── Notifications ──
 ALTER TABLE notifications ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Notifications: owner read" ON notifications;
+DROP POLICY IF EXISTS "Notifications: auth insert" ON notifications;
+DROP POLICY IF EXISTS "Notifications: owner update" ON notifications;
+DROP POLICY IF EXISTS "Notifications: owner delete" ON notifications;
 
 -- Users can only see their own notifications
 CREATE POLICY "Notifications: owner read" ON notifications

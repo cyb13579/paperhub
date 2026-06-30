@@ -157,9 +157,17 @@ export const supabase = {
         }
       });
     }
+    if (options.or) params.set('or', options.or);
     if (options.order) params.set('order', options.order);
-    if (options.limit) params.set('limit', options.limit);
-    if (options.skip) params.set('offset', options.skip);
+    if (options.range) {
+      const from = Math.max(0, parseInt(options.range.from, 10) || 0);
+      const to = Math.max(from, parseInt(options.range.to, 10) || from);
+      params.set('offset', from);
+      params.set('limit', to - from + 1);
+    } else {
+      if (options.limit) params.set('limit', options.limit);
+      if (options.skip) params.set('offset', options.skip);
+    }
 
     const isCount = options.count;
     if (isCount) {
@@ -169,16 +177,24 @@ export const supabase = {
     const queryString = params.toString();
     const url = SUPA_URL + '/rest/v1/' + table + (queryString ? '?' + queryString : '');
     const headers = authHeaders();
-    if (isCount) headers['Prefer'] = 'count=exact';
+    if (isCount || options.returnCount) headers['Prefer'] = 'count=exact';
 
     const res = await checkAuth(await fetch(url, { headers: headers }));
     if (!res.ok) throw new Error(await res.text());
 
+    const range = res.headers.get('content-range') || '';
+    const total = parseInt(range.split('/').pop(), 10);
     if (isCount) {
-      const range = res.headers.get('content-range') || '';
-      return parseInt(range.split('/').pop()) || 0;
+      return Number.isFinite(total) ? total : 0;
     }
-    return await res.json();
+    const data = await res.json();
+    if (options.returnCount) {
+      return {
+        data: data,
+        count: Number.isFinite(total) ? total : data.length
+      };
+    }
+    return data;
   },
 
   /** Get a single record by ID */
@@ -216,6 +232,22 @@ export const supabase = {
     const headers = authHeaders();
     delete headers['Content-Type']; // DELETE has no body
     const res = await checkAuth(await fetch(SUPA_URL + '/rest/v1/' + table + '?id=eq.' + id, {
+      method: 'DELETE',
+      headers: headers
+    }));
+    if (!res.ok) throw new Error(await res.text());
+  },
+
+  /** Delete records matching exact filters */
+  async removeWhere(table, where) {
+    const params = new URLSearchParams();
+    Object.keys(where || {}).forEach(function (k) {
+      const val = where[k];
+      if (val !== null && val !== undefined) params.set(k, 'eq.' + val);
+    });
+    const headers = authHeaders();
+    delete headers['Content-Type'];
+    const res = await checkAuth(await fetch(SUPA_URL + '/rest/v1/' + table + '?' + params.toString(), {
       method: 'DELETE',
       headers: headers
     }));
