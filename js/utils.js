@@ -142,10 +142,32 @@ const PREVIEWABLE = [
 ];
 
 const OFFICE_TYPES = ['ppt', 'pptx', 'doc', 'docx', 'xls', 'xlsx'];
+const VIDEO_TYPES = ['mp4', 'webm', 'ogg', 'mov', 'm4v'];
+
+export function isPdfPreview(ext) {
+  return (ext || '').toLowerCase() === 'pdf';
+}
+
+export function isVideoPreview(ext) {
+  return VIDEO_TYPES.indexOf((ext || '').toLowerCase()) > -1;
+}
+
+export function isEmbeddedPreview(ext) {
+  return isPdfPreview(ext) || isVideoPreview(ext);
+}
+
+export function getVideoMime(ext) {
+  const type = (ext || '').toLowerCase();
+  if (type === 'webm') return 'video/webm';
+  if (type === 'ogg') return 'video/ogg';
+  if (type === 'mp4' || type === 'mov' || type === 'm4v') return 'video/mp4';
+  return '';
+}
 
 export function isPreviewable(ext) {
   return PREVIEWABLE.indexOf((ext || '').toLowerCase()) > -1 ||
-    OFFICE_TYPES.indexOf((ext || '').toLowerCase()) > -1;
+    OFFICE_TYPES.indexOf((ext || '').toLowerCase()) > -1 ||
+    isVideoPreview(ext);
 }
 
 export function getPreviewUrl(url, ext) {
@@ -177,7 +199,8 @@ export function getFileIcon(ext) {
     zip: '📦', rar: '📦', '7z': '📦',
     doc: '📝', docx: '📝', txt: '📝', md: '📝', csv: '📝',
     ppt: '📊', pptx: '📊',
-    xls: '📈', xlsx: '📈'
+    xls: '📈', xlsx: '📈',
+    mp4: '🎬', webm: '🎬', ogg: '🎬', mov: '🎬', m4v: '🎬'
   };
   return icons[(ext || '').toLowerCase()] || '📎';
 }

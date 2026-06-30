@@ -5,7 +5,7 @@
  */
 
 import { supabase } from './supabase.js';
-import { esc, timeAgo, getFavorites, isFavorite, toggleFavorite, syncLocalFavorites, isPreviewable, getPreviewUrl, getFileIcon, toast, delegate, SUBJECTS } from './utils.js';
+import { esc, timeAgo, getFavorites, isFavorite, toggleFavorite, syncLocalFavorites, isPreviewable, isEmbeddedPreview, isPdfPreview, isVideoPreview, getVideoMime, getPreviewUrl, getFileIcon, toast, delegate, SUBJECTS } from './utils.js';
 
 // ── Shared helpers ──
 
@@ -37,6 +37,31 @@ function skeletonGrid(count) {
     html += '<div class="paper-card"><div class="skeleton"></div><div class="skeleton skeleton-short"></div></div>';
   }
   return html;
+}
+
+function renderEmbeddedPreview(fileUrl, fileType, title) {
+  if (!fileUrl || !isEmbeddedPreview(fileType)) return '';
+  const safeUrl = esc(fileUrl);
+  const safeTitle = esc(title || '资料预览');
+  let media = '';
+
+  if (isPdfPreview(fileType)) {
+    media = '<iframe class="embedded-pdf" src="' + safeUrl + '#toolbar=1" title="' + safeTitle + ' PDF 预览" loading="lazy"></iframe>';
+  } else if (isVideoPreview(fileType)) {
+    media = '<video class="embedded-video" controls preload="metadata">' +
+      '<source src="' + safeUrl + '" type="' + getVideoMime(fileType) + '">' +
+      '当前浏览器不支持内嵌视频播放。' +
+      '</video>';
+  }
+
+  return '<div class="preview-panel">' +
+    '<div class="preview-panel-head">' +
+    '<span>' + (isPdfPreview(fileType) ? 'PDF 在线预览' : '视频在线预览') + '</span>' +
+    '<a class="preview-open" href="' + safeUrl + '" target="_blank" rel="noopener noreferrer">新窗口打开</a>' +
+    '</div>' +
+    '<div class="preview-surface">' + media + '</div>' +
+    '<p class="preview-fallback">如果预览无法加载，请使用“新窗口打开”或下载文件。</p>' +
+    '</div>';
 }
 
 function renderPagination(current, total, perPage) {
@@ -399,7 +424,9 @@ export async function renderDetail(id) {
       html += '<button class="btn btn-danger btn-small" data-action="deletePaper" data-id="' + paper.id + '">删除</button>';
     }
 
-    html += '</div></div>' +
+    html += '</div>' +
+      renderEmbeddedPreview(fileUrl, fileType, paper.title || '') +
+      '</div>' +
       '<div class="section-title">评价 (' + reviews.length + ')</div>' +
       '<div id="reviewList">';
 
@@ -568,10 +595,10 @@ export function renderUpload() {
     '<div class="form-group"><label>文件 <span style="color:var(--red)">*</span>（最大100MB）</label>' +
     '<div class="upload-zone" id="dropZone">' +
     '<div>📁 拖拽文件到此处，或<strong>点击选择</strong></div>' +
-    '<div style="font-size:0.75rem;color:var(--text-muted);margin-top:4px">支持 PDF、图片、Office、压缩包等格式</div>' +
+    '<div style="font-size:0.75rem;color:var(--text-muted);margin-top:4px">支持 PDF、图片、视频、Office、压缩包等格式</div>' +
     '<div style="font-size:0.75rem;color:var(--text-muted);margin-top:4px" id="fileInfo"></div>' +
     '</div>' +
-    '<input type="file" id="upFile" accept=".pdf,.jpg,.jpeg,.png,.gif,.bmp,.webp,.zip,.rar,.7z,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt,.md,.csv" style="display:none">' +
+    '<input type="file" id="upFile" accept=".pdf,.jpg,.jpeg,.png,.gif,.bmp,.webp,.mp4,.webm,.ogg,.mov,.m4v,.zip,.rar,.7z,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt,.md,.csv" style="display:none">' +
     '</div>' +
     '<div class="modal-actions">' +
     '<button class="btn btn-ghost" onclick="location.hash=\'#/\'">取消</button>' +
@@ -583,7 +610,7 @@ export function renderUpload() {
   // Wire drop zone
   const dz = document.getElementById('dropZone');
   const fileInput = document.getElementById('upFile');
-  const ALLOWED_EXT = ['pdf','jpg','jpeg','png','gif','bmp','webp','zip','rar','7z','doc','docx','ppt','pptx','xls','xlsx','txt','md','csv'];
+  const ALLOWED_EXT = ['pdf','jpg','jpeg','png','gif','bmp','webp','mp4','webm','ogg','mov','m4v','zip','rar','7z','doc','docx','ppt','pptx','xls','xlsx','txt','md','csv'];
   if (dz) {
     dz.addEventListener('click', function () { fileInput.click(); });
     dz.addEventListener('dragover', function (e) { e.preventDefault(); dz.classList.add('drag'); });

@@ -549,6 +549,61 @@ a {
   margin-top: 12px;
 }
 
+/* ── Embedded Preview ── */
+.preview-panel {
+  margin-top: 18px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: #f8fafc;
+  overflow: hidden;
+}
+
+.preview-panel-head {
+  min-height: 42px;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 0.86rem;
+  font-weight: 600;
+}
+
+.preview-open {
+  font-size: 0.78rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.preview-surface {
+  background: #0f172a;
+}
+
+.embedded-pdf {
+  display: block;
+  width: 100%;
+  height: min(760px, 70vh);
+  border: 0;
+  background: #fff;
+}
+
+.embedded-video {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  max-height: 70vh;
+  background: #000;
+}
+
+.preview-fallback {
+  padding: 9px 14px;
+  border-top: 1px solid var(--border);
+  color: var(--text-muted);
+  font-size: 0.76rem;
+  background: var(--card);
+}
+
 .back-link {
   display: inline-flex;
   align-items: center;
@@ -764,6 +819,15 @@ a {
 
   .detail-card {
     padding: 16px;
+  }
+
+  .embedded-pdf {
+    height: 62vh;
+  }
+
+  .preview-panel-head {
+    align-items: flex-start;
+    flex-direction: column;
   }
 
   .form-row {
