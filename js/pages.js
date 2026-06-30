@@ -5,7 +5,7 @@
  */
 
 import { supabase } from './supabase.js';
-import { esc, timeAgo, getFavorites, isFavorite, toggleFavorite, syncLocalFavorites, isPreviewable, isEmbeddedPreview, isPdfPreview, isVideoPreview, getVideoMime, getPreviewUrl, getFileIcon, toast, delegate, SUBJECTS } from './utils.js';
+import { esc, timeAgo, getFavorites, isFavorite, toggleFavorite, syncLocalFavorites, isPreviewable, isEmbeddedPreview, isPdfPreview, isVideoPreview, getVideoMime, getPreviewUrl, getFileIcon, getFileExt, getFileValidationError, toast, delegate, SUBJECTS } from './utils.js';
 
 // ── Shared helpers ──
 
@@ -139,6 +139,10 @@ function ensureMainDelegate() {
       case 'doUpload':
         e.stopPropagation();
         doUpload();
+        break;
+      case 'doEditPaper':
+        e.stopPropagation();
+        doEditPaper(id);
         break;
       case 'doAuth':
         e.stopPropagation();
@@ -421,6 +425,7 @@ export async function renderDetail(id) {
     }
 
     if (isOwner) {
+      html += '<button class="btn btn-outline btn-small" onclick="location.hash=\'#/edit/' + paper.id + '\'">编辑</button>';
       html += '<button class="btn btn-danger btn-small" data-action="deletePaper" data-id="' + paper.id + '">删除</button>';
     }
 
@@ -610,7 +615,6 @@ export function renderUpload() {
   // Wire drop zone
   const dz = document.getElementById('dropZone');
   const fileInput = document.getElementById('upFile');
-  const ALLOWED_EXT = ['pdf','jpg','jpeg','png','gif','bmp','webp','mp4','webm','ogg','mov','m4v','zip','rar','7z','doc','docx','ppt','pptx','xls','xlsx','txt','md','csv'];
   if (dz) {
     dz.addEventListener('click', function () { fileInput.click(); });
     dz.addEventListener('dragover', function (e) { e.preventDefault(); dz.classList.add('drag'); });
@@ -620,9 +624,9 @@ export function renderUpload() {
       dz.classList.remove('drag');
       const f = e.dataTransfer.files[0];
       if (f) {
-        const ext = f.name.split('.').pop().toLowerCase();
-        if (ALLOWED_EXT.indexOf(ext) === -1) {
-          toast('不支持的文件格式: .' + ext);
+        const error = getFileValidationError(f);
+        if (error) {
+          toast(error);
           return;
         }
         fileInput.files = e.dataTransfer.files;
@@ -652,16 +656,15 @@ export async function doUpload() {
 
   if (!title) { toast('请输入标题'); return; }
   if (title.length < 2) { toast('标题至少2个字符'); return; }
-  if (!file) { toast('请选择文件'); return; }
-  if (file.size > 104857600) { toast('文件不能超过100MB'); return; }
-  if (file.size === 0) { toast('文件为空'); return; }
+  const fileError = getFileValidationError(file);
+  if (fileError) { toast(fileError); return; }
 
   const btn = document.getElementById('uploadBtn');
   btn.textContent = '0%';
   btn.disabled = true;
 
   try {
-    const ext = file.name.split('.').pop().toLowerCase();
+    const ext = getFileExt(file.name);
     const filePath = user.id + '/' + Date.now() + '.' + ext;
 
     await supabase.uploadFile('papers', filePath, file, function (pct) {
@@ -698,6 +701,167 @@ export async function doUpload() {
   }
   btn.textContent = '上传';
   btn.disabled = false;
+}
+
+// ── Edit Paper Page ──
+
+export async function renderEditPaper(paperId) {
+  ensureMainDelegate();
+  const user = supabase.getUser();
+  if (!user) { location.hash = '#/login'; return; }
+  if (!paperId) { location.hash = '#/mine'; return; }
+
+  document.getElementById('main').innerHTML =
+    '<a href="#/detail/' + paperId + '" class="back-link">← 返回详情</a>' +
+    '<div class="detail-card"><div class="skeleton"></div><div class="skeleton skeleton-short"></div></div>';
+
+  try {
+    const paper = await supabase.get('papers', paperId);
+    if (!paper) { toast('资料不存在'); location.hash = '#/mine'; return; }
+    if (paper.user_id !== user.id) { toast('只能编辑自己上传的资料'); location.hash = '#/detail/' + paperId; return; }
+
+    let html = '<a href="#/detail/' + paperId + '" class="back-link">← 返回详情</a>' +
+      '<div class="detail-card"><h1 class="detail-title">编辑资料</h1>' +
+      '<div class="form-group"><label>标题 <span style="color:var(--red)">*</span></label><input type="text" id="editTitle" value="' + esc(paper.title || '') + '" maxlength="100"></div>' +
+      '<div class="form-row">' +
+      '<div class="form-group"><label>学科</label>' +
+      '<select id="editSubject"><option value="">选择学科</option>';
+    SUBJECTS.forEach(function (s) {
+      html += '<option value="' + esc(s) + '"' + (paper.subject === s ? ' selected' : '') + '>' + esc(s) + '</option>';
+    });
+    html += '</select></div>' +
+      '<div class="form-group"><label>年份</label><select id="editYear">';
+    for (let y = new Date().getFullYear(); y >= 2000; y--) {
+      html += '<option value="' + y + '"' + (parseInt(paper.year) === y ? ' selected' : '') + '>' + y + '</option>';
+    }
+    html += '</select></div></div>' +
+      '<div class="form-group"><label>昵称（可选）</label><input type="text" id="editNick" value="' + esc(paper.user_email || '') + '" maxlength="30"></div>' +
+      '<div class="form-group"><label>标签（逗号分隔）</label><input type="text" id="editTags" value="' + esc(paper.tags || '') + '" maxlength="200"></div>' +
+      '<div class="form-group"><label>描述（可选）</label><textarea id="editDesc" rows="3" maxlength="500">' + esc(paper.description || '') + '</textarea></div>' +
+      '<div class="form-group"><label>替换文件（可选，最大100MB）</label>' +
+      '<div class="upload-zone" id="editDropZone">' +
+      '<div>当前文件：' + esc((paper.file_type || '').toUpperCase()) + ' ' + (paper.file_size ? (paper.file_size / 1048576).toFixed(2) + 'MB' : '') + '</div>' +
+      '<div style="font-size:0.75rem;color:var(--text-muted);margin-top:4px">拖拽新文件到此处，或 <strong>点击选择</strong></div>' +
+      '<div style="font-size:0.75rem;color:var(--text-muted);margin-top:4px" id="editFileInfo"></div>' +
+      '</div>' +
+      '<input type="file" id="editFile" accept=".pdf,.jpg,.jpeg,.png,.gif,.bmp,.webp,.mp4,.webm,.ogg,.mov,.m4v,.zip,.rar,.7z,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt,.md,.csv" style="display:none">' +
+      '</div>' +
+      '<div class="modal-actions">' +
+      '<button class="btn btn-ghost" onclick="location.hash=\'#/detail/' + paperId + '\'">取消</button>' +
+      '<button class="btn btn-primary" data-action="doEditPaper" data-id="' + paperId + '" id="editBtn">保存修改</button>' +
+      '</div></div>';
+
+    document.getElementById('main').innerHTML = html;
+    bindOptionalFilePicker('editDropZone', 'editFile', 'editFileInfo');
+  } catch (e) {
+    toast('加载失败: ' + e.message);
+    location.hash = '#/mine';
+  }
+}
+
+function bindOptionalFilePicker(zoneId, inputId, infoId) {
+  const dz = document.getElementById(zoneId);
+  const fileInput = document.getElementById(inputId);
+  const info = document.getElementById(infoId);
+  if (!dz || !fileInput) return;
+
+  function showFile(f) {
+    if (info && f) info.textContent = '已选择: ' + f.name + ' (' + (f.size / 1048576).toFixed(1) + 'MB)';
+  }
+
+  dz.addEventListener('click', function () { fileInput.click(); });
+  dz.addEventListener('dragover', function (e) { e.preventDefault(); dz.classList.add('drag'); });
+  dz.addEventListener('dragleave', function () { dz.classList.remove('drag'); });
+  dz.addEventListener('drop', function (e) {
+    e.preventDefault();
+    dz.classList.remove('drag');
+    const f = e.dataTransfer.files[0];
+    if (!f) return;
+    const error = getFileValidationError(f);
+    if (error) { toast(error); return; }
+    fileInput.files = e.dataTransfer.files;
+    showFile(f);
+  });
+  fileInput.addEventListener('change', function () {
+    const f = this.files[0];
+    if (!f) return;
+    const error = getFileValidationError(f);
+    if (error) { toast(error); this.value = ''; return; }
+    showFile(f);
+  });
+}
+
+export async function doEditPaper(paperId) {
+  const user = supabase.getUser();
+  if (!user) { toast('请先登录'); return; }
+
+  const title = document.getElementById('editTitle')?.value.trim() || '';
+  const subject = document.getElementById('editSubject')?.value || '';
+  const year = document.getElementById('editYear')?.value || '';
+  const nick = document.getElementById('editNick')?.value.trim() || '';
+  const tags = document.getElementById('editTags')?.value.trim() || '';
+  const desc = document.getElementById('editDesc')?.value.trim() || '';
+  const file = document.getElementById('editFile')?.files[0] || null;
+
+  if (!title) { toast('请输入标题'); return; }
+  if (title.length < 2) { toast('标题至少2个字符'); return; }
+  if (file) {
+    const fileError = getFileValidationError(file);
+    if (fileError) { toast(fileError); return; }
+  }
+
+  const btn = document.getElementById('editBtn');
+  if (btn) { btn.disabled = true; btn.textContent = file ? '上传新文件...' : '保存中...'; }
+
+  let newStoragePath = '';
+  let newFileUploaded = false;
+
+  try {
+    const paper = await supabase.get('papers', paperId);
+    if (!paper) throw new Error('资料不存在');
+    if (paper.user_id !== user.id) throw new Error('只能编辑自己上传的资料');
+
+    const updateData = {
+      title: title,
+      subject: subject,
+      year: parseInt(year),
+      tags: tags,
+      description: desc,
+      user_email: nick || user.email
+    };
+
+    if (file) {
+      const ext = getFileExt(file.name);
+      newStoragePath = user.id + '/' + Date.now() + '.' + ext;
+      await supabase.uploadFile('papers', newStoragePath, file, function (pct) {
+        if (btn) btn.textContent = pct + '%';
+      });
+      newFileUploaded = true;
+      updateData.file_path = supabase.getFileUrl('papers', newStoragePath);
+      updateData.file_type = ext;
+      updateData.file_size = file.size;
+    }
+
+    if (btn) btn.textContent = '保存中...';
+    await supabase.update('papers', paperId, updateData);
+
+    if (file && paper.file_path) {
+      try {
+        const oldPath = paper.file_path.split('/public/papers/')[1];
+        if (oldPath) await supabase.deleteFile('papers', oldPath);
+      } catch (e) { /* keep record update even if old file cleanup fails */ }
+    }
+
+    toast('资料已更新');
+    location.hash = '#/detail/' + paperId;
+  } catch (e) {
+    if (newFileUploaded && newStoragePath) {
+      supabase.deleteFile('papers', newStoragePath).catch(function () { });
+    }
+    toast('保存失败: ' + e.message);
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = '保存修改'; }
+  }
 }
 
 // ── Mine Page ──

@@ -52,6 +52,9 @@ function handleRoute() {
     case 'upload':
       pages.renderUpload();
       break;
+    case 'edit':
+      pages.renderEditPaper(param);
+      break;
     case 'mine':
       pages.renderMine();
       break;

@@ -143,6 +143,32 @@ const PREVIEWABLE = [
 
 const OFFICE_TYPES = ['ppt', 'pptx', 'doc', 'docx', 'xls', 'xlsx'];
 const VIDEO_TYPES = ['mp4', 'webm', 'ogg', 'mov', 'm4v'];
+export const ALLOWED_UPLOAD_EXT = [
+  'pdf', 'jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp',
+  'mp4', 'webm', 'ogg', 'mov', 'm4v',
+  'zip', 'rar', '7z',
+  'doc', 'docx', 'ppt', 'pptx', 'xls', 'xlsx',
+  'txt', 'md', 'csv'
+];
+export const MAX_UPLOAD_SIZE = 104857600;
+
+export function getFileExt(fileName) {
+  const parts = String(fileName || '').split('.');
+  return parts.length > 1 ? parts.pop().toLowerCase() : '';
+}
+
+export function isAllowedUploadExt(ext) {
+  return ALLOWED_UPLOAD_EXT.indexOf((ext || '').toLowerCase()) > -1;
+}
+
+export function getFileValidationError(file) {
+  if (!file) return '请选择文件';
+  if (file.size === 0) return '文件为空';
+  if (file.size > MAX_UPLOAD_SIZE) return '文件不能超过100MB';
+  const ext = getFileExt(file.name);
+  if (!isAllowedUploadExt(ext)) return '不支持的文件格式: .' + ext;
+  return '';
+}
 
 export function isPdfPreview(ext) {
   return (ext || '').toLowerCase() === 'pdf';
