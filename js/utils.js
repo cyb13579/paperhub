@@ -38,6 +38,21 @@ export function toast(message) {
   el._timer = setTimeout(function () { el.classList.remove('show'); }, 2500);
 }
 
+/** Prefer account display name, fall back to email or anonymous text. */
+export function displayNameFor(profile, fallback) {
+  const name = (profile && profile.display_name ? String(profile.display_name).trim() : '');
+  if (name) return name;
+  const email = (profile && profile.email ? String(profile.email).trim() : '');
+  if (email) return email;
+  return fallback || '匿名';
+}
+
+export function displayNameWithEmail(profile, fallback) {
+  const name = displayNameFor(profile, fallback);
+  const email = (profile && profile.email ? String(profile.email).trim() : '');
+  return email && name !== email ? name + ' · ' + email : name;
+}
+
 /** Favorite helpers (Supabase account storage with local fallback) */
 export function getLocalFavorites() {
   try { return JSON.parse(localStorage.getItem('favs') || '[]'); }

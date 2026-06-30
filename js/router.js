@@ -61,6 +61,9 @@ function handleRoute() {
     case 'favs':
       pages.renderFavs();
       break;
+    case 'profile':
+      pages.renderProfile();
+      break;
     case 'login':
       pages.renderLogin();
       break;

@@ -5,11 +5,42 @@
  */
 
 import { supabase } from './supabase.js';
-import { esc, timeAgo, getFavorites, isFavorite, toggleFavorite, syncLocalFavorites, isPreviewable, isEmbeddedPreview, isPdfPreview, isVideoPreview, getVideoMime, getPreviewUrl, getFileIcon, getFileExt, getFileValidationError, toast, delegate, SUBJECTS } from './utils.js';
+import { esc, timeAgo, getFavorites, isFavorite, toggleFavorite, syncLocalFavorites, isPreviewable, isEmbeddedPreview, isPdfPreview, isVideoPreview, getVideoMime, getPreviewUrl, getFileIcon, getFileExt, getFileValidationError, displayNameFor, displayNameWithEmail, toast, delegate, SUBJECTS } from './utils.js';
 
 // ── Shared helpers ──
 
 let starRating = 0;
+let profileCache = null;
+
+async function loadMyProfile() {
+  const user = supabase.getUser();
+  if (!user) return null;
+  if (profileCache && profileCache.id === user.id) return profileCache;
+  try {
+    const rows = await supabase.query('profiles', { where: { id: user.id }, limit: 1 });
+    if (rows && rows.length) {
+      profileCache = { id: rows[0].id, email: rows[0].email || user.email, display_name: rows[0].display_name || '' };
+      return profileCache;
+    }
+  } catch (e) { /* profiles may not be migrated yet */ }
+  profileCache = { id: user.id, email: user.email || '', display_name: '' };
+  return profileCache;
+}
+
+async function saveMyProfile(displayName) {
+  const user = supabase.getUser();
+  if (!user) throw new Error('请先登录');
+  const data = { email: user.email || '', display_name: displayName || '' };
+  try {
+    const existing = await supabase.query('profiles', { where: { id: user.id }, limit: 1 });
+    if (existing && existing.length) await supabase.update('profiles', user.id, data);
+    else await supabase.create('profiles', { id: user.id, ...data });
+    profileCache = { id: user.id, ...data };
+    return profileCache;
+  } catch (e) {
+    throw new Error('保存昵称失败，请确认已运行最新 supabase-setup.sql');
+  }
+}
 
 function renderCards(papers) {
   return papers.map(function (p) {
@@ -147,6 +178,10 @@ function ensureMainDelegate() {
       case 'doAuth':
         e.stopPropagation();
         doAuth();
+        break;
+      case 'saveProfile':
+        e.stopPropagation();
+        saveProfileAction();
         break;
       case 'switchAuth':
         e.stopPropagation();
@@ -520,6 +555,7 @@ export async function submitReview(paperId) {
   if (btn) { btn.disabled = true; btn.textContent = '提交中...'; }
 
   try {
+    const profile = await loadMyProfile();
     // Prevent duplicate
     const existing = await supabase.query('reviews', {
       where: { paper_id: paperId, user_id: user.id }
@@ -529,7 +565,7 @@ export async function submitReview(paperId) {
     await supabase.create('reviews', {
       paper_id: paperId,
       user_id: user.id,
-      user_email: user.email,
+      user_email: displayNameFor(profile, user.email),
       rating: starRating,
       comment: comment
     });
@@ -554,7 +590,8 @@ export async function deletePaper(paperId) {
     // Notify friends before deletion
     if (user) {
       try {
-        await notifyFriends(paperId, user.email + ' 删除了资料：' + title);
+        const profile = await loadMyProfile();
+        await notifyFriends(paperId, displayNameFor(profile, user.email) + ' 删除了资料：' + title);
       } catch (e) {
         console.warn('通知好友失败:', e.message);
       }
@@ -594,7 +631,6 @@ export function renderUpload() {
     html += '<option value="' + y + '">' + y + '</option>';
   }
   html += '</select></div></div>' +
-    '<div class="form-group"><label>昵称（可选）</label><input type="text" id="upNick" placeholder="不填显示邮箱" maxlength="30"></div>' +
     '<div class="form-group"><label>标签（逗号分隔）</label><input type="text" id="upTags" placeholder="高考,真题,全国卷" maxlength="200"></div>' +
     '<div class="form-group"><label>描述（可选）</label><textarea id="upDesc" placeholder="简要描述这份资料" rows="2" maxlength="500"></textarea></div>' +
     '<div class="form-group"><label>文件 <span style="color:var(--red)">*</span>（最大100MB）</label>' +
@@ -646,7 +682,6 @@ export async function doUpload() {
   const user = supabase.getUser();
   if (!user) { toast('请先登录'); return; }
 
-  const nick = document.getElementById('upNick')?.value?.trim() || '';
   const title = document.getElementById('upTitle').value.trim();
   const subject = document.getElementById('upSubject').value;
   const year = document.getElementById('upYear').value;
@@ -664,6 +699,7 @@ export async function doUpload() {
   btn.disabled = true;
 
   try {
+    const profile = await loadMyProfile();
     const ext = getFileExt(file.name);
     const filePath = user.id + '/' + Date.now() + '.' + ext;
 
@@ -682,7 +718,7 @@ export async function doUpload() {
       file_type: ext,
       file_size: file.size,
       user_id: user.id,
-      user_email: nick || user.email,
+      user_email: displayNameFor(profile, user.email),
       downloads: 0,
       avg_rating: 0,
       rating_count: 0
@@ -691,7 +727,7 @@ export async function doUpload() {
     toast('上传成功 🎉');
     // Await notification to ensure requests complete before navigation
     try {
-      await notifyFriends(result[0].id, user.email + ' 上传了资料：' + title);
+      await notifyFriends(result[0].id, displayNameFor(profile, user.email) + ' 上传了资料：' + title);
     } catch (e) {
       console.warn('通知好友失败:', e.message);
     }
@@ -735,7 +771,6 @@ export async function renderEditPaper(paperId) {
       html += '<option value="' + y + '"' + (parseInt(paper.year) === y ? ' selected' : '') + '>' + y + '</option>';
     }
     html += '</select></div></div>' +
-      '<div class="form-group"><label>昵称（可选）</label><input type="text" id="editNick" value="' + esc(paper.user_email || '') + '" maxlength="30"></div>' +
       '<div class="form-group"><label>标签（逗号分隔）</label><input type="text" id="editTags" value="' + esc(paper.tags || '') + '" maxlength="200"></div>' +
       '<div class="form-group"><label>描述（可选）</label><textarea id="editDesc" rows="3" maxlength="500">' + esc(paper.description || '') + '</textarea></div>' +
       '<div class="form-group"><label>替换文件（可选，最大100MB）</label>' +
@@ -798,7 +833,6 @@ export async function doEditPaper(paperId) {
   const title = document.getElementById('editTitle')?.value.trim() || '';
   const subject = document.getElementById('editSubject')?.value || '';
   const year = document.getElementById('editYear')?.value || '';
-  const nick = document.getElementById('editNick')?.value.trim() || '';
   const tags = document.getElementById('editTags')?.value.trim() || '';
   const desc = document.getElementById('editDesc')?.value.trim() || '';
   const file = document.getElementById('editFile')?.files[0] || null;
@@ -817,6 +851,7 @@ export async function doEditPaper(paperId) {
   let newFileUploaded = false;
 
   try {
+    const profile = await loadMyProfile();
     const paper = await supabase.get('papers', paperId);
     if (!paper) throw new Error('资料不存在');
     if (paper.user_id !== user.id) throw new Error('只能编辑自己上传的资料');
@@ -827,7 +862,7 @@ export async function doEditPaper(paperId) {
       year: parseInt(year),
       tags: tags,
       description: desc,
-      user_email: nick || user.email
+      user_email: displayNameFor(profile, user.email)
     };
 
     if (file) {
@@ -986,9 +1021,47 @@ export async function doAuth() {
 
 export async function doLogout() {
   await supabase.signOut();
+  profileCache = null;
   updateNav();
   toast('已退出');
   location.hash = '#/';
+}
+
+// ── Profile Page ──
+
+export async function renderProfile() {
+  ensureMainDelegate();
+  const user = supabase.getUser();
+  if (!user) { location.hash = '#/login'; return; }
+  document.getElementById('hero').style.display = 'none';
+  document.getElementById('main').innerHTML =
+    '<a href="#/" class="back-link">← 返回</a>' +
+    '<div class="detail-card"><h1 class="detail-title">个人资料</h1>' +
+    '<div class="form-group"><label>登录邮箱</label><input type="email" value="' + esc(user.email || '') + '" disabled></div>' +
+    '<div class="form-group"><label>昵称</label><input type="text" id="profileName" placeholder="用于资料、评论和好友列表显示" maxlength="30"></div>' +
+    '<div class="modal-actions">' +
+    '<button class="btn btn-primary" data-action="saveProfile" id="profileBtnSave">保存</button>' +
+    '</div></div>';
+  const profile = await loadMyProfile();
+  const input = document.getElementById('profileName');
+  if (input && profile) input.value = profile.display_name || '';
+}
+
+export async function saveProfileAction() {
+  const input = document.getElementById('profileName');
+  const btn = document.getElementById('profileBtnSave');
+  const name = input ? input.value.trim() : '';
+  if (name.length > 30) { toast('昵称不能超过30个字符'); return; }
+  if (btn) { btn.disabled = true; btn.textContent = '保存中...'; }
+  try {
+    await saveMyProfile(name);
+    updateNav();
+    toast('昵称已保存');
+  } catch (e) {
+    toast(e.message);
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = '保存'; }
+  }
 }
 
 // ── Friends & Notifications ──
@@ -1015,8 +1088,9 @@ export async function renderFriends() {
       return f.status === 'pending' && f.friend_id === user.id;
     });
 
-    // Build UUID→email map
+    // Build UUID→display label map
     const emailMap = {};
+    const labelMap = {};
     friends.forEach(function (f) {
       if (f.user_email) emailMap[f.user_id] = f.user_email;
       if (f.friend_email) emailMap[f.friend_id] = f.friend_email;
@@ -1036,7 +1110,10 @@ export async function renderFriends() {
           where: { id: { op: 'in', value: '(' + missingIds.join(',') + ')' } }
         });
         if (profiles && profiles.length) {
-          profiles.forEach(function (p) { if (p.email) emailMap[p.id] = p.email; });
+          profiles.forEach(function (p) {
+            if (p.email) emailMap[p.id] = p.email;
+            labelMap[p.id] = displayNameWithEmail(p, p.email || p.id);
+          });
         }
       } catch (e) { /* profiles table may not exist yet */ }
 
@@ -1054,7 +1131,7 @@ export async function renderFriends() {
     if (pending.length) {
       html += '<div class="section-title">📩 待处理请求 (' + pending.length + ')</div>';
       pending.forEach(function (f) {
-        const senderEmail = emailMap[f.user_id] || f.user_id;
+        const senderEmail = labelMap[f.user_id] || emailMap[f.user_id] || f.user_id;
         html += '<div class="review-card"><span style="font-weight:500">' + esc(senderEmail) + '</span> 想加你为好友 ' +
           '<button class="btn btn-primary btn-small" data-action="acceptFriend" data-id="' + f.id + '" style="margin-left:8px">接受</button></div>';
       });
@@ -1064,7 +1141,7 @@ export async function renderFriends() {
       html += '<div class="paper-grid">';
       accepted.forEach(function (f) {
         const fid = f.user_id === user.id ? f.friend_id : f.user_id;
-        const friendEmail = emailMap[fid] || fid;
+        const friendEmail = labelMap[fid] || emailMap[fid] || fid;
         html += '<div class="paper-card" style="cursor:default"><div class="paper-title">' + esc(friendEmail) + '</div></div>';
       });
       html += '</div>';
@@ -1086,6 +1163,7 @@ export async function addFriend() {
   if (friendEmail === user.email) { toast('不能添加自己'); return; }
 
   try {
+    const profile = await loadMyProfile();
     // Find friend UUID from profiles or papers
     let friendId = null;
 
@@ -1118,7 +1196,7 @@ export async function addFriend() {
     await supabase.create('friendships', {
       user_id: user.id,
       friend_id: friendId,
-      user_email: user.email,
+      user_email: displayNameFor(profile, user.email),
       friend_email: friendEmail,
       status: 'pending'
     });
@@ -1269,7 +1347,7 @@ export function stopNotifPolling() {
 
 export function updateNav() {
   const user = supabase.getUser();
-  const ids = ['loginBtn', 'logoutBtn', 'upBtn', 'favBtn', 'mineBtn', 'friendsBtn', 'notifBell'];
+  const ids = ['loginBtn', 'logoutBtn', 'upBtn', 'favBtn', 'mineBtn', 'friendsBtn', 'profileBtn', 'notifBell'];
   ids.forEach(function (id) {
     const el = document.getElementById(id);
     if (!el) return;
@@ -1278,9 +1356,18 @@ export function updateNav() {
   });
   const userInfo = document.getElementById('userInfo');
   if (userInfo) userInfo.textContent = user ? (user.email || '') : '';
+  if (user) {
+    loadMyProfile().then(function (profile) {
+      const name = displayNameFor(profile, user.email || '');
+      const ui = document.getElementById('userInfo');
+      if (ui) ui.textContent = name;
+      const suNow = document.getElementById('sideUser');
+      if (suNow) suNow.textContent = displayNameWithEmail(profile, user.email || '');
+    }).catch(function () { });
+  }
 
   // Sidebar
-  const sideItems = ['sideUpload', 'sideFavs', 'sideMine', 'sideFriends', 'sideNotifs'];
+  const sideItems = ['sideUpload', 'sideFavs', 'sideMine', 'sideFriends', 'sideProfile', 'sideNotifs'];
   sideItems.forEach(function (id) {
     const el = document.getElementById(id);
     if (el) el.style.display = user ? '' : 'none';

@@ -8,8 +8,11 @@
 CREATE TABLE IF NOT EXISTS profiles (
   id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
   email TEXT,
+  display_name TEXT DEFAULT '',
   created_at TIMESTAMPTZ DEFAULT now()
 );
+
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS display_name TEXT DEFAULT '';
 
 -- Auto-create profile on new user signup
 DROP FUNCTION IF EXISTS handle_new_user() CASCADE;
@@ -166,11 +169,16 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
 
 DROP POLICY IF EXISTS "Profiles: public read" ON profiles;
+DROP POLICY IF EXISTS "Profiles: owner insert" ON profiles;
 DROP POLICY IF EXISTS "Profiles: owner update" ON profiles;
 
 -- Anyone can read profiles (for friend email lookup)
 CREATE POLICY "Profiles: public read" ON profiles
   FOR SELECT USING (true);
+
+-- Users can create their own profile if a legacy account is missing one
+CREATE POLICY "Profiles: owner insert" ON profiles
+  FOR INSERT WITH CHECK (auth.uid() = id);
 
 -- Users can only update their own profile
 CREATE POLICY "Profiles: owner update" ON profiles
